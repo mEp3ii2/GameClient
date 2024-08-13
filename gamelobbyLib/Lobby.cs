@@ -12,26 +12,20 @@ namespace GameLobbyLib
     {
         private string name;
         private string host;
-        private List<string> users;
+        private List<User> users;
         private string title;
         private string description;
         private string mode;
         private List<string> tags;
         private readonly int userCount;
 
-        public Lobby(string name, string host, List<string> users, string title, string description, string mode, List<string> tags)
+        public Lobby(string name, User hostUser, string title, string description, string mode, List<string> tags)
         {
             Name = name;
-            Host = host;
-            Users = users;
-            Title = title;
-            Description = description;
-            Mode = mode;
-            Tags = tags;
-            Name = name;
-            Host = host;
-            Users = users;
-            Title = title;
+            Host = hostUser.ToString();
+            users = new List<User>();
+            users.Add(hostUser);
+            Title = title; //What is the difference between lobby name and lobby title?
             Description = description;
             Mode = mode;
             Tags = tags;
@@ -49,7 +43,7 @@ namespace GameLobbyLib
             set { host = value; }
         }
 
-        public List<string> Users 
+        public List<User> Users 
         { 
             get => users; 
             set => users = value; 
@@ -78,6 +72,24 @@ namespace GameLobbyLib
         public int UserCount
         {
             get => userCount;
+        }
+
+        public void addUser(User user)
+        {
+            users.Add(user);
+        }
+
+        public void removeUser(User user)
+        {
+            if (users.Contains(user))
+            {
+                users.Remove(user);
+            }
+            else
+            {
+                Console.WriteLine("User not found: " + user.ToString());
+            }
+
         }
 
         public string TagDis
