@@ -1,0 +1,19 @@
+﻿<Window x:Class="GameClient.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:GameClient"
+        mc:Ignorable="d"
+        Title="loginWindow" Height="250" Width="400">
+    <Grid>
+        <Grid.Background>
+            <ImageBrush ImageSource="/formBackGroundImage.jpg" Stretch="UniformToFill"/>
+        </Grid.Background>
+        <TextBox x:Name="userNameBox" HorizontalAlignment="Left" Margin="125,80,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" Foreground="White"/>
+        <Label Content="Enter User Name" HorizontalAlignment="Left" Margin="130,49,0,0" VerticalAlignment="Top" Width="110" Foreground="White"/>
+        <Button x:Name="loginBtn" Content="Login" HorizontalAlignment="Left" Margin="125,115,0,0" VerticalAlignment="Top" Width="120" Click="loginBtn_Click"/>
+        <TextBlock HorizontalAlignment="Left" Margin="135,21,0,0" TextWrapping="Wrap" Text="Mortal Combat X" VerticalAlignment="Top" Foreground="White"/>
+
+    </Grid>
+</Window>

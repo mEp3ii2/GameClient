@@ -1,0 +1,33 @@
+﻿<Window x:Class="GameClient.createLobbyWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:GameClient"
+        mc:Ignorable="d"
+        Title="createLobbyWindow" Height="400" Width="450">
+    <Window.Resources>
+        <local:AllFieldsFilledConverter x:Key="AllFieldsFilledConverter" />
+    </Window.Resources>
+    <Grid>
+        <Label Content="Mode:" HorizontalAlignment="Left" Height="27" Margin="220,14,0,0" VerticalAlignment="Top" Width="60" RenderTransformOrigin="0.217,1.039"/>
+        <Label Content="Name:" HorizontalAlignment="Left" Margin="11,9,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.542,0.656"/>
+        <Label x:Name="Description" Content="Description:" HorizontalAlignment="Left" Margin="11,77,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="Tags" Content="Tags:" HorizontalAlignment="Left" Margin="220,77,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="nameTxtBox" HorizontalAlignment="Left" Margin="11,41,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="194" Height="22"/>
+        <ComboBox x:Name="modeSelBox" HorizontalAlignment="Left" Margin="220,41,0,0" VerticalAlignment="Top" Width="194"/>
+        <TextBox x:Name="descTxtBox" HorizontalAlignment="Left" Margin="11,108,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="194" Height="148"/>
+        <Button x:Name="submitBtn" Content="Create Room" HorizontalAlignment="Left" Margin="11,270,0,0" VerticalAlignment="Top" Click="submitBtn_Click">
+            <Button.IsEnabled>
+                <MultiBinding Converter="{StaticResource AllFieldsFilledConverter}">
+                    <Binding ElementName="nameTxtBox" Path="Text" />
+                    <Binding ElementName="modeSelBox" Path="SelectedItem" />
+                </MultiBinding>
+            </Button.IsEnabled>
+        </Button>
+        <ListBox x:Name="optionsBox" Margin="220,108,0,0" SelectionMode="Multiple" Height="148" VerticalAlignment="Top" HorizontalAlignment="Left" Width="194"/>
+        <Button x:Name="backBtn" Content="Back" HorizontalAlignment="Left" Margin="11,304,0,0" VerticalAlignment="Top" Width="73" Click="backBtn_Click"/>
+        <Button x:Name="clearBtn" Content="Clear" HorizontalAlignment="Left" Margin="220,270,0,0" VerticalAlignment="Top" Width="76" Click="clearBtn_Click"/>
+
+    </Grid>
+</Window>
