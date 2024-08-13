@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace GameLobbyLib
 {
-    
 
+    [Serializable]
     public class Lobby
     {
         private string name;

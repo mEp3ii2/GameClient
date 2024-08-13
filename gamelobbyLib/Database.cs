@@ -53,6 +53,11 @@ namespace GameLobbyLib
             return lobbies;
         }
 
+        public List<User> getLobbyUsers(Lobby lobby)
+        {
+            return lobby.Users;
+        }
+
         //returns a list of all unique modes
         // using either the current set or the full list
         public List<string> GetUniqueModes(List<Lobby> curLobbyList)
