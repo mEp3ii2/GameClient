@@ -10,14 +10,32 @@ namespace GameServer
 {
     [ServiceContract]
     public interface ServerInterface
-    {   
+    {
         [OperationContract]
-        List<User> getUsers(Lobby lobby);
+        List<User> GetUsers(Lobby lobby);
 
         [OperationContract]
-        List<Lobby> getLobbys();
+        List<Lobby> GetAllLobbies();
 
         [OperationContract]
-        List<User> getAllUsers();
+        List<User> GetAllUsers();
+
+        [OperationContract]
+        void AddUser(User user);
+
+        [OperationContract]
+        List<string> GetUniqueModes(List<Lobby> currLobbyList);
+
+        [OperationContract]
+        List<string> GetUniqueTags(List<Lobby> curLobbyList);
+
+        [OperationContract]
+        List<Lobby> GetfilterdLobbiesList(string mode = null, string tag = null);
+
+        [OperationContract]
+        List<string> GetAllModeTypes();
+
+        [OperationContract]
+        List<string> GetAllTagTypes();
     }
 }

@@ -16,19 +16,49 @@ namespace GameServer
             database = new Database();
         }
 
-        public List<Lobby> getLobbys()
+        public List<Lobby> GetAllLobbies()
         {
             return database.getAllLobbies();
         }
 
-        public List<User> getUsers(Lobby lobby)
+        public List<User> GetUsers(Lobby lobby)
         {
             return database.getLobbyUsers(lobby);
         }
 
-        public List<User> getAllUsers()
+        public List<User> GetAllUsers()
         {
             return database.getAllUsers();
+        }
+
+        public void AddUser(User user)
+        {
+            database.addUser(user);
+        }
+
+        public List<string> GetUniqueModes(List<Lobby> curLobbyList)
+        {
+           return database.GetUniqueModes(curLobbyList);
+        }
+
+        public List<string> GetUniqueTags(List<Lobby> curLobbyList)
+        {
+            return database.GetUniqueTags(curLobbyList);
+        }
+
+        public List<Lobby> GetfilterdLobbiesList(string mode = null, string tag = null)
+        {
+            return database.getfilterdLobbiesList();
+        }
+
+        public List<string> GetAllModeTypes()
+        {
+            return Database.getAllModeTypes();
+        }
+
+        public List<string> GetAllTagTypes()
+        {
+            return Database.getAllTagTypes();
         }
     }
 }

@@ -119,5 +119,10 @@ namespace GameLobbyLib
             Lobby lobby = new Lobby(name, hostUser, name, desc, mode, tags);
             lobbies.Add(lobby);//need to make a call to the server to update lobby list for other clients
         }
+
+        public void addUser(User user)
+        {
+            users.Add(user);
+        }
     }
 }

@@ -15,6 +15,8 @@ using System.Windows.Shapes;
 
 using System.ServiceModel;
 using GameServer;
+using GameLobbyLib;
+using System.Configuration;
 
 namespace GameClient
 {
@@ -35,23 +37,34 @@ namespace GameClient
             foobFactory = new ChannelFactory<ServerInterface>(tcp, URL);
             foob = foobFactory.CreateChannel();
             //Also, tell me how many entries are in the DB.
-            userNumber.Text = "Number of Users: " + foob.getAllUsers().Count(); 
+            userNumber.Text = "Number of Users: " + foob.GetAllUsers().Count(); 
             
         }
 
         private void loginBtn_Click(object sender, RoutedEventArgs e)
         {
-            bool uniquename = false;
+            bool uniquename = true;
             string userName = userNameBox.Text;
 
             // check here is user name is unique
-            uniquename = true;//change later to check if name is valid and then set
+            List<User> users = foob.GetAllUsers();
+            foreach (User user in users) { }
+            {
+                foreach (User user in users)
+                {
+                    if (user.Name == userName)
+                    {
+                        uniquename = false;
+                    }
+                }
+            }
 
             if (uniquename)
             {
                 // open main window and close this one
                 // send across user name as well
-                lobbyFinderWindow curWindow = new lobbyFinderWindow(userName);
+                foob.AddUser(new User(userName));
+                lobbyFinderWindow curWindow = new lobbyFinderWindow(userName, foob);
                 curWindow.Show();
                 this.Close();
 
