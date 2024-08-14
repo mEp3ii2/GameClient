@@ -10,31 +10,20 @@ namespace GameLobbyLib
     {
         private string name;
         private string host;
-        private List<string> users;
+        private List<User> users;
         private string title;
         private string description;
         private string mode;
         private List<string> tags;
         private readonly int userCount;
 
-<<<<<<< HEAD
         public Lobby() { } //I dont fully understand why this works but DO NOT REMOVE. It fucks with something to do with serialization
 
         public Lobby(string name, User hostUser, string title, string description, string mode, List<string> tags)
-=======
-        public Lobby(string name, string host, List<string> users, string title, string description, string mode, List<string> tags)
->>>>>>> parent of 63c8e32 (Add user class, update constructors and other database components to accept user. Update lobbies to automatically add host to user list.)
         {
             Name = name;
-            Host = host;
-            Users = users;
-            Title = title;
-            Description = description;
-            Mode = mode;
-            Tags = tags;
-            Name = name;
-            Host = host;
-            Users = users;
+            Host = hostUser.Name;
+            users = new List<User>();
             Title = title;
             Description = description;
             Mode = mode;
@@ -53,7 +42,7 @@ namespace GameLobbyLib
             set { host = value; }
         }
 
-        public List<string> Users 
+        public List<User> Users 
         { 
             get => users; 
             set => users = value; 

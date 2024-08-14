@@ -6,18 +6,17 @@ using System.Threading.Tasks;
 
 namespace GameLobbyLib
 {
-    [Serializable]
     public class User
     {
-        public User(string name) { this.name = name; }
-
         private string name;
 
-        public string Name { get { return name; } set { name = value; } }
+        public User() { }
 
-        public override string ToString()
+        public User(string name)
         {
-            return name;
+            this.name = name;
         }
+
+        public string Name { get { return name; } set { name = value; } }
     }
 }
