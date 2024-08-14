@@ -8,8 +8,8 @@ namespace GameLobbyLib
 {
     public class Database
     {
-        List<Lobby> data;
-        List<string> users;
+        List<Lobby> lobbies;
+        List<User> users;
         List<string> tags;        
 
         private static readonly List<string> gameModes = new List<string> { 
@@ -20,33 +20,29 @@ namespace GameLobbyLib
             "All-Out Brawl", "Classic", "Intense", "Relaxed", "Focused", "Social", "Hardcore"};
         public Database()
         {
-<<<<<<< HEAD
             lobbies = new List<Lobby>();
             User user1 = new User("me");
             User user2 = new User("frank");
             users = new List<User>();
             users.Add(user1);
             users.Add(user2);
-=======
-            data = new List<Lobby>();
-            users = new List<string> { "me", "frank" };
->>>>>>> parent of 63c8e32 (Add user class, update constructors and other database components to accept user. Update lobbies to automatically add host to user list.)
+
             tags = new List<string> { "newbie", "friendly", "casual" };
             
 
-            Lobby testLobby = new Lobby("test", "me", users, "testLobb", "testing arena", "deathmatch", tags);
-            Lobby testLobby2 = new Lobby("test", "me", users, "testLobb", "testing arena", "King of the Hill", tags);
-            Lobby testLobby3 = new Lobby("test", "me", users, "testLobb", "testing arena", "deathmatch", tags);
-            Lobby testLobby4 = new Lobby("test", "me", users, "testLobb", "testing arena", "King of the Hill", new List<string> {"Solo"});
-            data.Add(testLobby);
-            data.Add(testLobby2);
-            data.Add(testLobby3);
-            data.Add(testLobby4);
+            Lobby testLobby = new Lobby("test", user1, "testLobb", "testing arena", "deathmatch", tags);
+            Lobby testLobby2 = new Lobby("test", user2, "testLobb", "testing arena", "King of the Hill", tags);
+            Lobby testLobby3 = new Lobby("test", user1, "testLobb", "testing arena", "deathmatch", tags);
+            Lobby testLobby4 = new Lobby("test", user2, "testLobb", "testing arena", "King of the Hill", new List<string> {"Solo"});
+            lobbies.Add(testLobby);
+            lobbies.Add(testLobby2);
+            lobbies.Add(testLobby3);
+            lobbies.Add(testLobby4);
         }
 
         public List<Lobby> getAllLobbies()
         {
-            return data;
+            return lobbies;
         }
 
         public List<User> getLobbyUsers(Lobby lobby)
@@ -67,7 +63,7 @@ namespace GameLobbyLib
             {
                 return curLobbyList.Select(lobby => lobby.Mode).Distinct().ToList();
             }
-            return data.Select(lobby => lobby.Mode).Distinct().ToList();
+            return lobbies.Select(lobby => lobby.Mode).Distinct().ToList();
         }
 
 
@@ -80,7 +76,7 @@ namespace GameLobbyLib
             {
                 return curLobbyList.SelectMany(lobby => lobby.Tags).Distinct().ToList();
             }
-            return data.SelectMany(lobby=> lobby.Tags).Distinct().ToList();
+            return lobbies.SelectMany(lobby=> lobby.Tags).Distinct().ToList();
         }
 
         public List<Lobby> getfilterdLobbiesList(string mode = null, string tag = null)
@@ -94,7 +90,7 @@ namespace GameLobbyLib
                 }
             }
             return tempList;*/
-            return data.Where(lobby =>(mode == null || lobby.Mode == mode)&&(tag == null || lobby.Tags.Contains(tag))).ToList();
+            return lobbies.Where(lobby =>(mode == null || lobby.Mode == mode)&&(tag == null || lobby.Tags.Contains(tag))).ToList();
         }
 
         public static List<string> getAllModeTypes()
@@ -107,10 +103,10 @@ namespace GameLobbyLib
             return allTags;
         }
 
-        public void addNewLobby(string name,string userName,string desc, string mode, List<string> tags)
+        public void addNewLobby(string name,User hostUser,string desc, string mode, List<string> tags)
         {
-            Lobby lobby = new Lobby(name, userName, new List<string> { userName}, name, desc, mode, tags);
-            data.Add(lobby);//need to make a call to the server to update lobby list for other clients
+            Lobby lobby = new Lobby(name, hostUser, name, desc, mode, tags);
+            lobbies.Add(lobby);//need to make a call to the server to update lobby list for other clients
         }
 
         public void addUser(User user)
