@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace GameLobbyLib
 {
+    [Serializable]
     public class User
     {
         public User(string name) { this.name = name; }

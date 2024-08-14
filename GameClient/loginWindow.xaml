@@ -14,6 +14,7 @@
         <Label Content="Enter User Name" HorizontalAlignment="Left" Margin="130,49,0,0" VerticalAlignment="Top" Width="110" Foreground="White"/>
         <Button x:Name="loginBtn" Content="Login" HorizontalAlignment="Left" Margin="125,115,0,0" VerticalAlignment="Top" Width="120" Click="loginBtn_Click"/>
         <TextBlock HorizontalAlignment="Left" Margin="135,21,0,0" TextWrapping="Wrap" Text="Mortal Combat X" VerticalAlignment="Top" Foreground="White"/>
+        <TextBlock x:Name="userNumber" HorizontalAlignment="Left" Margin="265,190,0,0" TextWrapping="Wrap" Text="Number of Users: " VerticalAlignment="Top" Background="White" Width="113"/>
 
     </Grid>
 </Window>

@@ -25,5 +25,10 @@ namespace GameServer
         {
             return database.getLobbyUsers(lobby);
         }
+
+        public List<User> getAllUsers()
+        {
+            return database.getAllUsers();
+        }
     }
 }

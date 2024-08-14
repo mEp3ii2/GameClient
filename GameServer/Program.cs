@@ -21,7 +21,7 @@ namespace GameServer
             //Bind server to the implementation of DataServer
             host = new ServiceHost(typeof(ServerImplementation));
             //Present the publicly accessible interface to the client. 0.0.0.0 tells .net to accept on any interface. :8100 means this will use port 8100. DataService is a name for the actual service, this can be any string.
-            host.AddServiceEndpoint(typeof(ServerInterface), tcp, "net.tcp://0.0.0.0:8100/DataService");
+            host.AddServiceEndpoint(typeof(ServerInterface), tcp, "net.tcp://0.0.0.0:8100/GameService");
             //And open the host for business!
             host.Open();
             Console.WriteLine("Server Online");

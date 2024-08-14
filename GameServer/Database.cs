@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GameLobbyLib;
 
-namespace GameLobbyLib
+namespace GameServer
 {
     public class Database
     {
@@ -56,14 +57,11 @@ namespace GameLobbyLib
             return lobbies;
         }
 
+        public List<User> getAllUsers() { return users; }
+
         public List<User> getLobbyUsers(Lobby lobby)
         {
             return lobby.Users;
-        }
-
-        public List<User> getAllUsers()
-        {
-            return users;
         }
 
         //returns a list of all unique modes

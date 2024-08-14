@@ -6,8 +6,6 @@ using System.Threading.Tasks;
 
 namespace GameLobbyLib
 {
-
-    [Serializable]
     public class Lobby
     {
         private string name;
@@ -18,6 +16,8 @@ namespace GameLobbyLib
         private string mode;
         private List<string> tags;
         private readonly int userCount;
+
+        public Lobby() { } //I dont fully understand why this works but DO NOT REMOVE. It fucks with something to do with serialization
 
         public Lobby(string name, User hostUser, string title, string description, string mode, List<string> tags)
         {

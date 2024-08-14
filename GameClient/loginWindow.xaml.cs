@@ -13,6 +13,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
+using System.ServiceModel;
+using GameServer;
+
 namespace GameClient
 {
     /// <summary>
@@ -20,9 +23,20 @@ namespace GameClient
     /// </summary>
     public partial class MainWindow : Window
     {
+        private ServerInterface foob;
         public MainWindow()
         {
             InitializeComponent();
+
+            ChannelFactory<ServerInterface> foobFactory;
+            NetTcpBinding tcp = new NetTcpBinding();
+            //Set the URL and create the connection!
+            string URL = "net.tcp://localhost:8100/GameService";
+            foobFactory = new ChannelFactory<ServerInterface>(tcp, URL);
+            foob = foobFactory.CreateChannel();
+            //Also, tell me how many entries are in the DB.
+            userNumber.Text = "Number of Users: " + foob.getAllUsers().Count(); 
+            
         }
 
         private void loginBtn_Click(object sender, RoutedEventArgs e)

@@ -9,12 +9,15 @@ using System.Threading.Tasks;
 namespace GameServer
 {
     [ServiceContract]
-    internal interface ServerInterface
+    public interface ServerInterface
     {   
         [OperationContract]
         List<User> getUsers(Lobby lobby);
 
         [OperationContract]
         List<Lobby> getLobbys();
+
+        [OperationContract]
+        List<User> getAllUsers();
     }
 }
