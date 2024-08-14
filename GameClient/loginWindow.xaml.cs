@@ -64,7 +64,7 @@ namespace GameClient
                 // open main window and close this one
                 // send across user name as well
                 foob.AddUser(new User(userName));
-                lobbyFinderWindow curWindow = new lobbyFinderWindow(userName, foob);
+                lobbyFinderWindow curWindow = new lobbyFinderWindow(userName);
                 curWindow.Show();
                 this.Close();
 
