@@ -10,22 +10,32 @@ namespace GameLobbyLib
     {
         private string name;
         private string host;
-        private List<User> users;
+        private List<string> users;
         private string title;
         private string description;
         private string mode;
         private List<string> tags;
         private readonly int userCount;
 
+<<<<<<< HEAD
         public Lobby() { } //I dont fully understand why this works but DO NOT REMOVE. It fucks with something to do with serialization
 
         public Lobby(string name, User hostUser, string title, string description, string mode, List<string> tags)
+=======
+        public Lobby(string name, string host, List<string> users, string title, string description, string mode, List<string> tags)
+>>>>>>> parent of 63c8e32 (Add user class, update constructors and other database components to accept user. Update lobbies to automatically add host to user list.)
         {
             Name = name;
-            Host = hostUser.ToString();
-            users = new List<User>();
-            users.Add(hostUser);
-            Title = title; //What is the difference between lobby name and lobby title?
+            Host = host;
+            Users = users;
+            Title = title;
+            Description = description;
+            Mode = mode;
+            Tags = tags;
+            Name = name;
+            Host = host;
+            Users = users;
+            Title = title;
             Description = description;
             Mode = mode;
             Tags = tags;
@@ -43,7 +53,7 @@ namespace GameLobbyLib
             set { host = value; }
         }
 
-        public List<User> Users 
+        public List<string> Users 
         { 
             get => users; 
             set => users = value; 
@@ -72,24 +82,6 @@ namespace GameLobbyLib
         public int UserCount
         {
             get => userCount;
-        }
-
-        public void addUser(User user)
-        {
-            users.Add(user);
-        }
-
-        public void removeUser(User user)
-        {
-            if (users.Contains(user))
-            {
-                users.Remove(user);
-            }
-            else
-            {
-                Console.WriteLine("User not found: " + user.ToString());
-            }
-
         }
 
         public string TagDis
