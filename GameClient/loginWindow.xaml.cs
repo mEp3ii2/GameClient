@@ -13,6 +13,11 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
+using System.ServiceModel;
+using GameServer;
+using GameLobbyLib;
+using System.Configuration;
+
 namespace GameClient
 {
     /// <summary>
@@ -20,23 +25,45 @@ namespace GameClient
     /// </summary>
     public partial class MainWindow : Window
     {
+        private ServerInterface foob;
         public MainWindow()
         {
             InitializeComponent();
+
+            ChannelFactory<ServerInterface> foobFactory;
+            NetTcpBinding tcp = new NetTcpBinding();
+            //Set the URL and create the connection!
+            string URL = "net.tcp://localhost:8100/GameService";
+            foobFactory = new ChannelFactory<ServerInterface>(tcp, URL);
+            foob = foobFactory.CreateChannel();
+            //Also, tell me how many entries are in the DB.
+            userNumber.Text = "Number of Users: " + foob.GetAllUsers().Count(); 
+            
         }
 
         private void loginBtn_Click(object sender, RoutedEventArgs e)
         {
-            bool uniquename = false;
+            bool uniquename = true;
             string userName = userNameBox.Text;
 
             // check here is user name is unique
-            uniquename = true;//change later to check if name is valid and then set
+            List<User> users = foob.GetAllUsers();
+            foreach (User user in users) { }
+            {
+                foreach (User user in users)
+                {
+                    if (user.Name == userName)
+                    {
+                        uniquename = false;
+                    }
+                }
+            }
 
             if (uniquename)
             {
                 // open main window and close this one
                 // send across user name as well
+                foob.AddUser(new User(userName));
                 lobbyFinderWindow curWindow = new lobbyFinderWindow(userName);
                 curWindow.Show();
                 this.Close();

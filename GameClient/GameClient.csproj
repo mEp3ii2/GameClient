@@ -37,6 +37,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -133,6 +134,10 @@
     <ProjectReference Include="..\gamelobbyLib\GameLobbyLib.csproj">
       <Project>{48a44000-ed5c-4309-aca2-55f103d04e0d}</Project>
       <Name>GameLobbyLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GameServer\GameServer.csproj">
+      <Project>{f55bef54-1050-4b81-87f8-6c28b8c72546}</Project>
+      <Name>GameServer</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

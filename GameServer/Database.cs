@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GameLobbyLib;
 
-namespace GameLobbyLib
+namespace GameServer
 {
     public class Database
     {
@@ -26,14 +27,25 @@ namespace GameLobbyLib
             users = new List<User>();
             users.Add(user1);
             users.Add(user2);
-
             tags = new List<string> { "newbie", "friendly", "casual" };
             
 
             Lobby testLobby = new Lobby("test", user1, "testLobb", "testing arena", "deathmatch", tags);
+            testLobby.addUser(user1);
+            testLobby.addUser(user2);
+
             Lobby testLobby2 = new Lobby("test", user2, "testLobb", "testing arena", "King of the Hill", tags);
+            testLobby2.addUser(user1);
+            testLobby2.addUser(user2);
+            
             Lobby testLobby3 = new Lobby("test", user1, "testLobb", "testing arena", "deathmatch", tags);
+            testLobby3.addUser(user1);
+            testLobby3.addUser(user2);
+            
             Lobby testLobby4 = new Lobby("test", user2, "testLobb", "testing arena", "King of the Hill", new List<string> {"Solo"});
+            testLobby4.addUser(user1);
+            testLobby4.addUser(user2);
+            
             lobbies.Add(testLobby);
             lobbies.Add(testLobby2);
             lobbies.Add(testLobby3);
@@ -45,14 +57,11 @@ namespace GameLobbyLib
             return lobbies;
         }
 
+        public List<User> getAllUsers() { return users; }
+
         public List<User> getLobbyUsers(Lobby lobby)
         {
             return lobby.Users;
-        }
-
-        public List<User> getAllUsers()
-        {
-            return users;
         }
 
         //returns a list of all unique modes
@@ -107,11 +116,6 @@ namespace GameLobbyLib
         {
             Lobby lobby = new Lobby(name, hostUser, name, desc, mode, tags);
             lobbies.Add(lobby);//need to make a call to the server to update lobby list for other clients
-        }
-
-        public void addUser(User user)
-        {
-            users.Add(user);
         }
     }
 }
