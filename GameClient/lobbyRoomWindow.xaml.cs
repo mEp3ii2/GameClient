@@ -21,21 +21,29 @@ namespace GameClient
     /// </summary>
     public partial class lobbyRoomWindow : Window
     {
-        private ObservableCollection<string> messages;//makes it so that the list box is notified when changes happen
+        
         private string userName;
         public lobbyRoomWindow(Lobby selectedLobby, string userName) 
         {
             
             InitializeComponent();
             this.userName = userName;
-            //get all users to populate user box
-            //load current chat history
-            messages = new ObservableCollection<string>();
-            messageBox.ItemsSource = messages;
+            messageList.Document.Blocks.Clear();
+            userList.Document.Blocks.Clear();
+
+            // Set the initial text from the passed-in variable
+            Paragraph initialParagraph = new Paragraph();
+            initialParagraph.Inlines.Add(new Run(selectedLobby.Name));
+            messageList.Document.Blocks.Add(initialParagraph);
+
             
+
+            //get all users to populate user box
+            //load current chat history            
+
         }
 
-       
+
 
         private void logOutBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -46,15 +54,38 @@ namespace GameClient
         {
             lobbyFinderWindow curWindow = new lobbyFinderWindow(userName);
             this.Close();
+            curWindow.Show();
         }
 
         private void messageBtn_Click(object sender, RoutedEventArgs e)
         {
-            //MessageBox.Show(userName);
-            //MessageBox.Show(userMessageBox.Text.ToString());
-            //messages.Append(userName + ": " + userMessageBox.Text.ToString());
-            messages.Add(userName + ": " + userMessageBox.Text.ToString());
+            addNewMessage(userName, userMessageBox.Text.ToString());
             userMessageBox.Clear();
+        }
+
+        private void addNewMessage(string userName, string message)
+        {
+            Paragraph pg = new Paragraph();
+
+            Run userNameRun = new Run(userName + ": ")
+            {
+                FontWeight = FontWeights.Bold,
+                Foreground = Brushes.Red
+            };
+
+            Run messageRun = new Run(message)
+            {
+                Foreground = Brushes.Black
+            };
+
+            pg.Inlines.Add(userNameRun);
+            pg.Inlines.Add(messageRun);
+
+            
+            messageList.Document.Blocks.Add(pg);
+
+            
+            messageList.ScrollToEnd();
         }
     }
 }

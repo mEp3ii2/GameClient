@@ -10,7 +10,7 @@
         <Grid.Background>
             <ImageBrush ImageSource="/formBackGroundImage.jpg" Stretch="UniformToFill"/>
         </Grid.Background>
-        <TextBox x:Name="userNameBox" HorizontalAlignment="Left" Margin="125,80,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" Foreground="White"/>
+        <TextBox x:Name="userNameBox" HorizontalAlignment="Left" Margin="125,80,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" Foreground="Black"/>
         <Label Content="Enter User Name" HorizontalAlignment="Left" Margin="130,49,0,0" VerticalAlignment="Top" Width="110" Foreground="White"/>
         <Button x:Name="loginBtn" Content="Login" HorizontalAlignment="Left" Margin="125,115,0,0" VerticalAlignment="Top" Width="120" Click="loginBtn_Click"/>
         <TextBlock HorizontalAlignment="Left" Margin="135,21,0,0" TextWrapping="Wrap" Text="Mortal Combat X" VerticalAlignment="Top" Foreground="White"/>
