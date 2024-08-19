@@ -64,6 +64,11 @@ namespace GameClient
         {
             // user has double clicked on lobby
             // send user to lobby
+            Lobby selectedLobby = (Lobby) lobbyList.SelectedItem;
+            lobbyRoomWindow curWindow = new lobbyRoomWindow(selectedLobby, userName);
+            curWindow.Show();
+            this.Close();
+            //need to modify lobby to reflect new user
         }
 
         private void createBtn_Click(object sender, RoutedEventArgs e)
