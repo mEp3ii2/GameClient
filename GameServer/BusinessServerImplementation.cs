@@ -5,65 +5,70 @@ using System.Linq;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
+using DataLayer;
 
-namespace GameServer
+namespace BusinessLayer
 {
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, UseSynchronizationContext = false)]
-    internal class ServerImplementation : ServerInterface
+    internal class BusinessServerImplementation : BusinessServerInterface
     {
-        Database database;
-        public ServerImplementation() {
-            database = new Database();
+        private DataServerInterface foob;
+        public BusinessServerImplementation() {
+            ChannelFactory<DataServerInterface> foobFactory;
+            NetTcpBinding tcp = new NetTcpBinding();
+            string URL = "net.tcp://localhost:8200/DataService";
+            foobFactory = new ChannelFactory<DataServerInterface>(tcp, URL);
+            foob = foobFactory.CreateChannel();
         }
 
         public List<Lobby> GetAllLobbies()
         {
-            return database.getAllLobbies();
+            return foob.GetAllLobbies();
         }
 
         public List<User> GetUsers(Lobby lobby)
         {
-            return database.getLobbyUsers(lobby);
+            return foob.GetUsers(lobby);
         }
 
         public List<User> GetAllUsers()
         {
-            return database.getAllUsers();
+            return foob.GetAllUsers();
         }
 
         public void AddUser(User user)
         {
-            database.addUser(user);
+           foob.AddUser(user);
         }
 
         public List<string> GetUniqueModes(List<Lobby> curLobbyList)
         {
-           return database.GetUniqueModes(curLobbyList);
+           return foob.GetUniqueModes(curLobbyList);
         }
 
         public List<string> GetUniqueTags(List<Lobby> curLobbyList)
         {
-            return database.GetUniqueTags(curLobbyList);
+            return foob.GetUniqueTags(curLobbyList);
         }
 
         public List<Lobby> GetfilterdLobbiesList(string mode = null, string tag = null)
         {
-            return database.getfilterdLobbiesList();
+            return foob.GetfilterdLobbiesList(mode, tag);
         }
 
         public List<string> GetAllModeTypes()
         {
-            return Database.getAllModeTypes();
+            return foob.GetAllModeTypes();
         }
 
         public List<string> GetAllTagTypes()
         {
-            return Database.getAllTagTypes();
+            return foob.GetAllTagTypes();
         }
 
         public void AddLobby(Lobby lobby)
         {
-            database.addNewLobby(lobby);
+            foob.AddLobby(lobby);
         }
     }
 }

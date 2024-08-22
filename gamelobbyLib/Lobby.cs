@@ -9,9 +9,7 @@ namespace GameLobbyLib
     public class Lobby
     {
         private string name;
-        private string host;
         private List<User> users;
-        private string title;
         private string description;
         private string mode;
         private List<string> tags;
@@ -22,9 +20,7 @@ namespace GameLobbyLib
         public Lobby(string name, User hostUser, string title, string description, string mode, List<string> tags)
         {
             Name = name;
-            Host = hostUser.Name;
             users = new List<User>();
-            Title = title;
             Description = description;
             Mode = mode;
             Tags = tags;
@@ -36,21 +32,11 @@ namespace GameLobbyLib
             get { return name; }
             set { name = value; }
         }
-        public string Host
-        {
-            get { return host; }
-            set { host = value; }
-        }
 
         public List<User> Users 
         { 
             get => users; 
             set => users = value; 
-        }
-        public string Title 
-        { 
-            get => title; 
-            set => title = value; 
         }
         public string Description 
         { 

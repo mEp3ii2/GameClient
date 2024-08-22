@@ -13,7 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using GameLobbyLib;
-using GameServer;
+using BusinessLayer;
 
 namespace GameClient
 {
@@ -27,25 +27,25 @@ namespace GameClient
         private string desc;
         private string roomName;
         private List<string> tags;
-        private ServerInterface foob;
+        private BusinessServerInterface foob;
         
         public createLobbyWindow(User currUser)
         {
             InitializeComponent();
 
-            ChannelFactory<ServerInterface> foobFactory;
+            ChannelFactory<BusinessServerInterface> foobFactory;
             NetTcpBinding tcp = new NetTcpBinding();
             string URL = "net.tcp://localhost:8100/GameService";
-            foobFactory = new ChannelFactory<ServerInterface>(tcp, URL);
+            foobFactory = new ChannelFactory<BusinessServerInterface>(tcp, URL);
             foob = foobFactory.CreateChannel();
 
             this.currUser = currUser;
             
-            modeSelBox.ItemsSource = Database.getAllModeTypes();
+            modeSelBox.ItemsSource = foob.GetAllModeTypes();
             //tagSelBox.ItemsSource = Database.getAllTagTypes();
             
 
-            optionsBox.ItemsSource = Database.getAllTagTypes();
+            optionsBox.ItemsSource = foob.GetAllTagTypes();
         }
 
         private void submitBtn_Click(object sender, RoutedEventArgs e)

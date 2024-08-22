@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{F55BEF54-1050-4B81-87F8-6C28B8C72546}</ProjectGuid>
+    <ProjectGuid>{58C9204B-7068-433C-A36C-93FCBE8F25D0}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>GameServer</RootNamespace>
-    <AssemblyName>GameServer</AssemblyName>
+    <RootNamespace>DataLayer</RootNamespace>
+    <AssemblyName>DataLayer</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -44,10 +44,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="Database.cs" />
+    <Compile Include="DataServerImplementation.cs" />
+    <Compile Include="DataServerInterface.cs" />
+    <Compile Include="DataTierServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ServerImplementation.cs" />
-    <Compile Include="ServerInterface.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

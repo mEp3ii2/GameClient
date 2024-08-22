@@ -14,9 +14,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
 using System.ServiceModel;
-using GameServer;
 using GameLobbyLib;
 using System.Configuration;
+using BusinessLayer;
 
 namespace GameClient
 {
@@ -25,15 +25,15 @@ namespace GameClient
     /// </summary>
     public partial class MainWindow : Window
     {
-        private ServerInterface foob;
+        private BusinessServerInterface foob;
         public MainWindow()
         {
             InitializeComponent();
 
-            ChannelFactory<ServerInterface> foobFactory;
+            ChannelFactory<BusinessServerInterface> foobFactory;
             NetTcpBinding tcp = new NetTcpBinding();
             string URL = "net.tcp://localhost:8100/GameService";
-            foobFactory = new ChannelFactory<ServerInterface>(tcp, URL);
+            foobFactory = new ChannelFactory<BusinessServerInterface>(tcp, URL);
             foob = foobFactory.CreateChannel();
 
             userNumber.Text = "Number of Users: " + foob.GetAllUsers().Count(); 

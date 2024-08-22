@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.ComponentModel;
 using GameLobbyLib;
-using GameServer;
+using BusinessLayer;
 using System.ServiceModel;
 
 namespace GameClient
@@ -28,16 +28,16 @@ namespace GameClient
         private List<Lobby> currentList;
         private string currentModeFilter;
         private string currentTagFilter;
-        private ServerInterface foob;
+        private BusinessServerInterface foob;
 
         public lobbyFinderWindow(User currUser)
         {
             InitializeComponent();
 
-            ChannelFactory<ServerInterface> foobFactory;
+            ChannelFactory<BusinessServerInterface> foobFactory;
             NetTcpBinding tcp = new NetTcpBinding();
             string URL = "net.tcp://localhost:8100/GameService";
-            foobFactory = new ChannelFactory<ServerInterface>(tcp, URL);
+            foobFactory = new ChannelFactory<BusinessServerInterface>(tcp, URL);
             foob = foobFactory.CreateChannel();
 
             this.currUser = currUser;
@@ -73,7 +73,7 @@ namespace GameClient
             // user has double clicked on lobby
             // send user to lobby
             Lobby selectedLobby = (Lobby) lobbyList.SelectedItem;
-            lobbyRoomWindow curWindow = new lobbyRoomWindow(selectedLobby, userName);
+            lobbyRoomWindow curWindow = new lobbyRoomWindow(selectedLobby, currUser);
             curWindow.Show();
             this.Close();
             //need to modify lobby to reflect new user
