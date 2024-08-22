@@ -5,9 +5,29 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GameClient"
         mc:Ignorable="d"
-        Title="lobbyRoomWindow" Height="450" Width="800">
+        Title="lobbyRoomWindow" Height="500" Width="850">
     <Grid>
-        <Button x:Name="logOutBtn" Content="Log Out" HorizontalAlignment="Left" Margin="602,336,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="logOutBtn" Content="Log Out" HorizontalAlignment="Left" Margin="10,385,0,0" VerticalAlignment="Top" Width="99" Height="24" Click="logOutBtn_Click"/>
+        <TextBox x:Name="userMessageBox" HorizontalAlignment="Left" Height="24" Margin="186,344,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="500"/>
+        <Label Content="Users" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="169"/>
+        <Label x:Name="lobbyNameBlock" Content="" HorizontalAlignment="Left" Margin="184,10,0,0" VerticalAlignment="Top" Width="606"/>
+        <Button x:Name="backButton" Content="Back" HorizontalAlignment="Left" Height="24" Margin="10,344,0,0" VerticalAlignment="Top" Width="99" Click="backButton_Click"/>
+        <Button x:Name="messageBtn" Content="Send" HorizontalAlignment="Left" Height="24" Margin="691,344,0,0" VerticalAlignment="Top" Width="99" Click="messageBtn_Click"/>
+        <RichTextBox Name = "messageList"  Margin="186,34,58,148" IsReadOnly="True" VerticalScrollBarVisibility="Auto" Grid.Row="0">
+            <FlowDocument>
+                <Paragraph>
+                    <Run Text="RichTextBox"/>
+                </Paragraph>
+            </FlowDocument>
+        </RichTextBox>
+        <Button x:Name="attachmentBtn" Content="Attachment" HorizontalAlignment="Left" Height="24" Margin="691,378,0,0" VerticalAlignment="Top" Width="99"/>
+        <RichTextBox x:Name="userList" Margin="4,34,671,148">
+            <FlowDocument>
+                <Paragraph>
+                    <Run Text="RichTextBox"/>
+                </Paragraph>
+            </FlowDocument>
+        </RichTextBox>
 
     </Grid>
 </Window>
