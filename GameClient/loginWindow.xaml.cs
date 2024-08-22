@@ -32,11 +32,10 @@ namespace GameClient
 
             ChannelFactory<ServerInterface> foobFactory;
             NetTcpBinding tcp = new NetTcpBinding();
-            //Set the URL and create the connection!
             string URL = "net.tcp://localhost:8100/GameService";
             foobFactory = new ChannelFactory<ServerInterface>(tcp, URL);
             foob = foobFactory.CreateChannel();
-            //Also, tell me how many entries are in the DB.
+
             userNumber.Text = "Number of Users: " + foob.GetAllUsers().Count(); 
             
         }
@@ -63,8 +62,9 @@ namespace GameClient
             {
                 // open main window and close this one
                 // send across user name as well
-                foob.AddUser(new User(userName));
-                lobbyFinderWindow curWindow = new lobbyFinderWindow(userName);
+                User currUser = new User(userName);
+                foob.AddUser(currUser);
+                lobbyFinderWindow curWindow = new lobbyFinderWindow(currUser);
                 curWindow.Show();
                 this.Close();
 

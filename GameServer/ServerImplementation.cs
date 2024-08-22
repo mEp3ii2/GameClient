@@ -60,5 +60,10 @@ namespace GameServer
         {
             return Database.getAllTagTypes();
         }
+
+        public void AddLobby(Lobby lobby)
+        {
+            database.addNewLobby(lobby);
+        }
     }
 }

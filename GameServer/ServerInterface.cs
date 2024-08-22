@@ -37,5 +37,8 @@ namespace GameServer
 
         [OperationContract]
         List<string> GetAllTagTypes();
+
+        [OperationContract]
+        void AddLobby(Lobby lobby);
     }
 }
