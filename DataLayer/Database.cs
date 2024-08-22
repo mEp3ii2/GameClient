@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GameLobbyLib;
 
-namespace GameLobbyLib
+namespace DataLayer
 {
-    public class Database
+    internal class Database
     {
         List<Lobby> lobbies;
         List<User> users;
@@ -107,6 +108,10 @@ namespace GameLobbyLib
         {
             Lobby lobby = new Lobby(name, hostUser, name, desc, mode, tags);
             lobbies.Add(lobby);//need to make a call to the server to update lobby list for other clients
+        }
+
+        public void addNewLobby(Lobby lobby) {
+            lobbies.Add(lobby);
         }
 
         public void addUser(User user)

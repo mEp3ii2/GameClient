@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -12,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using GameLobbyLib;
+using BusinessLayer;
 
 namespace GameClient
 {
@@ -20,22 +22,30 @@ namespace GameClient
     /// </summary>
     public partial class createLobbyWindow : Window
     {
-        private string userName;
+        private User currUser;
         private string mode;
         private string desc;
         private string roomName;
         private List<string> tags;
+        private BusinessServerInterface foob;
         
-        public createLobbyWindow(string userName)
+        public createLobbyWindow(User currUser)
         {
             InitializeComponent();
-            this.userName = userName;
+
+            ChannelFactory<BusinessServerInterface> foobFactory;
+            NetTcpBinding tcp = new NetTcpBinding();
+            string URL = "net.tcp://localhost:8100/GameService";
+            foobFactory = new ChannelFactory<BusinessServerInterface>(tcp, URL);
+            foob = foobFactory.CreateChannel();
+
+            this.currUser = currUser;
             
-            modeSelBox.ItemsSource = Database.getAllModeTypes();
+            modeSelBox.ItemsSource = foob.GetAllModeTypes();
             //tagSelBox.ItemsSource = Database.getAllTagTypes();
             
 
-            optionsBox.ItemsSource = Database.getAllTagTypes();
+            optionsBox.ItemsSource = foob.GetAllTagTypes();
         }
 
         private void submitBtn_Click(object sender, RoutedEventArgs e)
@@ -54,6 +64,8 @@ namespace GameClient
             roomName = nameTxtBox.Text;
             desc = descTxtBox.Text;
             MessageBox.Show(mode+" "+tagString + " " +roomName + " " + desc);
+
+            foob.AddLobby(new Lobby(roomName, currUser, roomName, desc, mode, tags));
         }
 
         private void clearBtn_Click(object sender, RoutedEventArgs e)
@@ -66,7 +78,7 @@ namespace GameClient
 
         private void backBtn_Click(object sender, RoutedEventArgs e)
         {
-            lobbyFinderWindow curWindow = new lobbyFinderWindow(userName);
+            lobbyFinderWindow curWindow = new lobbyFinderWindow(currUser);
             curWindow.Show();
             this.Close();
         }
