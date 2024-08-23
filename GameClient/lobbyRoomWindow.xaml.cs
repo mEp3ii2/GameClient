@@ -13,6 +13,10 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.ServiceModel;
+using BusinessLayer;
+using Microsoft.Win32;
+using System.IO;
 
 namespace GameClient
 {
@@ -23,11 +27,13 @@ namespace GameClient
     {
         
         private User currUser;
-        public lobbyRoomWindow(Lobby selectedLobby, User currUser) 
+        private BusinessServerInterface foob;
+        public lobbyRoomWindow(Lobby selectedLobby, User currUser,BusinessServerInterface foob) 
         {
             
             InitializeComponent();
             this.currUser = currUser;
+            this.foob = foob;
             messageList.Document.Blocks.Clear();
             userList.Document.Blocks.Clear();
 
@@ -52,7 +58,7 @@ namespace GameClient
 
         private void backButton_Click(object sender, RoutedEventArgs e)
         {
-            lobbyFinderWindow curWindow = new lobbyFinderWindow(currUser);
+            lobbyFinderWindow curWindow = new lobbyFinderWindow(currUser, foob);
             this.Close();
             curWindow.Show();
         }
@@ -86,6 +92,20 @@ namespace GameClient
 
             
             messageList.ScrollToEnd();
+        }
+
+        private void attachmentBtn_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            if(openFileDialog.ShowDialog() == true)
+            {
+                string filePath = openFileDialog.FileName;
+                byte[] fileData = File.ReadAllBytes(filePath);
+                string fileName = System.IO.Path.GetFileName(filePath);
+
+                //
+                foob.UploadFile(fileData,fileName);
+            }
         }
     }
 }

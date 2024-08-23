@@ -40,5 +40,16 @@ namespace BusinessLayer
 
         [OperationContract]
         void AddLobby(Lobby lobby);
+
+        [OperationContract]
+        bool UniqueUser(string userName);
+        
+        [OperationContract]
+        void UploadFile(byte[] fileData, string fileName);
+
+        [OperationContract]
+        void DownloadFile();
+
+        
     }
 }

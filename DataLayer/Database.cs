@@ -19,6 +19,7 @@ namespace DataLayer
         private static readonly List<string> allTags = new List<string> {
             "Beginner Friendly", "Casual", "Competitive", "High Stakes", "Fast-Paced", "Strategic", "Team-Based", "Solo",
             "All-Out Brawl", "Classic", "Intense", "Relaxed", "Focused", "Social", "Hardcore"};
+
         public Database()
         {
             lobbies = new List<Lobby>();
@@ -117,6 +118,16 @@ namespace DataLayer
         public void addUser(User user)
         {
             users.Add(user);
+        }
+
+        public List<List<string>> getMsgs(Lobby lobby)
+        {
+            return lobby.LobbyMsg;
+        }
+
+        public List<UploadedFile> getFiles(Lobby lobby)
+        {
+            return lobby.Files;
         }
     }
 }

@@ -21,7 +21,7 @@ namespace GameClient
             base.OnStartup(e);
             SoundPlayer player = new SoundPlayer("Mortal_Kombat.wav");
             player.LoadCompleted += delegate (object sender, AsyncCompletedEventArgs er) {
-                player.Play();
+                player.PlayLooping();
             };
             player.LoadAsync();
 

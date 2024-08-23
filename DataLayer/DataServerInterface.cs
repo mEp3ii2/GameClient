@@ -40,5 +40,9 @@ namespace DataLayer
 
         [OperationContract]
         void AddLobby(Lobby lobby);
+
+        [OperationContract]
+        List<List<string>> GetLobbyMsg(Lobby lobby);
+        void saveFile(string fileName, byte[] fileData);
     }
 }

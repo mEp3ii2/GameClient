@@ -14,6 +14,8 @@ namespace GameLobbyLib
         private string mode;
         private List<string> tags;
         private readonly int userCount;
+        private List<List<string>> lobbyMsgs;
+        private List<UploadedFile> files;
 
         public Lobby() { } //I dont fully understand why this works but DO NOT REMOVE. It fucks with something to do with serialization
 
@@ -25,6 +27,8 @@ namespace GameLobbyLib
             Mode = mode;
             Tags = tags;
             userCount= users.Count();
+            lobbyMsgs = new List<List<string>>();
+            files = new List<UploadedFile>();
         }
 
         public string Name
@@ -63,6 +67,18 @@ namespace GameLobbyLib
         {
             // uses ternery operator to either return the tags list in string form or an empty string
             get => Tags != null ? string.Join(",",Tags): string.Empty;
+        }
+
+        public List<List<string>> LobbyMsg
+        {
+            get => lobbyMsgs;
+            set => lobbyMsgs = value;
+        }
+
+        public List<UploadedFile> Files
+        {
+            get => files;
+            set => files = value;
         }
     }
 }

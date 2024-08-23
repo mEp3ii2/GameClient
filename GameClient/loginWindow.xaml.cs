@@ -42,29 +42,18 @@ namespace GameClient
 
         private void loginBtn_Click(object sender, RoutedEventArgs e)
         {
-            bool uniquename = true;
             string userName = userNameBox.Text;
 
             // check here is user name is unique
-            List<User> users = foob.GetAllUsers();
-            foreach (User user in users) { }
-            {
-                foreach (User user in users)
-                {
-                    if (user.Name == userName)
-                    {
-                        uniquename = false;
-                    }
-                }
-            }
-
-            if (uniquename)
+            bool uniqueUser = foob.UniqueUser(userName);
+            
+            if (uniqueUser)
             {
                 // open main window and close this one
                 // send across user name as well
                 User currUser = new User(userName);
                 foob.AddUser(currUser);
-                lobbyFinderWindow curWindow = new lobbyFinderWindow(currUser);
+                lobbyFinderWindow curWindow = new lobbyFinderWindow(currUser,foob);
                 curWindow.Show();
                 this.Close();
 

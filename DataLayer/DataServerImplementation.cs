@@ -11,7 +11,7 @@ namespace DataLayer
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, UseSynchronizationContext = false)]
     internal class DataServerImplementation : DataServerInterface
     {
-        Database database;
+        private static Database database;
         public DataServerImplementation()
         {
             database = new Database();
@@ -65,6 +65,16 @@ namespace DataLayer
         public void AddLobby(Lobby lobby)
         {
             database.addNewLobby(lobby);
+        }
+
+        public List<List<string>> GetLobbyMsg(Lobby lobby)
+        {
+            return database.getMsgs(lobby);
+        }
+
+        public void saveFile(string fileName, byte[] fileData)
+        {
+            throw new NotImplementedException();
         }
     }
 }

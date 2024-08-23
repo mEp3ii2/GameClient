@@ -30,15 +30,18 @@ namespace GameClient
         private string currentTagFilter;
         private BusinessServerInterface foob;
 
-        public lobbyFinderWindow(User currUser)
+        public lobbyFinderWindow(User currUser, BusinessServerInterface foob)
         {
             InitializeComponent();
+            this.foob = foob;
 
-            ChannelFactory<BusinessServerInterface> foobFactory;
+            //i think i would be better to just pass it around rather than reconnect on every window open
+            /*ChannelFactory<BusinessServerInterface> foobFactory;
             NetTcpBinding tcp = new NetTcpBinding();
             string URL = "net.tcp://localhost:8100/GameService";
             foobFactory = new ChannelFactory<BusinessServerInterface>(tcp, URL);
             foob = foobFactory.CreateChannel();
+            */
 
             this.currUser = currUser;
             currentList = foob.GetAllLobbies();
@@ -73,7 +76,7 @@ namespace GameClient
             // user has double clicked on lobby
             // send user to lobby
             Lobby selectedLobby = (Lobby) lobbyList.SelectedItem;
-            lobbyRoomWindow curWindow = new lobbyRoomWindow(selectedLobby, currUser);
+            lobbyRoomWindow curWindow = new lobbyRoomWindow(selectedLobby, currUser, foob);
             curWindow.Show();
             this.Close();
             //need to modify lobby to reflect new user
@@ -82,7 +85,7 @@ namespace GameClient
         private void createBtn_Click(object sender, RoutedEventArgs e)
         {
             // user creating room
-            createLobbyWindow curWindow = new createLobbyWindow(currUser);
+            createLobbyWindow curWindow = new createLobbyWindow(currUser,foob);
             curWindow.Show();
             this.Close();
             

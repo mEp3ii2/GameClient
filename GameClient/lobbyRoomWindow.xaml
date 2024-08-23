@@ -20,7 +20,7 @@
                 </Paragraph>
             </FlowDocument>
         </RichTextBox>
-        <Button x:Name="attachmentBtn" Content="Attachment" HorizontalAlignment="Left" Height="24" Margin="691,378,0,0" VerticalAlignment="Top" Width="99"/>
+        <Button x:Name="attachmentBtn" Content="Attachment" HorizontalAlignment="Left" Height="24" Margin="691,378,0,0" VerticalAlignment="Top" Width="99" Click="attachmentBtn_Click"/>
         <RichTextBox x:Name="userList" Margin="4,34,671,148">
             <FlowDocument>
                 <Paragraph>
