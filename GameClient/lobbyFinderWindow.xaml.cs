@@ -131,8 +131,8 @@ namespace GameClient
         // to remove user name
         private void app_Exit(object sender, CancelEventArgs e)
         {
-            string username = "loggedout";
-            MessageBox.Show(username);
+            //
+            
         }
 
         private void setLobbyList()
