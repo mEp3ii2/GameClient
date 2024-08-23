@@ -20,14 +20,7 @@
                 </Paragraph>
             </FlowDocument>
         </RichTextBox>
-        <Button x:Name="attachmentBtn" Content="Attachment" HorizontalAlignment="Left" Height="24" Margin="691,378,0,0" VerticalAlignment="Top" Width="99"/>
-        <RichTextBox x:Name="userList" Margin="4,34,671,148">
-            <FlowDocument>
-                <Paragraph>
-                    <Run Text="RichTextBox"/>
-                </Paragraph>
-            </FlowDocument>
-        </RichTextBox>
+        <Button x:Name="attachmentBtn" Content="Attachment" HorizontalAlignment="Left" Height="24" Margin="691,378,0,0" VerticalAlignment="Top" Width="99" Click="attachmentBtn_Click"/>
         <RichTextBox x:Name="filesList" Height="302" Margin="691,34,10,0" VerticalAlignment="Top" Width="149">
             <FlowDocument>
                 <Paragraph>
@@ -36,6 +29,7 @@
             </FlowDocument>
         </RichTextBox>
         <Label Content="Files" HorizontalAlignment="Left" Height="25" Margin="691,11,0,0" VerticalAlignment="Top" Width="149"/>
+        <ListBox x:Name="userlistBox" Margin="10,34,671,148"/>
 
     </Grid>
 </Window>

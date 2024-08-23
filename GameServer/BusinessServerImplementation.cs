@@ -6,6 +6,8 @@ using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 using DataLayer;
+using System.Runtime.CompilerServices;
+using System.IO;
 
 namespace BusinessLayer
 {
@@ -13,7 +15,9 @@ namespace BusinessLayer
     internal class BusinessServerImplementation : BusinessServerInterface
     {
         private DataServerInterface foob;
+        private static uint logNumber = 0;
         public BusinessServerImplementation() {
+
             ChannelFactory<DataServerInterface> foobFactory;
             NetTcpBinding tcp = new NetTcpBinding();
             string URL = "net.tcp://localhost:8200/DataService";
@@ -31,6 +35,11 @@ namespace BusinessLayer
             return foob.GetUsers(lobby);
         }
 
+        public void RemoveUser(Lobby lobby, User user)
+        {
+            foob.RemoveUser(lobby, user);
+        }
+
         public List<User> GetAllUsers()
         {
             return foob.GetAllUsers();
@@ -38,7 +47,8 @@ namespace BusinessLayer
 
         public void AddUser(User user)
         {
-           foob.AddUser(user);
+            Log($"Added new user: {user.Name}");
+            foob.AddUser(user);
         }
 
         public List<string> GetUniqueModes(List<Lobby> curLobbyList)
@@ -68,7 +78,46 @@ namespace BusinessLayer
 
         public void AddLobby(Lobby lobby)
         {
+            Log($"New lobby created: {lobby.Name}");
             foob.AddLobby(lobby);
+        }
+
+        public bool UniqueUser(string userName)
+        {
+            Log($"Attempted Login with username {userName}");
+            List<User> users = foob.GetAllUsers();
+            
+            foreach (User user in users)
+            {
+                if (user.Name == userName)
+                {
+                    Log($"Login failed {userName} already used");
+                    return false;
+                }
+            }
+            Log($"Login for {userName} successful ");
+            return true;
+        }
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        private void Log(string logString)
+        {
+            logNumber++;
+            string logMsg = $"Log #{logNumber}: {logString} at {DateTime.Now}";
+            Console.WriteLine(logMsg);
+        }
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public void UploadFile(byte[] fileData, string fileName)
+        {
+            Log($"Recieved file upload: {fileName}");
+
+            foob.saveFile(fileName, fileData);
+        }
+
+        public void DownloadFile()
+        {
+            Log($"File download by ?");
         }
     }
 }

@@ -40,5 +40,13 @@ namespace DataLayer
 
         [OperationContract]
         void AddLobby(Lobby lobby);
+
+       
+        
+        [OperationContract]
+        void saveFile(string fileName, byte[] fileData);
+        
+        [OperationContract]
+        void RemoveUser(Lobby lobby, User user);
     }
 }

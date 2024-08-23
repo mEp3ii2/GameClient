@@ -1,17 +1,14 @@
 ﻿using GameLobbyLib;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ServiceModel;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataLayer
 {
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, UseSynchronizationContext = false)]
     internal class DataServerImplementation : DataServerInterface
     {
-        Database database;
+        private static Database database;
         public DataServerImplementation()
         {
             database = new Database();
@@ -65,6 +62,18 @@ namespace DataLayer
         public void AddLobby(Lobby lobby)
         {
             database.addNewLobby(lobby);
+        }
+
+
+
+        public void saveFile(string fileName, byte[] fileData)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RemoveUser(Lobby lobby, User user)
+        {
+            database.RemoveUser(lobby, user);
         }
     }
 }
