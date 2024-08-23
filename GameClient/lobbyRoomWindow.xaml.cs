@@ -27,6 +27,7 @@ namespace GameClient
     {
         
         private User currUser;
+        private List<User> lobbyList;
         private BusinessServerInterface foob;
         public lobbyRoomWindow(Lobby selectedLobby, User currUser,BusinessServerInterface foob) 
         {
@@ -35,17 +36,21 @@ namespace GameClient
             this.currUser = currUser;
             this.foob = foob;
             messageList.Document.Blocks.Clear();
-            userList.Document.Blocks.Clear();
+            
+            lobbyList = selectedLobby.Users.ToList();
+            userlistBox.ItemsSource = lobbyList;
 
             // Set the initial text from the passed-in variable
             Paragraph initialParagraph = new Paragraph();
             initialParagraph.Inlines.Add(new Run(selectedLobby.Name));
             messageList.Document.Blocks.Add(initialParagraph);
 
+            //fill userList
             
 
             //get all users to populate user box
-            //load current chat history            
+            //load current chat history
+            
 
         }
 
@@ -106,6 +111,11 @@ namespace GameClient
                 //
                 foob.UploadFile(fileData,fileName);
             }
+        }
+
+        private void userList_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            //load chat related to selected user
         }
     }
 }

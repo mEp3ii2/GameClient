@@ -8,6 +8,7 @@ namespace GameLobbyLib
 {
     public class UploadedFile
     {
+        public int lobbyID { get;}
         public string FileName { get; set; }
         public byte[] FileContent { get; set; }
     }

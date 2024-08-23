@@ -76,6 +76,7 @@ namespace GameClient
             // user has double clicked on lobby
             // send user to lobby
             Lobby selectedLobby = (Lobby) lobbyList.SelectedItem;
+            selectedLobby.Users.Add(currUser);
             lobbyRoomWindow curWindow = new lobbyRoomWindow(selectedLobby, currUser, foob);
             curWindow.Show();
             this.Close();

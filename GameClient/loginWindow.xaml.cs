@@ -23,6 +23,8 @@ namespace GameClient
     /// <summary>
     /// Interaction logic for loginWindow.xaml
     /// </summary>
+
+    public delegate bool VerifyUser(string userName);
     public partial class MainWindow : Window
     {
         private BusinessServerInterface foob;
@@ -40,13 +42,12 @@ namespace GameClient
             
         }
 
-        private void loginBtn_Click(object sender, RoutedEventArgs e)
+        private async void loginBtn_Click(object sender, RoutedEventArgs e)
         {
             string userName = userNameBox.Text;
-
-            // check here is user name is unique
-            bool uniqueUser = foob.UniqueUser(userName);
             
+            bool uniqueUser = await Task.Run(()=> VerifyUser(userName));
+
             if (uniqueUser)
             {
                 // open main window and close this one
@@ -64,6 +65,11 @@ namespace GameClient
                 MessageBox.Show("Name is taken, please try again");
                 
             }
+        }
+
+        private bool VerifyUser(string userName)
+        {
+            return foob.UniqueUser(userName);
         }
     }
 }

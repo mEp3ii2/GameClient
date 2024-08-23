@@ -50,6 +50,8 @@ namespace BusinessLayer
         [OperationContract]
         void DownloadFile();
 
+        [OperationContract]
+        void RemoveUser(Lobby lobby,User user);
         
     }
 }

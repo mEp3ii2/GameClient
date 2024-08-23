@@ -35,6 +35,11 @@ namespace BusinessLayer
             return foob.GetUsers(lobby);
         }
 
+        public void RemoveUser(Lobby lobby, User user)
+        {
+            foob.RemoveUser(lobby, user);
+        }
+
         public List<User> GetAllUsers()
         {
             return foob.GetAllUsers();
@@ -84,7 +89,6 @@ namespace BusinessLayer
             
             foreach (User user in users)
             {
-                Console.WriteLine(user.Name);
                 if (user.Name == userName)
                 {
                     Log($"Login failed {userName} already used");
@@ -103,6 +107,7 @@ namespace BusinessLayer
             Console.WriteLine(logMsg);
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void UploadFile(byte[] fileData, string fileName)
         {
             Log($"Recieved file upload: {fileName}");

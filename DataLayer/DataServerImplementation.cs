@@ -1,10 +1,7 @@
 ﻿using GameLobbyLib;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ServiceModel;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataLayer
 {
@@ -67,14 +64,16 @@ namespace DataLayer
             database.addNewLobby(lobby);
         }
 
-        public List<List<string>> GetLobbyMsg(Lobby lobby)
-        {
-            return database.getMsgs(lobby);
-        }
+
 
         public void saveFile(string fileName, byte[] fileData)
         {
             throw new NotImplementedException();
+        }
+
+        public void RemoveUser(Lobby lobby, User user)
+        {
+            database.RemoveUser(lobby, user);
         }
     }
 }
