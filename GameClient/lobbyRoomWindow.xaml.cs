@@ -22,12 +22,12 @@ namespace GameClient
     public partial class lobbyRoomWindow : Window
     {
         
-        private string userName;
-        public lobbyRoomWindow(Lobby selectedLobby, string userName) 
+        private User currUser;
+        public lobbyRoomWindow(Lobby selectedLobby, User currUser) 
         {
             
             InitializeComponent();
-            this.userName = userName;
+            this.currUser = currUser;
             messageList.Document.Blocks.Clear();
             userList.Document.Blocks.Clear();
 
@@ -52,22 +52,22 @@ namespace GameClient
 
         private void backButton_Click(object sender, RoutedEventArgs e)
         {
-            lobbyFinderWindow curWindow = new lobbyFinderWindow(userName);
+            lobbyFinderWindow curWindow = new lobbyFinderWindow(currUser);
             this.Close();
             curWindow.Show();
         }
 
         private void messageBtn_Click(object sender, RoutedEventArgs e)
         {
-            addNewMessage(userName, userMessageBox.Text.ToString());
+            addNewMessage(currUser, userMessageBox.Text.ToString());
             userMessageBox.Clear();
         }
 
-        private void addNewMessage(string userName, string message)
+        private void addNewMessage(User currUser, string message)
         {
             Paragraph pg = new Paragraph();
 
-            Run userNameRun = new Run(userName + ": ")
+            Run userNameRun = new Run(currUser.Name + ": ")
             {
                 FontWeight = FontWeights.Bold,
                 Foreground = Brushes.Red

@@ -13,6 +13,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.ComponentModel;
 using GameLobbyLib;
+using BusinessLayer;
+using System.ServiceModel;
 
 namespace GameClient
 {
@@ -21,20 +23,26 @@ namespace GameClient
     /// </summary>
     public partial class lobbyFinderWindow : Window
     {
-        private string userName;
+        private User currUser;
         
-        private Database database;
         private List<Lobby> currentList;
         private string currentModeFilter;
         private string currentTagFilter;
+        private BusinessServerInterface foob;
 
-        public lobbyFinderWindow(string userName)
+        public lobbyFinderWindow(User currUser)
         {
             InitializeComponent();
-            database = new Database();
-            this.userName = userName;
-            currentList = database.getAllLobbies();
-            lobbyList.ItemsSource = database.getAllLobbies();
+
+            ChannelFactory<BusinessServerInterface> foobFactory;
+            NetTcpBinding tcp = new NetTcpBinding();
+            string URL = "net.tcp://localhost:8100/GameService";
+            foobFactory = new ChannelFactory<BusinessServerInterface>(tcp, URL);
+            foob = foobFactory.CreateChannel();
+
+            this.currUser = currUser;
+            currentList = foob.GetAllLobbies();
+            lobbyList.ItemsSource = foob.GetAllLobbies();
             loadModeFilterBox();
             loadTagFilterBox();
             currentModeFilter = null;
@@ -46,7 +54,7 @@ namespace GameClient
         {
             List<string> modelist = new List<string>();
             modelist.Add("");
-            List<string> modes = database.GetUniqueModes(null);
+            List<string> modes = foob.GetUniqueModes(null);
             modelist.AddRange(modes);
             modeFilterBox.ItemsSource = modelist;
         }
@@ -55,7 +63,7 @@ namespace GameClient
         {
             List<string> tagList = new List<string>();
             tagList.Add("");
-            List<string> tags = database.GetUniqueTags(null);
+            List<string> tags = foob.GetUniqueTags(null);
             tagList.AddRange(tags);
             tagFilterBox.ItemsSource = tagList;
         }
@@ -65,7 +73,7 @@ namespace GameClient
             // user has double clicked on lobby
             // send user to lobby
             Lobby selectedLobby = (Lobby) lobbyList.SelectedItem;
-            lobbyRoomWindow curWindow = new lobbyRoomWindow(selectedLobby, userName);
+            lobbyRoomWindow curWindow = new lobbyRoomWindow(selectedLobby, currUser);
             curWindow.Show();
             this.Close();
             //need to modify lobby to reflect new user
@@ -74,7 +82,7 @@ namespace GameClient
         private void createBtn_Click(object sender, RoutedEventArgs e)
         {
             // user creating room
-            createLobbyWindow curWindow = new createLobbyWindow(userName);
+            createLobbyWindow curWindow = new createLobbyWindow(currUser);
             curWindow.Show();
             this.Close();
             
@@ -112,7 +120,7 @@ namespace GameClient
 
         private void clearBtn_Click(object sender, RoutedEventArgs e)
         {
-            currentList = database.getAllLobbies();
+            currentList = foob.GetAllLobbies();
             lobbyList.ItemsSource = currentList;
             modeFilterBox.SelectedItem = "";
             tagFilterBox.SelectedItem = "";
@@ -129,7 +137,7 @@ namespace GameClient
 
         private void setLobbyList()
         {
-            currentList = database.getfilterdLobbiesList(mode: currentModeFilter, tag: currentTagFilter);
+            currentList = foob.GetfilterdLobbiesList(mode: currentModeFilter, tag: currentTagFilter);
             lobbyList.ItemsSource = currentList;
         }
 
@@ -143,7 +151,7 @@ namespace GameClient
             {
                 List<string> tagList = new List<string>();
                 tagList.Add("");
-                List<string> tags = database.GetUniqueTags(currentList);
+                List<string> tags = foob.GetUniqueTags(currentList);
                 tagList.AddRange(tags);
                 tagFilterBox.ItemsSource = tagList;
             }
@@ -151,7 +159,7 @@ namespace GameClient
             {
                 List<string> modelist = new List<string>();
                 modelist.Add("");
-                List<string> modes = database.GetUniqueModes(currentList);
+                List<string> modes = foob.GetUniqueModes(currentList);
                 modelist.AddRange(modes);
                 modeFilterBox.ItemsSource = modelist;
             }

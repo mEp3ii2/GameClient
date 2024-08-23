@@ -6,10 +6,10 @@ using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GameServer
+namespace DataLayer
 {
     [ServiceContract]
-    public interface ServerInterface
+    public interface DataServerInterface
     {
         [OperationContract]
         List<User> GetUsers(Lobby lobby);
@@ -37,5 +37,8 @@ namespace GameServer
 
         [OperationContract]
         List<string> GetAllTagTypes();
+
+        [OperationContract]
+        void AddLobby(Lobby lobby);
     }
 }

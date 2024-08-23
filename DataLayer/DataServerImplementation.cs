@@ -6,13 +6,14 @@ using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GameServer
+namespace DataLayer
 {
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, UseSynchronizationContext = false)]
-    internal class ServerImplementation : ServerInterface
+    internal class DataServerImplementation : DataServerInterface
     {
         Database database;
-        public ServerImplementation() {
+        public DataServerImplementation()
+        {
             database = new Database();
         }
 
@@ -38,7 +39,7 @@ namespace GameServer
 
         public List<string> GetUniqueModes(List<Lobby> curLobbyList)
         {
-           return database.GetUniqueModes(curLobbyList);
+            return database.GetUniqueModes(curLobbyList);
         }
 
         public List<string> GetUniqueTags(List<Lobby> curLobbyList)
@@ -59,6 +60,11 @@ namespace GameServer
         public List<string> GetAllTagTypes()
         {
             return Database.getAllTagTypes();
+        }
+
+        public void AddLobby(Lobby lobby)
+        {
+            database.addNewLobby(lobby);
         }
     }
 }
