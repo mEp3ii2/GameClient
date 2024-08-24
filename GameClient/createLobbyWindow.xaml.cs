@@ -27,9 +27,9 @@ namespace GameClient
         private string desc;
         private string roomName;
         private List<string> tags;
-        private BusinessServerInterface foob;
+        private IBusinessServerInterface foob;
         
-        public createLobbyWindow(User currUser, BusinessServerInterface foob)
+        public createLobbyWindow(User currUser, IBusinessServerInterface foob)
         {
             InitializeComponent();
 

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace DataLayer
 {
     [ServiceContract]
-    public interface DataServerInterface
+    public interface IDataServerInterface
     {
         [OperationContract]
         List<User> GetUsers(Lobby lobby);

@@ -28,8 +28,8 @@ namespace GameClient
         
         private User currUser;
         private List<User> lobbyList;
-        private BusinessServerInterface foob;
-        public lobbyRoomWindow(Lobby selectedLobby, User currUser,BusinessServerInterface foob) 
+        private IBusinessServerInterface foob;
+        public lobbyRoomWindow(Lobby selectedLobby, User currUser,IBusinessServerInterface foob) 
         {
             
             InitializeComponent();

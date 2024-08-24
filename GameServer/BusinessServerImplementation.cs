@@ -8,20 +8,24 @@ using System.Threading.Tasks;
 using DataLayer;
 using System.Runtime.CompilerServices;
 using System.IO;
+using System.Collections.Concurrent;
 
-namespace BusinessLayer
+namespace BusinessLayer    
 {
+    
+
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, UseSynchronizationContext = false)]
-    internal class BusinessServerImplementation : BusinessServerInterface
+    internal class BusinessServerImplementation : IBusinessServerInterface
     {
-        private DataServerInterface foob;
+        private readonly ConcurrentDictionary<string, IClientCallback> clients = new ConcurrentDictionary<string, IClientCallback>();
+        private IDataServerInterface foob;
         private static uint logNumber = 0;
         public BusinessServerImplementation() {
 
-            ChannelFactory<DataServerInterface> foobFactory;
+            ChannelFactory<IDataServerInterface> foobFactory;
             NetTcpBinding tcp = new NetTcpBinding();
             string URL = "net.tcp://localhost:8200/DataService";
-            foobFactory = new ChannelFactory<DataServerInterface>(tcp, URL);
+            foobFactory = new ChannelFactory<IDataServerInterface>(tcp, URL);
             foob = foobFactory.CreateChannel();
         }
 
@@ -49,6 +53,8 @@ namespace BusinessLayer
         {
             Log($"Added new user: {user.Name}");
             foob.AddUser(user);
+            IClientCallback callback = OperationContext.Current.GetCallbackChannel<IClientCallback>();
+            clients[user.Name]= callback;
         }
 
         public List<string> GetUniqueModes(List<Lobby> curLobbyList)
@@ -118,6 +124,21 @@ namespace BusinessLayer
         public void DownloadFile()
         {
             Log($"File download by ?");
+        }
+
+        public void UpdateUserCount(int userCount)
+        {
+            foreach(var client in clients.Values)
+            {
+                try
+                {
+                    client.UpdateUserCount(userCount);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
         }
     }
 }

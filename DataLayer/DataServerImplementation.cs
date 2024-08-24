@@ -6,7 +6,7 @@ using System.ServiceModel;
 namespace DataLayer
 {
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, UseSynchronizationContext = false)]
-    internal class DataServerImplementation : DataServerInterface
+    internal class DataServerImplementation : IDataServerInterface
     {
         private static Database database;
         public DataServerImplementation()
@@ -46,7 +46,7 @@ namespace DataLayer
 
         public List<Lobby> GetfilterdLobbiesList(string mode = null, string tag = null)
         {
-            return database.getfilterdLobbiesList();
+            return database.getfilterdLobbiesList(mode,tag);
         }
 
         public List<string> GetAllModeTypes()

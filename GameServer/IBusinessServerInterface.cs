@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 
 namespace BusinessLayer
 {
-    [ServiceContract]
-    public interface BusinessServerInterface
+    [ServiceContract(CallbackContract = typeof(IClientCallback))]
+    public interface IBusinessServerInterface
     {
         [OperationContract]
         List<User> GetUsers(Lobby lobby);
@@ -52,6 +52,10 @@ namespace BusinessLayer
 
         [OperationContract]
         void RemoveUser(Lobby lobby,User user);
+
+        [OperationContract]
+        void UpdateUserCount(int userCount);
+        
         
     }
 }
