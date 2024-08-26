@@ -13,7 +13,7 @@ namespace DataLayer
         {
 
             //This should *definitely* be more descriptive.
-            Console.WriteLine("Server starting...");
+            Console.WriteLine("Data Server starting...");
             //This is the actual host service system
             ServiceHost host;
             //This represents a tcp/ip binding in the Windows network stack
@@ -26,9 +26,18 @@ namespace DataLayer
             //And open the host for business!
             host.Open();
             Console.WriteLine("Server Online");
+
+           
+            
+
+            // Start the stats printing task
+            
+
             Console.ReadLine();
             //Don't forget to close the host after you're done!
             host.Close();
         }
     }
+
+    
 }

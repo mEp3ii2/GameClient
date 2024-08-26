@@ -17,13 +17,18 @@ namespace BusinessLayer
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, UseSynchronizationContext = false)]
     internal class BusinessServerImplementation : IBusinessServerInterface
     {
-        private readonly ConcurrentDictionary<string, IClientCallback> clients = new ConcurrentDictionary<string, IClientCallback>();
         private IDataServerInterface foob;
         private static uint logNumber = 0;
         public BusinessServerImplementation() {
 
             ChannelFactory<IDataServerInterface> foobFactory;
             NetTcpBinding tcp = new NetTcpBinding();
+            tcp.ReceiveTimeout = TimeSpan.FromMinutes(10); // Increase as needed
+            tcp.SendTimeout = TimeSpan.FromMinutes(10);
+            tcp.OpenTimeout = TimeSpan.FromMinutes(10);
+            tcp.CloseTimeout = TimeSpan.FromMinutes(10);
+            
+
             string URL = "net.tcp://localhost:8200/DataService";
             foobFactory = new ChannelFactory<IDataServerInterface>(tcp, URL);
             foob = foobFactory.CreateChannel();
@@ -31,7 +36,13 @@ namespace BusinessLayer
 
         public List<Lobby> GetAllLobbies()
         {
-            return foob.GetAllLobbies();
+            Log($"Retriving Lobbies from data layer");
+            List<Lobby> lobbyList = foob.GetAllLobbies();
+            foreach (Lobby lob in lobbyList)
+            {
+                Log($"Lobby {lob.Name}, {lob.ID}");
+            }
+            return lobbyList;
         }
 
         public List<User> GetUsers(Lobby lobby)
@@ -53,8 +64,7 @@ namespace BusinessLayer
         {
             Log($"Added new user: {user.Name}");
             foob.AddUser(user);
-            IClientCallback callback = OperationContext.Current.GetCallbackChannel<IClientCallback>();
-            clients[user.Name]= callback;
+            OperationContext.Current.GetCallbackChannel<ProcessServiceCallBack>().UpdateUserCount(foob.GetAllUsers().Count());
         }
 
         public List<string> GetUniqueModes(List<Lobby> curLobbyList)
@@ -105,6 +115,11 @@ namespace BusinessLayer
             return true;
         }
 
+        public List<Message> getChats(int lobbyId, User currUser)
+        {
+            return foob.GetChats(lobbyId, currUser);
+        }
+
         [MethodImpl(MethodImplOptions.Synchronized)]
         private void Log(string logString)
         {
@@ -124,21 +139,6 @@ namespace BusinessLayer
         public void DownloadFile()
         {
             Log($"File download by ?");
-        }
-
-        public void UpdateUserCount(int userCount)
-        {
-            foreach(var client in clients.Values)
-            {
-                try
-                {
-                    client.UpdateUserCount(userCount);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-            }
         }
     }
 }

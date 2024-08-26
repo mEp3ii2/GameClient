@@ -13,7 +13,7 @@ namespace BusinessLayer
         {
            
             //This should *definitely* be more descriptive.
-            Console.WriteLine("Server starting...");
+            Console.WriteLine("Business Server starting...");
             //This is the actual host service system
             ServiceHost host;
             //This represents a tcp/ip binding in the Windows network stack

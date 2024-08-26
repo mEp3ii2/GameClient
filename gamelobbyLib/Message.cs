@@ -11,7 +11,7 @@ namespace GameLobbyLib
         private int lobbyID;
         private List<string> messageList;
         private User[] userList;
-
+        
         //userList can be null in the case of the lobby group chat
         public Message(int lobbyID, User[] userList = null)
         {

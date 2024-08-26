@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace BusinessLayer
 {
-    [ServiceContract(CallbackContract = typeof(IClientCallback))]
+    [ServiceContract(CallbackContract =typeof(ProcessServiceCallBack))]
     public interface IBusinessServerInterface
     {
         [OperationContract]
@@ -54,8 +54,12 @@ namespace BusinessLayer
         void RemoveUser(Lobby lobby,User user);
 
         [OperationContract]
+        List<Message> getChats(int lobbyId, User currUser);
+    }
+
+    public interface ProcessServiceCallBack
+    {
+        [OperationContract(IsOneWay = true)]
         void UpdateUserCount(int userCount);
-        
-        
     }
 }

@@ -11,7 +11,7 @@
     </Window.Resources>
     <Grid>
         <Grid.Background>
-            <ImageBrush ImageSource="/formBackGroundImage.jpg" Stretch="UniformToFill"/>
+            <ImageBrush ImageSource="Resources/formBackGroundImage.jpg" Stretch="UniformToFill"/>
         </Grid.Background>
         <TextBox x:Name="userNameBox" HorizontalAlignment="Left" Margin="125,80,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" Foreground="Black"/>
         <Label Content="Enter User Name" HorizontalAlignment="Left" Margin="130,49,0,0" VerticalAlignment="Top" Width="110" Foreground="White"/>

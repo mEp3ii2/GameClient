@@ -40,6 +40,9 @@ namespace DataLayer
 
         [OperationContract]
         void AddLobby(Lobby lobby);
+        
+        [OperationContract]
+        List<Message> GetChats(int lobbyId, User currUser);
 
        
         
