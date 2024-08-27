@@ -24,6 +24,10 @@ namespace DataLayer
             foreach (Lobby lobb in lob)
             {
                 Log($"Lobby {lobb.Name}, ID: {lobb.ID}");
+                foreach(User user in lobb.Users)
+                {
+                    Log($"\tUser: {user.Name}");
+                }
             }
             return lob;
         }
@@ -83,6 +87,17 @@ namespace DataLayer
         {
             database.RemoveUser(lobby, user);
         }
+
+        public void UpdateMessage(Message msg)
+        {
+            database.UpdateMessage(msg);
+        }
+
+        public void joinLobby(Lobby lobby, User user)
+        {
+            database.joinLobby(lobby, user);
+        }
+
 
         public List<Message> GetChats(int lobbyID, User currUser)
         {

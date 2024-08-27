@@ -44,12 +44,16 @@ namespace DataLayer
         [OperationContract]
         List<Message> GetChats(int lobbyId, User currUser);
 
-       
-        
+        [OperationContract]
+        void joinLobby(Lobby lobby, User user);
+
         [OperationContract]
         void saveFile(string fileName, byte[] fileData);
         
         [OperationContract]
         void RemoveUser(Lobby lobby, User user);
+
+        [OperationContract]
+        void UpdateMessage(Message msg);
     }
 }

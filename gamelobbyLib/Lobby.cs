@@ -16,7 +16,6 @@ namespace GameLobbyLib
         private string description;
         private string mode;
         private List<string> tags;
-        private int userCount;
         public int Id; // if set to private id doesnt get passed to businesss layer and its set to 0 so idk
 
 
@@ -30,7 +29,6 @@ namespace GameLobbyLib
             Description = description;
             Mode = mode;
             Tags = tags;
-            userCount = users.Count();
         }
 
         
@@ -66,11 +64,6 @@ namespace GameLobbyLib
         { 
             get => tags; 
             set => tags = value; 
-        }
-
-        public int UserCount
-        {
-            get => userCount;
         }
 
         public string TagDis

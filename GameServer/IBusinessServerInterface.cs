@@ -55,6 +55,12 @@ namespace BusinessLayer
 
         [OperationContract]
         List<Message> getChats(int lobbyId, User currUser);
+
+        [OperationContract]
+        void UpdateMessage(Message msg);
+
+        [OperationContract]
+        void joinLobby(Lobby lobby, User user);
     }
 
     public interface ProcessServiceCallBack

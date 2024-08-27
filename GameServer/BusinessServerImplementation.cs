@@ -23,15 +23,12 @@ namespace BusinessLayer
 
             ChannelFactory<IDataServerInterface> foobFactory;
             NetTcpBinding tcp = new NetTcpBinding();
-            tcp.ReceiveTimeout = TimeSpan.FromMinutes(10); // Increase as needed
-            tcp.SendTimeout = TimeSpan.FromMinutes(10);
-            tcp.OpenTimeout = TimeSpan.FromMinutes(10);
-            tcp.CloseTimeout = TimeSpan.FromMinutes(10);
             
 
             string URL = "net.tcp://localhost:8200/DataService";
             foobFactory = new ChannelFactory<IDataServerInterface>(tcp, URL);
             foob = foobFactory.CreateChannel();
+            
         }
 
         public List<Lobby> GetAllLobbies()
@@ -120,6 +117,8 @@ namespace BusinessLayer
             return foob.GetChats(lobbyId, currUser);
         }
 
+        
+
         [MethodImpl(MethodImplOptions.Synchronized)]
         private void Log(string logString)
         {
@@ -139,6 +138,16 @@ namespace BusinessLayer
         public void DownloadFile()
         {
             Log($"File download by ?");
+        }
+
+        public void UpdateMessage(Message msg)
+        {
+            foob.UpdateMessage(msg);
+        }
+
+        public void joinLobby(Lobby lobby, User user)
+        {
+            foob.joinLobby(lobby,user);
         }
     }
 }

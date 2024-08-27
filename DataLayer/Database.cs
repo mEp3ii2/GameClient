@@ -19,11 +19,12 @@ namespace DataLayer
             }
             return Instance;
         }
+        
 
-        List<Lobby> lobbies;
-        List<User> users;
-        List<Message> messages;
-        List<UploadedFile> uploadedFiles;
+        static List<Lobby> lobbies;
+        static List<User> users;
+        static List<Message> messages;
+        static List<UploadedFile> uploadedFiles;
 
         List<string> tags;        //test value to be removed later
 
@@ -52,6 +53,8 @@ namespace DataLayer
             addNewLobby("test", "testing arena", "King of the Hill", tags);
             addNewLobby("test", "testing arena", "deathmatch", tags);
             addNewLobby("test", "testing arena", "King of the Hill", new List<string> {"Solo"});
+            lobbies[0].Users.Add(user1);
+            lobbies[0].Users.Add(user2);
         }
 
         public List<Lobby> getAllLobbies()
@@ -159,6 +162,27 @@ namespace DataLayer
             
             return messages.Where(m => m.LobbyID == id && (m.UserList == null || m.UserList.Contains(currUser))).ToList();
         }
+
+        public Message getMessage(int id)
+        {
+            return messages.FirstOrDefault(m => m.ID == id);
+        }
+
+        public void UpdateMessage(Message msg)
+        {
+
+            Message existingMsg = getMessage(msg.ID);
+            existingMsg.MessageList = msg.MessageList;
+        }
+
+        public void joinLobby(Lobby lobby, User user)
+        {
+            lobby.Users.Add(user);
+        }
+
+        
+
+
         //public void addFile(int lobbyID,!fileDetails here not sure yet)
 
         

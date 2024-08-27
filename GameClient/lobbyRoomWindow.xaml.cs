@@ -71,34 +71,13 @@ namespace GameClient
 
         private void messageBtn_Click(object sender, RoutedEventArgs e)
         {
-            addNewMessage(currUser, userMessageBox.Text.ToString());
-            userMessageBox.Clear();
+            string msg =$"{currUser.Name}: {userMessageBox.Text.ToString()}\n";
+            displayedChat.MessageList.Add(msg);
+            foob.UpdateMessage(displayedChat);
+            displayMsgs(displayedChat);
         }
 
-        private void addNewMessage(User currUser, string message)
-        {
-            Paragraph pg = new Paragraph();
-
-            Run userNameRun = new Run(currUser.Name + ": ")
-            {
-                FontWeight = FontWeights.Bold,
-                Foreground = Brushes.Red
-            };
-
-            Run messageRun = new Run(message)
-            {
-                Foreground = Brushes.Black
-            };
-
-            pg.Inlines.Add(userNameRun);
-            pg.Inlines.Add(messageRun);
-
-            
-            messageList.Document.Blocks.Add(pg);
-
-            
-            messageList.ScrollToEnd();
-        }
+        
 
         private void attachmentBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -129,14 +108,16 @@ namespace GameClient
 
         private void displayMsgs(Message currChat)
         {
-            List<string> msg = currChat.MessageList;
-            
-            foreach (string msgItem in msg)
-            {
-                messageList.AppendText(msgItem + Environment.NewLine);
-            }
+            messageList.Document.Blocks.Clear();
+            List<string> msgList = currChat.MessageList;
 
-            
+            foreach (string msgItem in msgList)
+            {
+                // Create a new paragraph for each message item
+                var paragraph = new Paragraph(new Run(msgItem));
+                messageList.Document.Blocks.Add(paragraph);
+            }
         }
+
     }
 }

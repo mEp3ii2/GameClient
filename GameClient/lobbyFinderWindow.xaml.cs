@@ -76,7 +76,9 @@ namespace GameClient
         {
             
             Lobby selectedLobby = (Lobby) lobbyList.SelectedItem;
-            selectedLobby.Users.Add(currUser);
+            foob.joinLobby(selectedLobby, currUser);
+            MessageBox.Show(selectedLobby.Users.Count().ToString());
+            
             lobbyRoomWindow curWindow = new lobbyRoomWindow(selectedLobby, currUser, foob);
             curWindow.Show();
             this.Close();
