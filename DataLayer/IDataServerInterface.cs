@@ -6,10 +6,10 @@ using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessLayer
+namespace DataLayer
 {
     [ServiceContract]
-    public interface BusinessServerInterface
+    public interface IDataServerInterface
     {
         [OperationContract]
         List<User> GetUsers(Lobby lobby);
@@ -40,18 +40,16 @@ namespace BusinessLayer
 
         [OperationContract]
         void AddLobby(Lobby lobby);
-
-        [OperationContract]
-        bool UniqueUser(string userName);
         
         [OperationContract]
-        void UploadFile(byte[] fileData, string fileName);
+        List<Message> GetChats(int lobbyId, User currUser);
 
-        [OperationContract]
-        void DownloadFile();
-
-        [OperationContract]
-        void RemoveUser(Lobby lobby,User user);
+       
         
+        [OperationContract]
+        void saveFile(string fileName, byte[] fileData);
+        
+        [OperationContract]
+        void RemoveUser(Lobby lobby, User user);
     }
 }

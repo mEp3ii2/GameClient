@@ -14,8 +14,6 @@
         <DataGrid x:Name="lobbyList" HorizontalAlignment="Left" Height="290" Margin="25,0,0,0" VerticalAlignment="Center" Width="747" AutoGenerateColumns ="False" SelectionChanged="lobbyList_SelectionChanged" IsReadOnly="True">
             <DataGrid.Columns>
                 <DataGridTextColumn Header ="Name" Binding ="{Binding Name}" />
-                <DataGridTextColumn Header ="Host" Binding ="{Binding Host}" />
-                <DataGridTextColumn Header="Title" Binding="{Binding Title}" />
                 <DataGridTextColumn Header="Description" Binding="{Binding Description}"/>
                 <DataGridTextColumn Header="Mode" Binding="{Binding Mode}" />
                 <DataGridTextColumn Header="User Count" Binding="{Binding UserCount}" />
@@ -28,5 +26,6 @@
         <Button x:Name="clearBtn" Content="Clear" HorizontalAlignment="Left" Margin="652,36,0,0" VerticalAlignment="Top" Width="120" Click="clearBtn_Click"/>
         <Label Content="Tag: " HorizontalAlignment="Left" Height="31" Margin="164,2,0,0" VerticalAlignment="Top" Width="86" Foreground="White"/>
         <ComboBox x:Name="tagFilterBox" HorizontalAlignment="Left" Margin="164,36,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="tagFilterBox_SelectionChanged" />
+        <Label x:Name="lobbyCountLabel" Content="Active Lobbies: " HorizontalAlignment="Left" Margin="327,373,0,0" VerticalAlignment="Top" Width="169" Foreground="White"/>
     </Grid>
 </Window>

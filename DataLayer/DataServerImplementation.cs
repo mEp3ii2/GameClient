@@ -1,22 +1,31 @@
 ﻿using GameLobbyLib;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.ServiceModel;
+using System.Threading.Tasks;
 
 namespace DataLayer
 {
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, UseSynchronizationContext = false)]
-    internal class DataServerImplementation : DataServerInterface
+    internal class DataServerImplementation : IDataServerInterface //change back to internal later
     {
         private static Database database;
+        private static uint logNumber = 0;
         public DataServerImplementation()
         {
-            database = new Database();
+            database = Database.getInstance();
         }
 
         public List<Lobby> GetAllLobbies()
         {
-            return database.getAllLobbies();
+            Log($"Grabbing all Lobbies");
+            List<Lobby> lob = database.getAllLobbies();
+            foreach (Lobby lobb in lob)
+            {
+                Log($"Lobby {lobb.Name}, ID: {lobb.ID}");
+            }
+            return lob;
         }
 
         public List<User> GetUsers(Lobby lobby)
@@ -46,7 +55,7 @@ namespace DataLayer
 
         public List<Lobby> GetfilterdLobbiesList(string mode = null, string tag = null)
         {
-            return database.getfilterdLobbiesList();
+            return database.getfilterdLobbiesList(mode, tag);
         }
 
         public List<string> GetAllModeTypes()
@@ -62,9 +71,8 @@ namespace DataLayer
         public void AddLobby(Lobby lobby)
         {
             database.addNewLobby(lobby);
+            
         }
-
-
 
         public void saveFile(string fileName, byte[] fileData)
         {
@@ -75,5 +83,25 @@ namespace DataLayer
         {
             database.RemoveUser(lobby, user);
         }
+
+        public List<Message> GetChats(int lobbyID, User currUser)
+        {
+            Log($"Retrieving Chats associated with lobby id {lobbyID} for user {currUser}");
+            List<Message> lobMes = database.getChats(lobbyID, currUser);
+            foreach (Message message in lobMes)
+            {
+                Log($"Retrieved message: {message.LobbyID}");
+            }
+            return lobMes;
+        }
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        private void Log(string logString)
+        {
+            logNumber++;
+            string logMsg = $"Log #{logNumber}: {logString} at {DateTime.Now}";
+            Console.WriteLine(logMsg);
+        }
+
     }
 }

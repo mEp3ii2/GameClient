@@ -8,26 +8,41 @@ using System.Threading.Tasks;
 using DataLayer;
 using System.Runtime.CompilerServices;
 using System.IO;
+using System.Collections.Concurrent;
 
-namespace BusinessLayer
+namespace BusinessLayer    
 {
+    
+
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, UseSynchronizationContext = false)]
-    internal class BusinessServerImplementation : BusinessServerInterface
+    internal class BusinessServerImplementation : IBusinessServerInterface
     {
-        private DataServerInterface foob;
+        private IDataServerInterface foob;
         private static uint logNumber = 0;
         public BusinessServerImplementation() {
 
-            ChannelFactory<DataServerInterface> foobFactory;
+            ChannelFactory<IDataServerInterface> foobFactory;
             NetTcpBinding tcp = new NetTcpBinding();
+            tcp.ReceiveTimeout = TimeSpan.FromMinutes(10); // Increase as needed
+            tcp.SendTimeout = TimeSpan.FromMinutes(10);
+            tcp.OpenTimeout = TimeSpan.FromMinutes(10);
+            tcp.CloseTimeout = TimeSpan.FromMinutes(10);
+            
+
             string URL = "net.tcp://localhost:8200/DataService";
-            foobFactory = new ChannelFactory<DataServerInterface>(tcp, URL);
+            foobFactory = new ChannelFactory<IDataServerInterface>(tcp, URL);
             foob = foobFactory.CreateChannel();
         }
 
         public List<Lobby> GetAllLobbies()
         {
-            return foob.GetAllLobbies();
+            Log($"Retriving Lobbies from data layer");
+            List<Lobby> lobbyList = foob.GetAllLobbies();
+            foreach (Lobby lob in lobbyList)
+            {
+                Log($"Lobby {lob.Name}, {lob.ID}");
+            }
+            return lobbyList;
         }
 
         public List<User> GetUsers(Lobby lobby)
@@ -49,6 +64,7 @@ namespace BusinessLayer
         {
             Log($"Added new user: {user.Name}");
             foob.AddUser(user);
+            OperationContext.Current.GetCallbackChannel<ProcessServiceCallBack>().UpdateUserCount(foob.GetAllUsers().Count());
         }
 
         public List<string> GetUniqueModes(List<Lobby> curLobbyList)
@@ -97,6 +113,11 @@ namespace BusinessLayer
             }
             Log($"Login for {userName} successful ");
             return true;
+        }
+
+        public List<Message> getChats(int lobbyId, User currUser)
+        {
+            return foob.GetChats(lobbyId, currUser);
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]

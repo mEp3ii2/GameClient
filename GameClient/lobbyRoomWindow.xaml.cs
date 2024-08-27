@@ -28,8 +28,10 @@ namespace GameClient
         
         private User currUser;
         private List<User> lobbyList;
-        private BusinessServerInterface foob;
-        public lobbyRoomWindow(Lobby selectedLobby, User currUser,BusinessServerInterface foob) 
+        private List<Message> messages;
+        private IBusinessServerInterface foob;
+        private Message displayedChat;
+        public lobbyRoomWindow(Lobby selectedLobby, User currUser,IBusinessServerInterface foob) 
         {
             
             InitializeComponent();
@@ -39,11 +41,10 @@ namespace GameClient
             
             lobbyList = selectedLobby.Users.ToList();
             userlistBox.ItemsSource = lobbyList;
-
-            // Set the initial text from the passed-in variable
-            Paragraph initialParagraph = new Paragraph();
-            initialParagraph.Inlines.Add(new Run(selectedLobby.Name));
-            messageList.Document.Blocks.Add(initialParagraph);
+            MessageBox.Show(selectedLobby.Name+ selectedLobby.ID.ToString());
+            messages = foob.getChats(selectedLobby.ID, currUser);
+            displayedChat = messages.FirstOrDefault(m => m.UserList == null);
+            displayMsgs(displayedChat);
 
             //fill userList
             
@@ -116,6 +117,26 @@ namespace GameClient
         private void userList_TextChanged(object sender, TextChangedEventArgs e)
         {
             //load chat related to selected user
+        }
+
+        private void userlistBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // user has selected user or lobby
+            // change message box to relect chat with said entity
+            string selectedChat = userlistBox.SelectedItem.ToString();
+
+        }
+
+        private void displayMsgs(Message currChat)
+        {
+            List<string> msg = currChat.MessageList;
+            
+            foreach (string msgItem in msg)
+            {
+                messageList.AppendText(msgItem + Environment.NewLine);
+            }
+
+            
         }
     }
 }

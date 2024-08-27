@@ -25,31 +25,29 @@ namespace GameClient
     {
         private User currUser;
         
-        private List<Lobby> currentList;
+        private List<Lobby> currentList;//list of lobbies retrieved from business layer
         private string currentModeFilter;
         private string currentTagFilter;
-        private BusinessServerInterface foob;
+        private IBusinessServerInterface foob;
 
-        public lobbyFinderWindow(User currUser, BusinessServerInterface foob)
+        public lobbyFinderWindow(User currUser, IBusinessServerInterface foob)
         {
             InitializeComponent();
-            this.foob = foob;
+            this.foob = foob;// connection to business layer
 
-            //i think i would be better to just pass it around rather than reconnect on every window open
-            /*ChannelFactory<BusinessServerInterface> foobFactory;
-            NetTcpBinding tcp = new NetTcpBinding();
-            string URL = "net.tcp://localhost:8100/GameService";
-            foobFactory = new ChannelFactory<BusinessServerInterface>(tcp, URL);
-            foob = foobFactory.CreateChannel();
-            */
-
-            this.currUser = currUser;
+            this.currUser = currUser; 
             currentList = foob.GetAllLobbies();
-            lobbyList.ItemsSource = foob.GetAllLobbies();
+            lobbyList.ItemsSource = currentList;
             loadModeFilterBox();
             loadTagFilterBox();
             currentModeFilter = null;
             currentTagFilter = null;
+            updateLobbyCountLabel(currentList.Count);
+        }
+
+        private void updateLobbyCountLabel(int lobbyCount)
+        {
+            lobbyCountLabel.Content =$"Active Lobbies: {lobbyCount}";
         }
 
         //loads list of unique modes plus a blank option for user to be able to unselect mode filter
@@ -62,6 +60,7 @@ namespace GameClient
             modeFilterBox.ItemsSource = modelist;
         }
 
+        //loads list of unique modes plus a blank option for user to be able to unselect mode filter
         private void loadTagFilterBox()
         {
             List<string> tagList = new List<string>();
@@ -71,10 +70,11 @@ namespace GameClient
             tagFilterBox.ItemsSource = tagList;
         }
 
+        // user has double clicked on lobby
+        // send user to lobby
         private void lobbyList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            // user has double clicked on lobby
-            // send user to lobby
+            
             Lobby selectedLobby = (Lobby) lobbyList.SelectedItem;
             selectedLobby.Users.Add(currUser);
             lobbyRoomWindow curWindow = new lobbyRoomWindow(selectedLobby, currUser, foob);
@@ -83,6 +83,7 @@ namespace GameClient
             //need to modify lobby to reflect new user
         }
 
+        // option window for creating new lobby
         private void createBtn_Click(object sender, RoutedEventArgs e)
         {
             // user creating room
@@ -92,6 +93,7 @@ namespace GameClient
             
         }
 
+        // user had select a mode to filter on
         private void modeFilterBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (modeFilterBox.SelectedItem.ToString() == "")

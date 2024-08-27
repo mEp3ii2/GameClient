@@ -18,6 +18,7 @@ using GameLobbyLib;
 using System.Configuration;
 using BusinessLayer;
 
+
 namespace GameClient
 {
     /// <summary>
@@ -27,16 +28,25 @@ namespace GameClient
     public delegate bool VerifyUser(string userName);
     public partial class MainWindow : Window
     {
-        private BusinessServerInterface foob;
+        private IBusinessServerInterface foob;
+        private ProcessServiceCallBack foobCallback;
+
+
         public MainWindow()
         {
             InitializeComponent();
 
-            ChannelFactory<BusinessServerInterface> foobFactory;
+
+            DuplexChannelFactory<IBusinessServerInterface> foobFactory;
             NetTcpBinding tcp = new NetTcpBinding();
+            
             string URL = "net.tcp://localhost:8100/GameService";
-            foobFactory = new ChannelFactory<BusinessServerInterface>(tcp, URL);
+            foobCallback = new ProcessServiceCallBackImpl(this);
+            
+            foobFactory = new DuplexChannelFactory<IBusinessServerInterface>
+                (foobCallback, tcp, URL); 
             foob = foobFactory.CreateChannel();
+
 
             userNumber.Text = "Number of Users: " + foob.GetAllUsers().Count(); 
             
@@ -70,6 +80,22 @@ namespace GameClient
         private bool VerifyUser(string userName)
         {
             return foob.UniqueUser(userName);
+        }
+
+        public void UpdateUserCount(int userAmount)
+        {
+            if (userNumber.Dispatcher.CheckAccess())
+            {
+                userNumber.Text = "Number of Users: " + userAmount.ToString();
+            }
+            else
+            {
+                userNumber.Dispatcher.Invoke(() =>
+                {
+                    userNumber.Text = "Number of Users: " + userAmount.ToString();
+                });
+            }
+            
         }
     }
 }

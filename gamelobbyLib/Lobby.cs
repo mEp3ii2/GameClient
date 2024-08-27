@@ -10,20 +10,21 @@ namespace GameLobbyLib
 
     public class Lobby
     {
-        private static int Id = 0;
+        private static int nextID = 1;
         private string name;
         private List<User> users;
         private string description;
         private string mode;
         private List<string> tags;
-        private readonly int userCount;
+        private int userCount;
+        public int Id; // if set to private id doesnt get passed to businesss layer and its set to 0 so idk
 
 
         public Lobby() { } //I dont fully understand why this works but DO NOT REMOVE. It fucks with something to do with serialization
 
-        public Lobby(string name, User hostUser, string title, string description, string mode, List<string> tags)
+        public Lobby(string name,  string description, string mode, List<string> tags)
         {
-            Id = Id++;
+            Id = nextID++;
             Name = name;
             users = new List<User>();
             Description = description;
@@ -32,6 +33,7 @@ namespace GameLobbyLib
             userCount = users.Count();
         }
 
+        
         public int ID
         {
             get { return Id; }

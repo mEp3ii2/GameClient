@@ -27,9 +27,9 @@ namespace GameClient
         private string desc;
         private string roomName;
         private List<string> tags;
-        private BusinessServerInterface foob;
+        private IBusinessServerInterface foob;
         
-        public createLobbyWindow(User currUser, BusinessServerInterface foob)
+        public createLobbyWindow(User currUser, IBusinessServerInterface foob)
         {
             InitializeComponent();
 
@@ -66,7 +66,7 @@ namespace GameClient
             roomName = nameTxtBox.Text;
             desc = descTxtBox.Text;
             MessageBox.Show(mode+" "+tagString + " " +roomName + " " + desc);
-            Lobby tempLob = new Lobby(roomName, currUser, roomName, desc, mode, tags);
+            Lobby tempLob = new Lobby(roomName,desc, mode, tags);
             foob.AddLobby(tempLob);
             lobbyRoomWindow curWindow = new lobbyRoomWindow(tempLob,currUser,foob);
             curWindow.Show();
