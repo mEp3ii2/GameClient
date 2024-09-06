@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace GameLobbyLib
-{
+{ 
     public class User
     {
         private string name;

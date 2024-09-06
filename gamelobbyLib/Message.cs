@@ -12,17 +12,15 @@ namespace GameLobbyLib
     {
         public int id;
         private static int nextID = 1;
-        public int lobbyID;
         private List<string> messageList;
-        private User[] userList;
+        private string[] userList;
 
         public Message() { }//I dont fully understand why this works but DO NOT REMOVE. It fucks with something to do with serialization
 
         //userList can be null in the case of the lobby group chat
-        public Message(int lobbyID, User[] userList = null)
+        public Message(string[] userList = null)
         {
-            id = nextID++;
-            this.lobbyID = lobbyID; 
+            id = nextID++; 
             this.messageList = new List<string>();
             this.userList = userList;
         }
@@ -31,12 +29,6 @@ namespace GameLobbyLib
         {
             get { return id; }
         }
-
-        public int LobbyID
-        {
-            get { return lobbyID; }
-        }
-
     
         public List<string> MessageList
         {
@@ -45,9 +37,10 @@ namespace GameLobbyLib
         }
 
         [DataMember]
-        public User[] UserList
+        public string[] UserList
         {
-            get { return userList; }            
+            get { return userList; }
+            set { userList = value; }
         }
 
     }

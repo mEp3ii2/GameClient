@@ -47,9 +47,19 @@ namespace BusinessLayer
             return foob.GetUsers(lobby);
         }
 
+        public User GetUser(string name)
+        {
+            return foob.GetUser(name);
+        }
+
         public void RemoveUserFromLobby(Lobby lobby, User user)
         {
             foob.RemoveUserFromLobby(lobby, user);
+        }
+
+        public void AddMessage(Lobby lobby, User user1, User user2)
+        {
+            foob.AddMessage(lobby, user1, user2);
         }
 
         public void RemoveUser(User user)
@@ -145,14 +155,24 @@ namespace BusinessLayer
             Log($"File download by ?");
         }
 
-        public void UpdateMessage(Message msg)
+        public void UpdateMessage(Message msg, Lobby lobby)
         {
-            foob.UpdateMessage(msg);
+            foob.UpdateMessage(msg, lobby);
         }
 
         public void joinLobby(Lobby lobby, User user)
         {
             foob.joinLobby(lobby,user);
+        }
+
+        public Message GetMessage(User user1, User user2, Lobby lobby)
+        {
+            return foob.GetMessage(user1, user2, lobby);
+        }
+
+        public Lobby GetLobby(Lobby lobby)
+        {
+            return foob.GetLobby(lobby);
         }
     }
 }

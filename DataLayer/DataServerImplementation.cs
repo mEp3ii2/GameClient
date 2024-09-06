@@ -1,6 +1,7 @@
 ﻿using GameLobbyLib;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.ServiceModel;
 using System.Threading.Tasks;
@@ -41,6 +42,11 @@ namespace DataLayer
                 Log($"{user}");
             }
             return users;
+        }
+
+        public User GetUser(string name)
+        {
+            return database.getUser(name);
         }
 
         public List<User> GetAllUsers()
@@ -106,9 +112,10 @@ namespace DataLayer
             database.RemoveUser(user);
         }
 
-        public void UpdateMessage(Message msg)
+        public void UpdateMessage(Message msg, Lobby lobby)
         {
-            database.UpdateMessage(msg);
+            Lobby thisLobby = database.getLobby(lobby.Name);
+            thisLobby.updateMessage(msg);
         }
 
         public void joinLobby(Lobby lobby, User user)
@@ -121,10 +128,14 @@ namespace DataLayer
         public List<Message> GetChats(Lobby lobby, User currUser)
         {
             Log($"Retrieving Chats associated with lobby id {lobby.ID} for user {currUser}");
-            List<Message> lobMes = database.getChats(lobby, currUser);
-            foreach (Message message in lobMes)
+            Lobby thisLobby =  database.getLobby(lobby.Name);
+            List<Message> lobMes = new List<Message>();
+            foreach (Message message in thisLobby.Messages)
             {
-                Log($"Retrieved message: {message.LobbyID}");
+                if (message.UserList.Contains(null) || message.UserList.Contains(currUser.Name))
+                {
+                    lobMes.Add(message);
+                }
             }
             return lobMes;
         }
@@ -137,5 +148,21 @@ namespace DataLayer
             Console.WriteLine(logMsg);
         }
 
+        public void AddMessage(Lobby lobby, User user1, User user2)
+        {
+            Lobby thisLobby = database.getLobby(lobby.Name);
+            thisLobby.Messages.Add(new Message(new string[] {user1.Name, user2.Name}));
+        }
+
+        public Message GetMessage(User user1, User user2, Lobby lobby)
+        {
+            Lobby thisLobby = database.getLobby(lobby.Name);
+            return thisLobby.getMessage(user1, user2);
+        }
+
+        public Lobby GetLobby(Lobby lobby)
+        {
+            return database.getLobby(lobby.Name);
+        }
     }
 }

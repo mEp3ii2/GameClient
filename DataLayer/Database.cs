@@ -24,7 +24,6 @@ namespace DataLayer
 
         static List<Lobby> lobbies;
         static List<User> users;
-        static List<Message> messages;
         static List<UploadedFile> uploadedFiles;
 
         List<string> tags;        //test value to be removed later
@@ -40,7 +39,6 @@ namespace DataLayer
         public Database()
         {
             lobbies = new List<Lobby>();
-            messages = new List<Message>();
             User user1 = new User("me");
             User user2 = new User("frank");
             users = new List<User>();
@@ -70,6 +68,17 @@ namespace DataLayer
             return users;
         }
 
+        public User getUser(string name)
+        {
+            foreach (User user in users)
+            {
+                if (user.Name.Equals(name))
+                {
+                    return user;
+                }
+            }
+            return null;
+        }
         public List<User> getAllUsers()
         {
             return users;
@@ -156,22 +165,15 @@ namespace DataLayer
             }
 
             lobbies.Add(lobby);//need to make a call to the server to update lobby list for other clients
-            newChat(lobby.ID, null);
         }
 
         public void addNewLobby(Lobby lobby) {
             lobbies.Add(lobby);
-            newChat(lobby.ID, null);
         }
 
         public void addUser(User user)
         {
             users.Add(user);
-        }
-    
-        public void newChat(int lobbyID,User[] userList = null)
-        {
-            messages.Add(new Message(lobbyID, userList));
         }
 
         public Lobby getLobby(string name)
@@ -182,23 +184,6 @@ namespace DataLayer
                     return lobby;
             }
             return null;
-        }
-
-        public List<Message> getChats(Lobby lobby, User currUser)
-        {
-            return messages.Where(m => m.lobbyID == lobby.ID && (m.UserList == null || m.UserList.Contains(currUser))).ToList();
-        }
-
-        public Message getMessage(int id)
-        {
-            return messages.FirstOrDefault(m => m.ID == id);
-        }
-
-        public void UpdateMessage(Message msg)
-        {
-
-            Message existingMsg = getMessage(msg.ID);
-            existingMsg.MessageList = msg.MessageList;
         }
 
         public void joinLobby(Lobby lobby, User user)
