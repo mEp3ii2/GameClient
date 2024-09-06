@@ -47,9 +47,14 @@ namespace BusinessLayer
             return foob.GetUsers(lobby);
         }
 
-        public void RemoveUser(Lobby lobby, User user)
+        public void RemoveUserFromLobby(Lobby lobby, User user)
         {
-            foob.RemoveUser(lobby, user);
+            foob.RemoveUserFromLobby(lobby, user);
+        }
+
+        public void RemoveUser(User user)
+        {
+            foob.RemoveUser(user);
         }
 
         public List<User> GetAllUsers()
@@ -112,9 +117,9 @@ namespace BusinessLayer
             return true;
         }
 
-        public List<Message> getChats(int lobbyId, User currUser)
+        public List<Message> getChats(Lobby lobby, User currUser)
         {
-            return foob.GetChats(lobbyId, currUser);
+            return foob.GetChats(lobby, currUser);
         }
 
         

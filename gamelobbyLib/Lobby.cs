@@ -71,5 +71,22 @@ namespace GameLobbyLib
             // uses ternery operator to either return the tags list in string form or an empty string
             get => Tags != null ? string.Join(",",Tags): string.Empty;
         }
+
+        public void addUser(User user)
+        {
+            users.Add(user);
+        }
+
+        public void removeUser(User user)
+        {
+            foreach (User searchUser in users)
+            {
+                if (searchUser.Name.Equals(user.Name))
+                {
+                    users.Remove(searchUser);
+                    break;
+                }
+            }
+        }
     }
 }

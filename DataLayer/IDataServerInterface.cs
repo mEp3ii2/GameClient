@@ -42,7 +42,7 @@ namespace DataLayer
         void AddLobby(Lobby lobby);
         
         [OperationContract]
-        List<Message> GetChats(int lobbyId, User currUser);
+        List<Message> GetChats(Lobby lobby, User currUser);
 
         [OperationContract]
         void joinLobby(Lobby lobby, User user);
@@ -51,7 +51,10 @@ namespace DataLayer
         void saveFile(string fileName, byte[] fileData);
         
         [OperationContract]
-        void RemoveUser(Lobby lobby, User user);
+        void RemoveUserFromLobby(Lobby lobby, User user);
+
+        [OperationContract]
+        void RemoveUser(User user);
 
         [OperationContract]
         void UpdateMessage(Message msg);

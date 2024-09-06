@@ -31,18 +31,20 @@ namespace GameClient
         private List<Message> messages;
         private IBusinessServerInterface foob;
         private Message displayedChat;
+        private Lobby thisLobby;
         public lobbyRoomWindow(Lobby selectedLobby, User currUser,IBusinessServerInterface foob) 
         {
             
             InitializeComponent();
             this.currUser = currUser;
             this.foob = foob;
+            this.thisLobby = selectedLobby;
             messageList.Document.Blocks.Clear();
             
-            lobbyList = selectedLobby.Users.ToList();
+            lobbyList = foob.GetUsers(thisLobby);
             userlistBox.ItemsSource = lobbyList;
             MessageBox.Show(selectedLobby.Name+ selectedLobby.ID.ToString());
-            messages = foob.getChats(selectedLobby.ID, currUser);
+            messages = foob.getChats(thisLobby, currUser);
             displayedChat = messages.FirstOrDefault(m => m.UserList == null);
             displayMsgs(displayedChat);
 
@@ -59,11 +61,14 @@ namespace GameClient
 
         private void logOutBtn_Click(object sender, RoutedEventArgs e)
         {
+            foob.RemoveUserFromLobby(thisLobby, currUser);
+            foob.RemoveUser(currUser);
             this.Close();
         }
 
         private void backButton_Click(object sender, RoutedEventArgs e)
         {
+            foob.RemoveUserFromLobby(thisLobby, currUser);
             lobbyFinderWindow curWindow = new lobbyFinderWindow(currUser, foob);
             this.Close();
             curWindow.Show();
@@ -117,6 +122,19 @@ namespace GameClient
                 var paragraph = new Paragraph(new Run(msgItem));
                 messageList.Document.Blocks.Add(paragraph);
             }
+        }
+
+        private void refreshBtn_click(object sender, RoutedEventArgs e)
+        {
+            //Update messages from server
+            messages = foob.getChats(thisLobby, currUser);
+            displayedChat = messages.FirstOrDefault(m => m.UserList == null);
+            displayMsgs(displayedChat);
+
+            //Update users in server
+            userlistBox.ItemsSource = null;
+            lobbyList = foob.GetUsers(thisLobby);
+            userlistBox.ItemsSource = lobbyList;
         }
 
     }

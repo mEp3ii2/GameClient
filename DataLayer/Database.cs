@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
 using GameLobbyLib;
@@ -49,10 +50,10 @@ namespace DataLayer
             tags = new List<string> { "newbie", "friendly", "casual" };
 
 
-            addNewLobby("test", "testing arena", "deathmatch", tags);
-            addNewLobby("test", "testing arena", "King of the Hill", tags);
-            addNewLobby("test", "testing arena", "deathmatch", tags);
-            addNewLobby("test", "testing arena", "King of the Hill", new List<string> {"Solo"});
+            addNewLobby("test1", "testing arena", "deathmatch", tags);
+            addNewLobby("test2", "testing arena", "King of the Hill", tags);
+            addNewLobby("test3", "testing arena", "deathmatch", tags);
+            addNewLobby("test4", "testing arena", "King of the Hill", new List<string> {"Solo"});
             lobbies[0].Users.Add(user1);
             lobbies[0].Users.Add(user2);
         }
@@ -64,7 +65,9 @@ namespace DataLayer
 
         public List<User> getLobbyUsers(Lobby lobby)
         {
-            return lobby.Users;
+            Lobby thisLobby = getLobby(lobby.Name);
+            List<User> users = thisLobby.Users;
+            return users;
         }
 
         public List<User> getAllUsers()
@@ -72,9 +75,25 @@ namespace DataLayer
             return users;
         }
 
+        //Remove user from lobby
         public void RemoveUser(Lobby lobby, User user)
         {
-            lobby.Users.Remove(user);
+            Lobby editLobby = getLobby(lobby.Name);
+            editLobby.removeUser(user);
+
+        }
+
+        //Remove user from database
+        public void RemoveUser(User user)
+        {
+            foreach (User searchUser in users)
+            {
+                if (searchUser.Name.Equals(user.Name))
+                {
+                    users.Remove(searchUser);
+                    break;
+                }
+            }
         }
 
         //returns a list of all unique modes
@@ -115,12 +134,12 @@ namespace DataLayer
             return lobbies.Where(lobby =>(mode == null || lobby.Mode == mode)&&(tag == null || lobby.Tags.Contains(tag))).ToList();
         }
 
-        public static List<string> getAllModeTypes()
+        public List<string> getAllModeTypes()
         {
             return gameModes;
         }
 
-        public static List<string> getAllTagTypes()
+        public List<string> getAllTagTypes()
         {
             return allTags;
         }
@@ -128,6 +147,14 @@ namespace DataLayer
         public void addNewLobby(string name,string desc, string mode, List<string> tags)
         {
             Lobby lobby = new Lobby(name, desc, mode, tags);
+            foreach (Lobby thislobby in lobbies)
+            {
+                if (name.Equals(thislobby.Name))
+                {
+                    throw new Exception("Lobbies cannot have the same name");
+                }
+            }
+
             lobbies.Add(lobby);//need to make a call to the server to update lobby list for other clients
             newChat(lobby.ID, null);
         }
@@ -147,20 +174,19 @@ namespace DataLayer
             messages.Add(new Message(lobbyID, userList));
         }
 
-        public Lobby getLobby(int id)
+        public Lobby getLobby(string name)
         {
             foreach (Lobby lobby in lobbies)
             {
-                if (lobby.ID == id)
+                if (lobby.Name.Equals(name))
                     return lobby;
             }
             return null;
         }
 
-        public List<Message> getChats(int id, User currUser)
+        public List<Message> getChats(Lobby lobby, User currUser)
         {
-            
-            return messages.Where(m => m.LobbyID == id && (m.UserList == null || m.UserList.Contains(currUser))).ToList();
+            return messages.Where(m => m.lobbyID == lobby.ID && (m.UserList == null || m.UserList.Contains(currUser))).ToList();
         }
 
         public Message getMessage(int id)
@@ -177,7 +203,8 @@ namespace DataLayer
 
         public void joinLobby(Lobby lobby, User user)
         {
-            lobby.Users.Add(user);
+            Lobby changeLobby = getLobby(lobby.Name);
+            changeLobby.Users.Add(user);
         }
 
         

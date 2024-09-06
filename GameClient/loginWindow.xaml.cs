@@ -97,5 +97,10 @@ namespace GameClient
             }
             
         }
+
+        public void refreshBtn_click(object sender, RoutedEventArgs e)
+        {
+            userNumber.Text = "Number of Users: " + foob.GetAllUsers().Count();
+        }
     }
 }
