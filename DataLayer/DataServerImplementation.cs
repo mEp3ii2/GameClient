@@ -34,7 +34,13 @@ namespace DataLayer
 
         public List<User> GetUsers(Lobby lobby)
         {
-            return database.getLobbyUsers(lobby);
+            Log($"Getting users from lobby {lobby.Name}");
+            List<User> users = database.getLobbyUsers(lobby);
+            foreach (User user in users)
+            {
+                Log($"{user}");
+            }
+            return users;
         }
 
         public List<User> GetAllUsers()
@@ -85,7 +91,14 @@ namespace DataLayer
 
         public void RemoveUser(Lobby lobby, User user)
         {
+            Log($"Remove user {user.Name} from lobby {lobby.Name}");
             database.RemoveUser(lobby, user);
+            Log($"Update Lobby list:");
+            List<User> users = database.getLobbyUsers(lobby);
+            foreach (var item in users)
+            {
+                Log($"{item.Name}");
+            }
         }
 
         public void UpdateMessage(Message msg)
@@ -95,14 +108,15 @@ namespace DataLayer
 
         public void joinLobby(Lobby lobby, User user)
         {
+            Log($"Adding user {user.Name} to lobby {lobby.ID}");
             database.joinLobby(lobby, user);
         }
 
 
-        public List<Message> GetChats(int lobbyID, User currUser)
+        public List<Message> GetChats(Lobby lobby, User currUser)
         {
-            Log($"Retrieving Chats associated with lobby id {lobbyID} for user {currUser}");
-            List<Message> lobMes = database.getChats(lobbyID, currUser);
+            Log($"Retrieving Chats associated with lobby id {lobby.ID} for user {currUser}");
+            List<Message> lobMes = database.getChats(lobby, currUser);
             foreach (Message message in lobMes)
             {
                 Log($"Retrieved message: {message.LobbyID}");

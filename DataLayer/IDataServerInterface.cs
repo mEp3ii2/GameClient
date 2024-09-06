@@ -42,7 +42,7 @@ namespace DataLayer
         void AddLobby(Lobby lobby);
         
         [OperationContract]
-        List<Message> GetChats(int lobbyId, User currUser);
+        List<Message> GetChats(Lobby lobby, User currUser);
 
         [OperationContract]
         void joinLobby(Lobby lobby, User user);

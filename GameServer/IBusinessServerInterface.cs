@@ -54,7 +54,7 @@ namespace BusinessLayer
         void RemoveUser(Lobby lobby,User user);
 
         [OperationContract]
-        List<Message> getChats(int lobbyId, User currUser);
+        List<Message> getChats(Lobby lobby, User currUser);
 
         [OperationContract]
         void UpdateMessage(Message msg);

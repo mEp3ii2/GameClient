@@ -41,10 +41,10 @@ namespace GameClient
             this.thisLobby = selectedLobby;
             messageList.Document.Blocks.Clear();
             
-            lobbyList = selectedLobby.Users.ToList();
+            lobbyList = foob.GetUsers(thisLobby);
             userlistBox.ItemsSource = lobbyList;
             MessageBox.Show(selectedLobby.Name+ selectedLobby.ID.ToString());
-            messages = foob.getChats(selectedLobby.ID, currUser);
+            messages = foob.getChats(thisLobby, currUser);
             displayedChat = messages.FirstOrDefault(m => m.UserList == null);
             displayMsgs(displayedChat);
 
@@ -61,11 +61,13 @@ namespace GameClient
 
         private void logOutBtn_Click(object sender, RoutedEventArgs e)
         {
+            foob.RemoveUser(thisLobby, currUser);
             this.Close();
         }
 
         private void backButton_Click(object sender, RoutedEventArgs e)
         {
+            foob.RemoveUser(thisLobby, currUser);
             lobbyFinderWindow curWindow = new lobbyFinderWindow(currUser, foob);
             this.Close();
             curWindow.Show();
@@ -123,9 +125,15 @@ namespace GameClient
 
         private void refreshBtn_click(object sender, RoutedEventArgs e)
         {
-            messages = foob.getChats(thisLobby.ID, currUser);
+            //Update messages from server
+            messages = foob.getChats(thisLobby, currUser);
             displayedChat = messages.FirstOrDefault(m => m.UserList == null);
             displayMsgs(displayedChat);
+
+            //Update users in server
+            userlistBox.ItemsSource = null;
+            lobbyList = foob.GetUsers(thisLobby);
+            userlistBox.ItemsSource = lobbyList;
         }
 
     }

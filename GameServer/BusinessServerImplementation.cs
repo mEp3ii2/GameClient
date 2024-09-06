@@ -112,9 +112,9 @@ namespace BusinessLayer
             return true;
         }
 
-        public List<Message> getChats(int lobbyId, User currUser)
+        public List<Message> getChats(Lobby lobby, User currUser)
         {
-            return foob.GetChats(lobbyId, currUser);
+            return foob.GetChats(lobby, currUser);
         }
 
         
