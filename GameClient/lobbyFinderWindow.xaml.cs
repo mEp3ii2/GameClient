@@ -45,6 +45,17 @@ namespace GameClient
             updateLobbyCountLabel(currentList.Count);
         }
 
+        private void refreshBtn_click(object sender, EventArgs e)
+        {
+            currentList = foob.GetAllLobbies();
+            lobbyList.ItemsSource = currentList;
+            loadModeFilterBox();
+            loadTagFilterBox();
+            currentModeFilter = null;
+            currentTagFilter = null;
+            updateLobbyCountLabel(currentList.Count);
+        }
+
         private void updateLobbyCountLabel(int lobbyCount)
         {
             lobbyCountLabel.Content =$"Active Lobbies: {lobbyCount}";
@@ -178,5 +189,7 @@ namespace GameClient
             foob.RemoveUser(currUser);
             this.Close();
         }
+
+      
     }
 }
