@@ -94,12 +94,12 @@ namespace DataLayer
             return lobbies.Where(lobby =>(mode == null || lobby.Mode == mode)&&(tag == null || lobby.Tags.Contains(tag))).ToList();
         }
 
-        public static List<string> getAllModeTypes()
+        public List<string> getAllModeTypes()
         {
             return gameModes;
         }
 
-        public static List<string> getAllTagTypes()
+        public List<string> getAllTagTypes()
         {
             return allTags;
         }

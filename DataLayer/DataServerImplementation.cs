@@ -54,12 +54,12 @@ namespace DataLayer
 
         public List<string> GetAllModeTypes()
         {
-            return Database.getAllModeTypes();
+            return database.getAllModeTypes();
         }
 
         public List<string> GetAllTagTypes()
         {
-            return Database.getAllTagTypes();
+            return database.getAllTagTypes();
         }
 
         public void AddLobby(Lobby lobby)

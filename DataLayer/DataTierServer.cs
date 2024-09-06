@@ -13,7 +13,7 @@ namespace DataLayer
         {
 
             //This should *definitely* be more descriptive.
-            Console.WriteLine("Server starting...");
+            Console.WriteLine("Data Server starting...");
             //This is the actual host service system
             ServiceHost host;
             //This represents a tcp/ip binding in the Windows network stack
@@ -24,7 +24,7 @@ namespace DataLayer
             host.AddServiceEndpoint(typeof(DataServerInterface), tcp, "net.tcp://0.0.0.0:8200/DataService");
             //And open the host for business!
             host.Open();
-            Console.WriteLine("Server Online");
+            Console.WriteLine("Data Server Online");
             Console.ReadLine();
             //Don't forget to close the host after you're done!
             host.Close();
