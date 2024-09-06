@@ -6,13 +6,16 @@
         xmlns:local="clr-namespace:GameClient"
         mc:Ignorable="d"
         Title="loginWindow" Height="250" Width="400">
+    <Window.Resources>
+        <local:textBoxFilled x:Key="textBoxFilled"/>
+    </Window.Resources>
     <Grid>
         <Grid.Background>
-            <ImageBrush ImageSource="/formBackGroundImage.jpg" Stretch="UniformToFill"/>
+            <ImageBrush ImageSource="Resources/formBackGroundImage.jpg" Stretch="UniformToFill"/>
         </Grid.Background>
         <TextBox x:Name="userNameBox" HorizontalAlignment="Left" Margin="125,80,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" Foreground="Black"/>
         <Label Content="Enter User Name" HorizontalAlignment="Left" Margin="130,49,0,0" VerticalAlignment="Top" Width="110" Foreground="White"/>
-        <Button x:Name="loginBtn" Content="Login" HorizontalAlignment="Left" Margin="125,115,0,0" VerticalAlignment="Top" Width="120" Click="loginBtn_Click"/>
+        <Button x:Name="loginBtn" Content="Login" HorizontalAlignment="Left" Margin="125,115,0,0" VerticalAlignment="Top" Width="120" Click="loginBtn_Click" IsEnabled="{Binding Text, ElementName=userNameBox, Converter={StaticResource textBoxFilled}}"/>
         <TextBlock HorizontalAlignment="Left" Margin="135,21,0,0" TextWrapping="Wrap" Text="Mortal Combat X" VerticalAlignment="Top" Foreground="White"/>
         <TextBlock x:Name="userNumber" HorizontalAlignment="Left" Margin="265,190,0,0" TextWrapping="Wrap" Text="Number of Users: " VerticalAlignment="Top" Background="White" Width="113"/>
 

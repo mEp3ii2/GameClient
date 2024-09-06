@@ -27,18 +27,20 @@ namespace GameClient
         private string desc;
         private string roomName;
         private List<string> tags;
-        private BusinessServerInterface foob;
+        private IBusinessServerInterface foob;
         
-        public createLobbyWindow(User currUser)
+        public createLobbyWindow(User currUser, IBusinessServerInterface foob)
         {
             InitializeComponent();
 
-            ChannelFactory<BusinessServerInterface> foobFactory;
+            this.foob = foob;
+            //passing foob instead
+            /*ChannelFactory<BusinessServerInterface> foobFactory;
             NetTcpBinding tcp = new NetTcpBinding();
             string URL = "net.tcp://localhost:8100/GameService";
             foobFactory = new ChannelFactory<BusinessServerInterface>(tcp, URL);
             foob = foobFactory.CreateChannel();
-
+            */
             this.currUser = currUser;
             
             modeSelBox.ItemsSource = foob.GetAllModeTypes();
@@ -64,8 +66,11 @@ namespace GameClient
             roomName = nameTxtBox.Text;
             desc = descTxtBox.Text;
             MessageBox.Show(mode+" "+tagString + " " +roomName + " " + desc);
-
-            foob.AddLobby(new Lobby(roomName, currUser, roomName, desc, mode, tags));
+            Lobby tempLob = new Lobby(roomName,desc, mode, tags);
+            foob.AddLobby(tempLob);
+            lobbyRoomWindow curWindow = new lobbyRoomWindow(tempLob,currUser,foob);
+            curWindow.Show();
+            this.Close();
         }
 
         private void clearBtn_Click(object sender, RoutedEventArgs e)
@@ -78,7 +83,7 @@ namespace GameClient
 
         private void backBtn_Click(object sender, RoutedEventArgs e)
         {
-            lobbyFinderWindow curWindow = new lobbyFinderWindow(currUser);
+            lobbyFinderWindow curWindow = new lobbyFinderWindow(currUser, foob);
             curWindow.Show();
             this.Close();
         }

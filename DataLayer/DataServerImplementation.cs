@@ -1,25 +1,35 @@
 ﻿using GameLobbyLib;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Runtime.CompilerServices;
 using System.ServiceModel;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DataLayer
 {
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, UseSynchronizationContext = false)]
-    internal class DataServerImplementation : DataServerInterface
+    internal class DataServerImplementation : IDataServerInterface //change back to internal later
     {
-        Database database;
+        private static Database database;
+        private static uint logNumber = 0;
         public DataServerImplementation()
         {
-            database = new Database();
+            database = Database.getInstance();
         }
 
         public List<Lobby> GetAllLobbies()
         {
-            return database.getAllLobbies();
+            Log($"Grabbing all Lobbies");
+            List<Lobby> lob = database.getAllLobbies();
+            foreach (Lobby lobb in lob)
+            {
+                Log($"Lobby {lobb.Name}, ID: {lobb.ID}");
+                foreach(User user in lobb.Users)
+                {
+                    Log($"\tUser: {user.Name}");
+                }
+            }
+            return lob;
         }
 
         public List<User> GetUsers(Lobby lobby)
@@ -49,7 +59,7 @@ namespace DataLayer
 
         public List<Lobby> GetfilterdLobbiesList(string mode = null, string tag = null)
         {
-            return database.getfilterdLobbiesList();
+            return database.getfilterdLobbiesList(mode, tag);
         }
 
         public List<string> GetAllModeTypes()
@@ -65,6 +75,48 @@ namespace DataLayer
         public void AddLobby(Lobby lobby)
         {
             database.addNewLobby(lobby);
+            
         }
+
+        public void saveFile(string fileName, byte[] fileData)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RemoveUser(Lobby lobby, User user)
+        {
+            database.RemoveUser(lobby, user);
+        }
+
+        public void UpdateMessage(Message msg)
+        {
+            database.UpdateMessage(msg);
+        }
+
+        public void joinLobby(Lobby lobby, User user)
+        {
+            database.joinLobby(lobby, user);
+        }
+
+
+        public List<Message> GetChats(int lobbyID, User currUser)
+        {
+            Log($"Retrieving Chats associated with lobby id {lobbyID} for user {currUser}");
+            List<Message> lobMes = database.getChats(lobbyID, currUser);
+            foreach (Message message in lobMes)
+            {
+                Log($"Retrieved message: {message.LobbyID}");
+            }
+            return lobMes;
+        }
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        private void Log(string logString)
+        {
+            logNumber++;
+            string logMsg = $"Log #{logNumber}: {logString} at {DateTime.Now}";
+            Console.WriteLine(logMsg);
+        }
+
     }
 }

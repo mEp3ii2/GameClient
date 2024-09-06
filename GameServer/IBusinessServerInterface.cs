@@ -6,10 +6,10 @@ using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataLayer
+namespace BusinessLayer
 {
-    [ServiceContract]
-    public interface DataServerInterface
+    [ServiceContract(CallbackContract =typeof(ProcessServiceCallBack))]
+    public interface IBusinessServerInterface
     {
         [OperationContract]
         List<User> GetUsers(Lobby lobby);
@@ -40,5 +40,32 @@ namespace DataLayer
 
         [OperationContract]
         void AddLobby(Lobby lobby);
+
+        [OperationContract]
+        bool UniqueUser(string userName);
+        
+        [OperationContract]
+        void UploadFile(byte[] fileData, string fileName);
+
+        [OperationContract]
+        void DownloadFile();
+
+        [OperationContract]
+        void RemoveUser(Lobby lobby,User user);
+
+        [OperationContract]
+        List<Message> getChats(int lobbyId, User currUser);
+
+        [OperationContract]
+        void UpdateMessage(Message msg);
+
+        [OperationContract]
+        void joinLobby(Lobby lobby, User user);
+    }
+
+    public interface ProcessServiceCallBack
+    {
+        [OperationContract(IsOneWay = true)]
+        void UpdateUserCount(int userCount);
     }
 }

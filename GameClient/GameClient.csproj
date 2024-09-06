@@ -56,6 +56,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Classes\ProcessServiceCallBackImpl.cs" />
+    <Compile Include="Classes\textBoxFilled.cs" />
     <Page Include="createLobbyWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -79,7 +81,7 @@
     <Compile Include="createLobbyWindow.xaml.cs">
       <DependentUpon>createLobbyWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="AllFieldsFilledConverter.cs" />
+    <Compile Include="Classes\AllFieldsFilledConverter.cs" />
     <Compile Include="lobbyFinderWindow.xaml.cs">
       <DependentUpon>lobbyFinderWindow.xaml</DependentUpon>
     </Compile>
@@ -98,7 +100,7 @@
     <Compile Include="messageForm.xaml.cs">
       <DependentUpon>messageForm.xaml</DependentUpon>
     </Compile>
-    <Compile Include="musicplayer.cs" />
+    <Compile Include="Classes\musicplayer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -116,12 +118,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <Resource Include="formBackGroundImage.jpg">
+    <Resource Include="Resources\formBackGroundImage.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Content Include="formBackGroundImage.webp">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -141,9 +140,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Mortal_Kombat.wav">
+    <Content Include="Resources\Mortal_Kombat.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

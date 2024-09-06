@@ -15,20 +15,18 @@ namespace GameClient
     /// </summary>
     public partial class App : Application
     {
-
+        
+        
         protected override void OnStartup(StartupEventArgs e)
-        {
+        {  
             base.OnStartup(e);
-            SoundPlayer player = new SoundPlayer("Mortal_Kombat.wav");
+            SoundPlayer player = new SoundPlayer("Resources/Mortal_Kombat.wav");
             player.LoadCompleted += delegate (object sender, AsyncCompletedEventArgs er) {
-                player.Play();
+                player.PlayLooping();
             };
             player.LoadAsync();
 
-            /*var player = musicplayer.Instance;
-            string musicPath = "Mortal_Kombat.mp3";
-            player.PlayMusic(musicPath);*/
-
+           
         }
         private void app_Exit(object sender, ExitEventArgs e)
         {

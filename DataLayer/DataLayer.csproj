@@ -35,6 +35,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -46,7 +47,7 @@
   <ItemGroup>
     <Compile Include="Database.cs" />
     <Compile Include="DataServerImplementation.cs" />
-    <Compile Include="DataServerInterface.cs" />
+    <Compile Include="IDataServerInterface.cs" />
     <Compile Include="DataTierServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -7,11 +7,27 @@ using GameLobbyLib;
 
 namespace DataLayer
 {
+    
     internal class Database
     {
-        List<Lobby> lobbies;
-        List<User> users;
-        List<string> tags;        
+        private static Database Instance = null;
+        public static Database getInstance()
+        {
+            if (Instance == null)
+            {
+                Instance = new Database();
+            }
+            return Instance;
+        }
+        
+
+        static List<Lobby> lobbies;
+        static List<User> users;
+        static List<Message> messages;
+        static List<UploadedFile> uploadedFiles;
+
+        List<string> tags;        //test value to be removed later
+
 
         private static readonly List<string> gameModes = new List<string> { 
             "Deathmatch", "King of the Hill", "Survival", "Tag Team", "Team Battle", "1v1 Duel", "Tournament", "Time Attack", 
@@ -19,9 +35,11 @@ namespace DataLayer
         private static readonly List<string> allTags = new List<string> {
             "Beginner Friendly", "Casual", "Competitive", "High Stakes", "Fast-Paced", "Strategic", "Team-Based", "Solo",
             "All-Out Brawl", "Classic", "Intense", "Relaxed", "Focused", "Social", "Hardcore"};
+
         public Database()
         {
             lobbies = new List<Lobby>();
+            messages = new List<Message>();
             User user1 = new User("me");
             User user2 = new User("frank");
             users = new List<User>();
@@ -29,16 +47,14 @@ namespace DataLayer
             users.Add(user2);
 
             tags = new List<string> { "newbie", "friendly", "casual" };
-            
 
-            Lobby testLobby = new Lobby("test", user1, "testLobb", "testing arena", "deathmatch", tags);
-            Lobby testLobby2 = new Lobby("test", user2, "testLobb", "testing arena", "King of the Hill", tags);
-            Lobby testLobby3 = new Lobby("test", user1, "testLobb", "testing arena", "deathmatch", tags);
-            Lobby testLobby4 = new Lobby("test", user2, "testLobb", "testing arena", "King of the Hill", new List<string> {"Solo"});
-            lobbies.Add(testLobby);
-            lobbies.Add(testLobby2);
-            lobbies.Add(testLobby3);
-            lobbies.Add(testLobby4);
+
+            addNewLobby("test", "testing arena", "deathmatch", tags);
+            addNewLobby("test", "testing arena", "King of the Hill", tags);
+            addNewLobby("test", "testing arena", "deathmatch", tags);
+            addNewLobby("test", "testing arena", "King of the Hill", new List<string> {"Solo"});
+            lobbies[0].Users.Add(user1);
+            lobbies[0].Users.Add(user2);
         }
 
         public List<Lobby> getAllLobbies()
@@ -54,6 +70,11 @@ namespace DataLayer
         public List<User> getAllUsers()
         {
             return users;
+        }
+
+        public void RemoveUser(Lobby lobby, User user)
+        {
+            lobby.Users.Remove(user);
         }
 
         //returns a list of all unique modes
@@ -104,19 +125,66 @@ namespace DataLayer
             return allTags;
         }
 
-        public void addNewLobby(string name,User hostUser,string desc, string mode, List<string> tags)
+        public void addNewLobby(string name,string desc, string mode, List<string> tags)
         {
-            Lobby lobby = new Lobby(name, hostUser, name, desc, mode, tags);
+            Lobby lobby = new Lobby(name, desc, mode, tags);
             lobbies.Add(lobby);//need to make a call to the server to update lobby list for other clients
+            newChat(lobby.ID, null);
         }
 
         public void addNewLobby(Lobby lobby) {
             lobbies.Add(lobby);
+            newChat(lobby.ID, null);
         }
 
         public void addUser(User user)
         {
             users.Add(user);
         }
+    
+        public void newChat(int lobbyID,User[] userList = null)
+        {
+            messages.Add(new Message(lobbyID, userList));
+        }
+
+        public Lobby getLobby(int id)
+        {
+            foreach (Lobby lobby in lobbies)
+            {
+                if (lobby.ID == id)
+                    return lobby;
+            }
+            return null;
+        }
+
+        public List<Message> getChats(int id, User currUser)
+        {
+            
+            return messages.Where(m => m.LobbyID == id && (m.UserList == null || m.UserList.Contains(currUser))).ToList();
+        }
+
+        public Message getMessage(int id)
+        {
+            return messages.FirstOrDefault(m => m.ID == id);
+        }
+
+        public void UpdateMessage(Message msg)
+        {
+
+            Message existingMsg = getMessage(msg.ID);
+            existingMsg.MessageList = msg.MessageList;
+        }
+
+        public void joinLobby(Lobby lobby, User user)
+        {
+            lobby.Users.Add(user);
+        }
+
+        
+
+
+        //public void addFile(int lobbyID,!fileDetails here not sure yet)
+
+        
     }
 }

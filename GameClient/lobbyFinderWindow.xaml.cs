@@ -25,28 +25,29 @@ namespace GameClient
     {
         private User currUser;
         
-        private List<Lobby> currentList;
+        private List<Lobby> currentList;//list of lobbies retrieved from business layer
         private string currentModeFilter;
         private string currentTagFilter;
-        private BusinessServerInterface foob;
+        private IBusinessServerInterface foob;
 
-        public lobbyFinderWindow(User currUser)
+        public lobbyFinderWindow(User currUser, IBusinessServerInterface foob)
         {
             InitializeComponent();
+            this.foob = foob;// connection to business layer
 
-            ChannelFactory<BusinessServerInterface> foobFactory;
-            NetTcpBinding tcp = new NetTcpBinding();
-            string URL = "net.tcp://localhost:8100/GameService";
-            foobFactory = new ChannelFactory<BusinessServerInterface>(tcp, URL);
-            foob = foobFactory.CreateChannel();
-
-            this.currUser = currUser;
+            this.currUser = currUser; 
             currentList = foob.GetAllLobbies();
-            lobbyList.ItemsSource = foob.GetAllLobbies();
+            lobbyList.ItemsSource = currentList;
             loadModeFilterBox();
             loadTagFilterBox();
             currentModeFilter = null;
             currentTagFilter = null;
+            updateLobbyCountLabel(currentList.Count);
+        }
+
+        private void updateLobbyCountLabel(int lobbyCount)
+        {
+            lobbyCountLabel.Content =$"Active Lobbies: {lobbyCount}";
         }
 
         //loads list of unique modes plus a blank option for user to be able to unselect mode filter
@@ -59,6 +60,7 @@ namespace GameClient
             modeFilterBox.ItemsSource = modelist;
         }
 
+        //loads list of unique modes plus a blank option for user to be able to unselect mode filter
         private void loadTagFilterBox()
         {
             List<string> tagList = new List<string>();
@@ -68,26 +70,32 @@ namespace GameClient
             tagFilterBox.ItemsSource = tagList;
         }
 
+        // user has double clicked on lobby
+        // send user to lobby
         private void lobbyList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            // user has double clicked on lobby
-            // send user to lobby
+            
             Lobby selectedLobby = (Lobby) lobbyList.SelectedItem;
-            lobbyRoomWindow curWindow = new lobbyRoomWindow(selectedLobby, currUser);
+            foob.joinLobby(selectedLobby, currUser);
+            MessageBox.Show(selectedLobby.Users.Count().ToString());
+            
+            lobbyRoomWindow curWindow = new lobbyRoomWindow(selectedLobby, currUser, foob);
             curWindow.Show();
             this.Close();
             //need to modify lobby to reflect new user
         }
 
+        // option window for creating new lobby
         private void createBtn_Click(object sender, RoutedEventArgs e)
         {
             // user creating room
-            createLobbyWindow curWindow = new createLobbyWindow(currUser);
+            createLobbyWindow curWindow = new createLobbyWindow(currUser,foob);
             curWindow.Show();
             this.Close();
             
         }
 
+        // user had select a mode to filter on
         private void modeFilterBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (modeFilterBox.SelectedItem.ToString() == "")
@@ -131,8 +139,8 @@ namespace GameClient
         // to remove user name
         private void app_Exit(object sender, CancelEventArgs e)
         {
-            string username = "loggedout";
-            MessageBox.Show(username);
+            //
+            
         }
 
         private void setLobbyList()
