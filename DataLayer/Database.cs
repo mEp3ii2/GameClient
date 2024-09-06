@@ -75,11 +75,25 @@ namespace DataLayer
             return users;
         }
 
+        //Remove user from lobby
         public void RemoveUser(Lobby lobby, User user)
         {
             Lobby editLobby = getLobby(lobby.Name);
             editLobby.removeUser(user);
 
+        }
+
+        //Remove user from database
+        public void RemoveUser(User user)
+        {
+            foreach (User searchUser in users)
+            {
+                if (searchUser.Name.Equals(user.Name))
+                {
+                    users.Remove(searchUser);
+                    break;
+                }
+            }
         }
 
         //returns a list of all unique modes

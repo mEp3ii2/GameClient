@@ -89,7 +89,7 @@ namespace DataLayer
             throw new NotImplementedException();
         }
 
-        public void RemoveUser(Lobby lobby, User user)
+        public void RemoveUserFromLobby(Lobby lobby, User user)
         {
             Log($"Remove user {user.Name} from lobby {lobby.Name}");
             database.RemoveUser(lobby, user);
@@ -99,6 +99,11 @@ namespace DataLayer
             {
                 Log($"{item.Name}");
             }
+        }
+
+        public void RemoveUser(User user)
+        {
+            database.RemoveUser(user);
         }
 
         public void UpdateMessage(Message msg)

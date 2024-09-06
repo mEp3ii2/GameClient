@@ -47,9 +47,14 @@ namespace BusinessLayer
             return foob.GetUsers(lobby);
         }
 
-        public void RemoveUser(Lobby lobby, User user)
+        public void RemoveUserFromLobby(Lobby lobby, User user)
         {
-            foob.RemoveUser(lobby, user);
+            foob.RemoveUserFromLobby(lobby, user);
+        }
+
+        public void RemoveUser(User user)
+        {
+            foob.RemoveUser(user);
         }
 
         public List<User> GetAllUsers()

@@ -26,7 +26,7 @@
                 <DataGridTextColumn Header="Tags" Binding="{Binding TagDis}" />
             </DataGrid.Columns>
         </DataGrid>
-        <Button x:Name="logOutBtn" Content="Log Out" HorizontalAlignment="Left" Height="27" Margin="184,373,0,0" VerticalAlignment="Top" Width="131"/>
+        <Button x:Name="logOutBtn" Content="Log Out" HorizontalAlignment="Left" Height="27" Margin="184,373,0,0" VerticalAlignment="Top" Width="131" Click="logOutBtn_Click"/>
         <ComboBox x:Name="modeFilterBox" HorizontalAlignment="Left" Margin="25,36,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="modeFilterBox_SelectionChanged"/>
         <Label Content="Modes:" HorizontalAlignment="Left" Margin="25,5,0,0" VerticalAlignment="Top" Foreground="White"/>
         <Button x:Name="clearBtn" Content="Clear" HorizontalAlignment="Left" Margin="652,36,0,0" VerticalAlignment="Top" Width="120" Click="clearBtn_Click"/>

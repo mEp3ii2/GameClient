@@ -51,7 +51,10 @@ namespace BusinessLayer
         void DownloadFile();
 
         [OperationContract]
-        void RemoveUser(Lobby lobby,User user);
+        void RemoveUserFromLobby(Lobby lobby,User user);
+
+        [OperationContract]
+        void RemoveUser(User user);
 
         [OperationContract]
         List<Message> getChats(Lobby lobby, User currUser);

@@ -61,13 +61,14 @@ namespace GameClient
 
         private void logOutBtn_Click(object sender, RoutedEventArgs e)
         {
-            foob.RemoveUser(thisLobby, currUser);
+            foob.RemoveUserFromLobby(thisLobby, currUser);
+            foob.RemoveUser(currUser);
             this.Close();
         }
 
         private void backButton_Click(object sender, RoutedEventArgs e)
         {
-            foob.RemoveUser(thisLobby, currUser);
+            foob.RemoveUserFromLobby(thisLobby, currUser);
             lobbyFinderWindow curWindow = new lobbyFinderWindow(currUser, foob);
             this.Close();
             curWindow.Show();

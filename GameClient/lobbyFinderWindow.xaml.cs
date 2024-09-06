@@ -172,5 +172,11 @@ namespace GameClient
                 modeFilterBox.ItemsSource = modelist;
             }
         }
+
+        private void logOutBtn_Click(object sender, EventArgs e)
+        {
+            foob.RemoveUser(currUser);
+            this.Close();
+        }
     }
 }
