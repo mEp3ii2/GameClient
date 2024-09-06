@@ -31,12 +31,14 @@ namespace GameClient
         private List<Message> messages;
         private IBusinessServerInterface foob;
         private Message displayedChat;
+        private Lobby thisLobby;
         public lobbyRoomWindow(Lobby selectedLobby, User currUser,IBusinessServerInterface foob) 
         {
             
             InitializeComponent();
             this.currUser = currUser;
             this.foob = foob;
+            this.thisLobby = selectedLobby;
             messageList.Document.Blocks.Clear();
             
             lobbyList = selectedLobby.Users.ToList();
@@ -117,6 +119,13 @@ namespace GameClient
                 var paragraph = new Paragraph(new Run(msgItem));
                 messageList.Document.Blocks.Add(paragraph);
             }
+        }
+
+        private void refreshBtn_click(object sender, RoutedEventArgs e)
+        {
+            messages = foob.getChats(thisLobby.ID, currUser);
+            displayedChat = messages.FirstOrDefault(m => m.UserList == null);
+            displayMsgs(displayedChat);
         }
 
     }
