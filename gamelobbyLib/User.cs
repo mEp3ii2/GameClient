@@ -17,6 +17,13 @@ namespace GameLobbyLib
             this.name = name;
         }
 
+        public override bool Equals(object obj)
+        {
+            User user = obj as User;
+            if (user == null) return false;
+            return name == user.name;
+        }
+
         public string Name { get { return name; } set { name = value; } }
 
         public override string ToString()

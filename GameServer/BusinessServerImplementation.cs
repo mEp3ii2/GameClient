@@ -117,7 +117,7 @@ namespace BusinessLayer
             
             foreach (User user in users)
             {
-                if (user.Name == userName)
+                if (user.Name.Equals(userName))
                 {
                     Log($"Login failed {userName} already used");
                     return false;

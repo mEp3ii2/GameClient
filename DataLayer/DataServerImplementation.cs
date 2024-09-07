@@ -132,7 +132,7 @@ namespace DataLayer
             List<Message> lobMes = new List<Message>();
             foreach (Message message in thisLobby.Messages)
             {
-                if (message.UserList.Contains(null) || message.UserList.Contains(currUser.Name))
+                if (message.UserList.Contains(null) || message.UserList.Contains(currUser))
                 {
                     lobMes.Add(message);
                 }
@@ -151,7 +151,7 @@ namespace DataLayer
         public void AddMessage(Lobby lobby, User user1, User user2)
         {
             Lobby thisLobby = database.getLobby(lobby.Name);
-            thisLobby.Messages.Add(new Message(new string[] {user1.Name, user2.Name}));
+            thisLobby.Messages.Add(new Message(new User[] {user1, user2 }));
         }
 
         public Message GetMessage(User user1, User user2, Lobby lobby)

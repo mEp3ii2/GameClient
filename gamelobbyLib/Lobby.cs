@@ -31,7 +31,7 @@ namespace GameLobbyLib
             User lobbyUser = new User("lobby");
             users.Add(lobbyUser);
             messages = new List<Message>();
-            Message defaultMessage = new Message(new string[] { lobbyUser.Name, null });
+            Message defaultMessage = new Message(new User[] { lobbyUser, null });
             defaultMessage.MessageList.Add("Lobby chat is now open!");
             messages.Add(defaultMessage);
             Description = description;
@@ -39,7 +39,17 @@ namespace GameLobbyLib
             Tags = tags;
         }
 
-        
+        public override bool Equals(object obj)
+        {
+            Lobby other = obj as Lobby;
+            if (other == null) return false;
+            if (Id == other.ID && Name.Equals(other.Name))
+            {
+                return true;
+            }
+            return false;
+        }
+
         public int ID
         {
             get { return Id; }
@@ -115,14 +125,14 @@ namespace GameLobbyLib
             //if not lobby chat, find a message with both users
             foreach (Message message in messages)
             {
-                if (message.UserList.Contains(user1.Name) && message.UserList.Contains(user2.Name))
+                if (message.UserList.Contains(user1) && message.UserList.Contains(user2))
                 {
                     Console.WriteLine("Sending messages from " + user1.Name + " to " + user2.Name);
                     return message;
                 }
             }
             //If no message with both users, create one
-            Message newMessage = new Message(new string[] { user1.Name, user2.Name });
+            Message newMessage = new Message(new User[] { user1, user2 });
             messages.Add(newMessage);
             Console.WriteLine("Sending new message from " + user1.Name + " to " + user2.Name);
             return newMessage;

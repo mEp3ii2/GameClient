@@ -190,6 +190,12 @@ namespace GameClient
             this.Close();
         }
 
-      
+        protected override void OnClosed(EventArgs e)
+        {
+            foob.RemoveUser(currUser);
+            this.Close();
+        }
+
+
     }
 }

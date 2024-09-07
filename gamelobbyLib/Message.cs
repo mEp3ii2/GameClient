@@ -13,16 +13,26 @@ namespace GameLobbyLib
         public int id;
         private static int nextID = 1;
         private List<string> messageList;
-        private string[] userList;
+        private User[] userList;
 
         public Message() { }//I dont fully understand why this works but DO NOT REMOVE. It fucks with something to do with serialization
 
         //userList can be null in the case of the lobby group chat
-        public Message(string[] userList = null)
+        public Message(User[] userList = null)
         {
             id = nextID++; 
             this.messageList = new List<string>();
             this.userList = userList;
+        }
+
+        public override bool Equals(object obj)
+        {
+            Message other = obj as Message;
+            if (other.userList.Contains(userList[0]) && other.userList.Contains(userList[1]))
+            {
+                return true;
+            }
+            return false;
         }
 
         public int ID
@@ -37,7 +47,7 @@ namespace GameLobbyLib
         }
 
         [DataMember]
-        public string[] UserList
+        public User[] UserList
         {
             get { return userList; }
             set { userList = value; }

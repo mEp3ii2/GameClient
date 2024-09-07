@@ -35,13 +35,12 @@ namespace GameClient
         {
             
             InitializeComponent();
-            this.currUser = foob.GetUser(currUser.Name);
+            this.currUser = currUser;
             this.foob = foob;
-            this.thisLobby = foob.GetLobby(selectedLobby);
+            this.thisLobby = selectedLobby;
             messageList.Document.Blocks.Clear();
             
-            lobbyList = foob.GetUsers(thisLobby);
-            userlistBox.ItemsSource = lobbyList;
+            updateUsers();
             MessageBox.Show(selectedLobby.Name+ selectedLobby.ID.ToString());
             Message lobbyMessage = foob.GetMessage(null, currUser, thisLobby);
             currentMessage = lobbyMessage;
@@ -71,6 +70,13 @@ namespace GameClient
             lobbyFinderWindow curWindow = new lobbyFinderWindow(currUser, foob);
             this.Close();
             curWindow.Show();
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            foob.RemoveUserFromLobby(thisLobby, currUser);
+            foob.RemoveUser(currUser);
+            this.Close();
         }
 
         private void messageBtn_Click(object sender, RoutedEventArgs e)
@@ -139,14 +145,19 @@ namespace GameClient
 
         private void refreshBtn_click(object sender, RoutedEventArgs e)
         {
-            userlistBox.SelectedItem = foob.GetUsers(thisLobby)[0];
-
             //Update messages from server
             currentMessage = foob.GetMessage(currUser, selectedUser, thisLobby);
             displayMsgs();
 
             //Update users in server
-            userlistBox.ItemsSource = foob.GetUsers(thisLobby);
+            updateUsers();
+        }
+
+        private void updateUsers()
+        {
+            lobbyList = foob.GetUsers(thisLobby);
+            lobbyList.Remove(currUser);
+            userlistBox.ItemsSource = lobbyList;
         }
 
     }
