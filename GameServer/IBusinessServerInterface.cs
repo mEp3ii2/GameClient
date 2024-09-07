@@ -18,6 +18,12 @@ namespace BusinessLayer
         List<Lobby> GetAllLobbies();
 
         [OperationContract]
+        User GetUser(string name);
+
+        [OperationContract]
+        void AddMessage(Lobby lobby, User user1, User user2);
+
+        [OperationContract]
         List<User> GetAllUsers();
 
         [OperationContract]
@@ -60,10 +66,16 @@ namespace BusinessLayer
         List<Message> getChats(Lobby lobby, User currUser);
 
         [OperationContract]
-        void UpdateMessage(Message msg);
+        void UpdateMessage(Message msg, Lobby lobby);
 
         [OperationContract]
         void joinLobby(Lobby lobby, User user);
+
+        [OperationContract]
+        Message GetMessage(User user1, User user2, Lobby lobby);
+
+        [OperationContract]
+        Lobby GetLobby(Lobby lobby);
     }
 
     public interface ProcessServiceCallBack

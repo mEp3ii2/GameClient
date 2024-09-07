@@ -26,11 +26,10 @@ namespace GameClient
     public partial class lobbyRoomWindow : Window
     {
         
-        private User currUser;
+        private User currUser, selectedUser;
         private List<User> lobbyList;
-        private List<Message> messages;
         private IBusinessServerInterface foob;
-        private Message displayedChat;
+        private Message currentMessage;
         private Lobby thisLobby;
         public lobbyRoomWindow(Lobby selectedLobby, User currUser,IBusinessServerInterface foob) 
         {
@@ -41,12 +40,11 @@ namespace GameClient
             this.thisLobby = selectedLobby;
             messageList.Document.Blocks.Clear();
             
-            lobbyList = foob.GetUsers(thisLobby);
-            userlistBox.ItemsSource = lobbyList;
+            updateUsers();
             MessageBox.Show(selectedLobby.Name+ selectedLobby.ID.ToString());
-            messages = foob.getChats(thisLobby, currUser);
-            displayedChat = messages.FirstOrDefault(m => m.UserList == null);
-            displayMsgs(displayedChat);
+            Message lobbyMessage = foob.GetMessage(null, currUser, thisLobby);
+            currentMessage = lobbyMessage;
+            displayMsgs();
 
             //fill userList
             
@@ -74,12 +72,19 @@ namespace GameClient
             curWindow.Show();
         }
 
+        protected override void OnClosed(EventArgs e)
+        {
+            foob.RemoveUserFromLobby(thisLobby, currUser);
+            foob.RemoveUser(currUser);
+            this.Close();
+        }
+
         private void messageBtn_Click(object sender, RoutedEventArgs e)
         {
             string msg =$"{currUser.Name}: {userMessageBox.Text.ToString()}\n";
-            displayedChat.MessageList.Add(msg);
-            foob.UpdateMessage(displayedChat);
-            displayMsgs(displayedChat);
+            currentMessage.MessageList.Add(msg);
+            foob.UpdateMessage(currentMessage, thisLobby);
+            displayMsgs();
         }
 
         
@@ -107,14 +112,28 @@ namespace GameClient
         {
             // user has selected user or lobby
             // change message box to relect chat with said entity
-            string selectedChat = userlistBox.SelectedItem.ToString();
+            string selectedChat;
+            if (userlistBox.SelectedItem == null)
+            {
+                selectedChat = "lobby";
+            }
+            else
+            {
+                selectedChat = userlistBox.SelectedItem.ToString();
+            }
+            
+            selectedUser = foob.GetUser(selectedChat);
 
+            Message selectedMessage = foob.GetMessage(currUser, selectedUser, thisLobby);
+            currentMessage = selectedMessage;
+
+            displayMsgs();
         }
 
-        private void displayMsgs(Message currChat)
+        private void displayMsgs()
         {
             messageList.Document.Blocks.Clear();
-            List<string> msgList = currChat.MessageList;
+            List<string> msgList = currentMessage.MessageList;
 
             foreach (string msgItem in msgList)
             {
@@ -127,13 +146,17 @@ namespace GameClient
         private void refreshBtn_click(object sender, RoutedEventArgs e)
         {
             //Update messages from server
-            messages = foob.getChats(thisLobby, currUser);
-            displayedChat = messages.FirstOrDefault(m => m.UserList == null);
-            displayMsgs(displayedChat);
+            currentMessage = foob.GetMessage(currUser, selectedUser, thisLobby);
+            displayMsgs();
 
             //Update users in server
-            userlistBox.ItemsSource = null;
+            updateUsers();
+        }
+
+        private void updateUsers()
+        {
             lobbyList = foob.GetUsers(thisLobby);
+            lobbyList.Remove(currUser);
             userlistBox.ItemsSource = lobbyList;
         }
 

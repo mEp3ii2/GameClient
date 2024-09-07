@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.ServiceModel.Channels;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,6 +14,7 @@ namespace GameLobbyLib
         private static int nextID = 1;
         private string name;
         private List<User> users;
+        private List<Message> messages;
         private string description;
         private string mode;
         private List<string> tags;
@@ -26,12 +28,28 @@ namespace GameLobbyLib
             Id = nextID++;
             Name = name;
             users = new List<User>();
+            User lobbyUser = new User("lobby");
+            users.Add(lobbyUser);
+            messages = new List<Message>();
+            Message defaultMessage = new Message(new User[] { lobbyUser, null });
+            defaultMessage.MessageList.Add("Lobby chat is now open!");
+            messages.Add(defaultMessage);
             Description = description;
             Mode = mode;
             Tags = tags;
         }
 
-        
+        public override bool Equals(object obj)
+        {
+            Lobby other = obj as Lobby;
+            if (other == null) return false;
+            if (Id == other.ID && Name.Equals(other.Name))
+            {
+                return true;
+            }
+            return false;
+        }
+
         public int ID
         {
             get { return Id; }
@@ -48,6 +66,12 @@ namespace GameLobbyLib
         { 
             get => users;  
             set => users = value;
+        }
+
+        public List<Message> Messages
+        {
+            get => messages;
+            set => messages = value;
         }
 
         public string Description 
@@ -84,6 +108,43 @@ namespace GameLobbyLib
                 if (searchUser.Name.Equals(user.Name))
                 {
                     users.Remove(searchUser);
+                    break;
+                }
+            }
+        }
+
+        public Message getMessage(User user1, User user2)
+        {
+            
+            //Case for if a user is the lobby ie selecting lobby chat
+            if(user1==null || user2 == null)
+            {
+                Console.WriteLine("Sending messages from lobby chat");
+                return messages[0];
+            }
+            //if not lobby chat, find a message with both users
+            foreach (Message message in messages)
+            {
+                if (message.UserList.Contains(user1) && message.UserList.Contains(user2))
+                {
+                    Console.WriteLine("Sending messages from " + user1.Name + " to " + user2.Name);
+                    return message;
+                }
+            }
+            //If no message with both users, create one
+            Message newMessage = new Message(new User[] { user1, user2 });
+            messages.Add(newMessage);
+            Console.WriteLine("Sending new message from " + user1.Name + " to " + user2.Name);
+            return newMessage;
+        }
+
+        public void updateMessage(Message inMessage)
+        {
+            for (int i = 0; i < messages.Count; i++)
+            {
+                if (inMessage.UserList.Contains(messages[i].UserList[0]) && inMessage.UserList.Contains(messages[i].UserList[1])){
+                    Console.WriteLine("Updating message...");
+                    messages[i] = inMessage;
                     break;
                 }
             }

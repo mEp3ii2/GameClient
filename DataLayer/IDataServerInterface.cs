@@ -21,6 +21,12 @@ namespace DataLayer
         List<User> GetAllUsers();
 
         [OperationContract]
+        User GetUser(string name);
+
+        [OperationContract]
+        void AddMessage(Lobby lobby, User user1, User user2);
+
+        [OperationContract]
         void AddUser(User user);
 
         [OperationContract]
@@ -57,6 +63,12 @@ namespace DataLayer
         void RemoveUser(User user);
 
         [OperationContract]
-        void UpdateMessage(Message msg);
+        void UpdateMessage(Message msg, Lobby lobby);
+
+        [OperationContract]
+        Message GetMessage(User user1, User user2, Lobby lobby);
+
+        [OperationContract]
+        Lobby GetLobby(Lobby lobby);
     }
 }

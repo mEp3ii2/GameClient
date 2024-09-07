@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace GameLobbyLib
-{
+{ 
     public class User
     {
         private string name;
@@ -15,6 +15,13 @@ namespace GameLobbyLib
         public User(string name)
         {
             this.name = name;
+        }
+
+        public override bool Equals(object obj)
+        {
+            User user = obj as User;
+            if (user == null) return false;
+            return name == user.name;
         }
 
         public string Name { get { return name; } set { name = value; } }
