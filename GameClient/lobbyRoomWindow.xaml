@@ -21,7 +21,7 @@
             </FlowDocument>
         </RichTextBox>
         <Button x:Name="attachmentBtn" Content="Attachment" HorizontalAlignment="Left" Height="24" Margin="691,378,0,0" VerticalAlignment="Top" Width="99" Click="attachmentBtn_Click"/>
-        <RichTextBox x:Name="filesList" Height="302" Margin="691,34,10,0" VerticalAlignment="Top" Width="149">
+        <RichTextBox x:Name="filesList" Height="302" Margin="691,34,10,0" VerticalAlignment="Top" Width="149" IsDocumentEnabled="True">
             <FlowDocument>
                 <Paragraph>
                     <Run Text="RichTextBox"/>

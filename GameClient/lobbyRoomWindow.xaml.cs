@@ -17,6 +17,7 @@ using System.ServiceModel;
 using BusinessLayer;
 using Microsoft.Win32;
 using System.IO;
+using System.Diagnostics;
 
 namespace GameClient
 {
@@ -45,12 +46,14 @@ namespace GameClient
             currentMessage = lobbyMessage;
             displayMsgs();
 
+            filesList.AddHandler(Hyperlink.RequestNavigateEvent, new RoutedEventHandler(Hyperlink_Click)); // Enable hyperlink click handling for the RichTextBox
+
             //fill userList
-            
+
 
             //get all users to populate user box
             //load current chat history
-            
+
 
         }
 
@@ -82,29 +85,66 @@ namespace GameClient
             currentMessage.MessageList.Add(msg);
             foob.UpdateMessage(currentMessage, thisLobby);
             displayMsgs();
-        }     
+        }
 
+        // Upload file button click handler
         private void attachmentBtn_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
-            if(openFileDialog.ShowDialog() == true)
+            if (openFileDialog.ShowDialog() == true)
             {
                 string filePath = openFileDialog.FileName;
                 byte[] fileData = File.ReadAllBytes(filePath);
                 string fileName = System.IO.Path.GetFileName(filePath);
 
-                //
                 foob.UploadFile(fileData,fileName);
 
-                // Display uploaded file in the file list
+                // Display uploaded file as a clickable hyperlink in the file list
                 Paragraph paragraph = new Paragraph();
                 Hyperlink link = new Hyperlink(new Run(fileName))
                 {
-                    NavigateUri = new Uri(fileName, UriKind.RelativeOrAbsolute)
+                    NavigateUri = new Uri(fileName, UriKind.RelativeOrAbsolute)  // This is fine for local file names
                 };
-                link.Click += (s, args) => DownloadFile(fileName);
+
                 paragraph.Inlines.Add(link);
                 filesList.Document.Blocks.Add(paragraph);
+
+                // link.Click += (s, args) => OpenFile(fileName);
+                // paragraph.Inlines.Add(link);
+                // filesList.Document.Blocks.Add(paragraph);
+            }
+        }
+
+        // Handle hyperlink click event to open the file
+        private void Hyperlink_Click(object sender, RoutedEventArgs e)
+        {
+            if (e.OriginalSource is Hyperlink link)
+            {
+                // Retrieve the file name from the hyperlink
+                string fileName = link.NavigateUri.ToString();
+
+                // Download and open the file
+                OpenFile(fileName);
+            }
+        }
+
+        // Open the file using the default application for its type
+        private void OpenFile(string fileName)
+        {
+            try
+            {
+                // We will download the file first to ensure we have a local copy
+                string filePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Downloads", fileName);
+                byte[] fileData = foob.DownloadFile(fileName);  // Download the file from the server
+                Directory.CreateDirectory(System.IO.Path.GetDirectoryName(filePath));  // Ensure directory exists
+                File.WriteAllBytes(filePath, fileData);  // Save the file locally
+
+                // Now open the file with the default application for its type
+                Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error opening file: {ex.Message}");
             }
         }
 
@@ -113,8 +153,8 @@ namespace GameClient
             try
             {
                 byte[] fileData = foob.DownloadFile(fileName);
-                string filePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Downloads", fileName);  // Explicit reference to System.IO.Path
-                Directory.CreateDirectory(System.IO.Path.GetDirectoryName(filePath));  // Explicit reference to System.IO.Path
+                string filePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Downloads", fileName);  // Explicit reference to System.IO.Path otherwise its an ambiguous reference between that and System.Windows.Shapes.Path.
+                Directory.CreateDirectory(System.IO.Path.GetDirectoryName(filePath));  // Explicit reference to System.IO.Path otherwise its an ambiguous reference between that and System.Windows.Shapes.Path.
                 File.WriteAllBytes(filePath, fileData);
                 MessageBox.Show($"File downloaded successfully to {filePath}");
             }
