@@ -51,7 +51,7 @@ namespace BusinessLayer
         bool UniqueUser(string userName);
 
         [OperationContract]
-        void UploadFile(byte[] fileData, string fileName);
+        void UploadFile(byte[] fileData, string fileName, string lobbyName);
 
         [OperationContract]
         byte[] DownloadFile(string fileName);
@@ -76,6 +76,9 @@ namespace BusinessLayer
 
         [OperationContract]
         Lobby GetLobby(Lobby lobby);
+
+        [OperationContract]
+        List<string> GetLobbyFiles(string lobbyName);
     }
 
     public interface ProcessServiceCallBack

@@ -130,13 +130,25 @@ namespace DataLayer
             return database.getLobby(lobby.Name);
         }
 
-        // Add file upload method
-        public void saveFile(string fileName, byte[] fileData)
+        // Save the file and record the file name in the lobby
+        public void saveFile(string fileName, byte[] fileData, string lobbyName)
         {
             string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SharedFiles", fileName);
             Directory.CreateDirectory(Path.GetDirectoryName(filePath));  // Ensure the directory exists
             File.WriteAllBytes(filePath, fileData);
+
             Log($"File {fileName} saved to {filePath}");
+
+            // Retrieve the current lobby using the passed lobby name
+            Lobby currentLobby = database.getLobby(lobbyName);
+            currentLobby?.AddFile(fileName);  // Add the file to the lobby's list of uploaded files
+        }
+
+        // Retrieve the list of previously uploaded files for a given lobby
+        public List<string> GetLobbyFiles(string lobbyName)
+        {
+            Lobby lobby = database.getLobby(lobbyName);
+            return lobby?.UploadedFiles ?? new List<string>();
         }
 
         // Add file download method

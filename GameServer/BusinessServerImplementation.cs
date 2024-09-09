@@ -136,11 +136,10 @@ namespace BusinessLayer
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        // Upload a file to the server
-        public void UploadFile(byte[] fileData, string fileName)
+        public void UploadFile(byte[] fileData, string fileName, string lobbyName)
         {
-            Log($"Received file upload request: {fileName}");
-            foob.saveFile(fileName, fileData);
+            // Delegate to the data server with the lobby name
+            foob.saveFile(fileName, fileData, lobbyName);
         }
 
         // Download a file from the server
@@ -168,6 +167,12 @@ namespace BusinessLayer
         public Lobby GetLobby(Lobby lobby)
         {
             return foob.GetLobby(lobby);
+        }
+
+        // Fetch previously uploaded files for the specified lobby
+        public List<string> GetLobbyFiles(string lobbyName)
+        {
+            return foob.GetLobbyFiles(lobbyName);  // Delegate the call to the Data Layer
         }
     }
 }

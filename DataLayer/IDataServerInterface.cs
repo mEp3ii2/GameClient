@@ -54,7 +54,7 @@ namespace DataLayer
         void joinLobby(Lobby lobby, User user);
 
         [OperationContract]
-        void saveFile(string fileName, byte[] fileData);
+        void saveFile(string fileName, byte[] fileData, string lobbyName);
 
         [OperationContract]
         byte[] downloadFile(string fileName);
@@ -73,5 +73,8 @@ namespace DataLayer
 
         [OperationContract]
         Lobby GetLobby(Lobby lobby);
+
+        [OperationContract]
+        List<string> GetLobbyFiles(string lobbyName);
     }
 }
