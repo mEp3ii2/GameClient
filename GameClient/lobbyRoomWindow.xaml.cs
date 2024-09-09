@@ -228,12 +228,31 @@ namespace GameClient
 
         private void refreshBtn_click(object sender, RoutedEventArgs e)
         {
-            //Update messages from server
+            // Update messages from server
             currentMessage = foob.GetMessage(currUser, selectedUser, thisLobby);
             displayMsgs();
 
-            //Update users in server
+            // Update users in the server
             updateUsers();
+
+            // Update the file list in the RichTextBox
+            updateFiles();
+        }
+
+        // Helper method to update the file list
+        private void updateFiles()
+        {
+            // Clear the existing file list from the RichTextBox
+            filesList.Document.Blocks.Clear();
+
+            // Retrieve the list of uploaded files for the current lobby
+            List<string> uploadedFiles = foob.GetLobbyFiles(thisLobby.Name);
+
+            // Display each file as a clickable hyperlink in the RichTextBox
+            foreach (string fileName in uploadedFiles)
+            {
+                AddFileToRichTextBox(fileName);  // Reuse the existing helper method
+            }
         }
 
         private void updateUsers()
