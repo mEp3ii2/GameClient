@@ -5,14 +5,16 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.ServiceModel;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace DataLayer
 {
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, UseSynchronizationContext = false)]
-    internal class DataServerImplementation : IDataServerInterface //change back to internal later
+    public class DataServerImplementation : IDataServerInterface //change back to internal later
     {
         private static Database database;
         private static uint logNumber = 0;
+
         public DataServerImplementation()
         {
             database = Database.getInstance();
@@ -21,27 +23,13 @@ namespace DataLayer
         public List<Lobby> GetAllLobbies()
         {
             Log($"Grabbing all Lobbies");
-            List<Lobby> lob = database.getAllLobbies();
-            foreach (Lobby lobb in lob)
-            {
-                Log($"Lobby {lobb.Name}, ID: {lobb.ID}");
-                foreach(User user in lobb.Users)
-                {
-                    Log($"\tUser: {user.Name}");
-                }
-            }
-            return lob;
+            return database.getAllLobbies();
         }
 
         public List<User> GetUsers(Lobby lobby)
         {
             Log($"Getting users from lobby {lobby.Name}");
-            List<User> users = database.getLobbyUsers(lobby);
-            foreach (User user in users)
-            {
-                Log($"{user}");
-            }
-            return users;
+            return database.getLobbyUsers(lobby);
         }
 
         public User GetUser(string name)
@@ -87,24 +75,11 @@ namespace DataLayer
         public void AddLobby(Lobby lobby)
         {
             database.addNewLobby(lobby);
-            
-        }
-
-        public void saveFile(string fileName, byte[] fileData)
-        {
-            throw new NotImplementedException();
         }
 
         public void RemoveUserFromLobby(Lobby lobby, User user)
         {
-            Log($"Remove user {user.Name} from lobby {lobby.Name}");
             database.RemoveUser(lobby, user);
-            Log($"Update Lobby list:");
-            List<User> users = database.getLobbyUsers(lobby);
-            foreach (var item in users)
-            {
-                Log($"{item.Name}");
-            }
         }
 
         public void RemoveUser(User user)
@@ -114,30 +89,69 @@ namespace DataLayer
 
         public void UpdateMessage(Message msg, Lobby lobby)
         {
-            Lobby thisLobby = database.getLobby(lobby.Name);
-            thisLobby.updateMessage(msg);
+            database.getLobby(lobby.Name).updateMessage(msg);
         }
 
         public void joinLobby(Lobby lobby, User user)
         {
-            Log($"Adding user {user.Name} to lobby {lobby.ID}");
             database.joinLobby(lobby, user);
         }
 
-
         public List<Message> GetChats(Lobby lobby, User currUser)
         {
-            Log($"Retrieving Chats associated with lobby id {lobby.ID} for user {currUser}");
-            Lobby thisLobby =  database.getLobby(lobby.Name);
-            List<Message> lobMes = new List<Message>();
-            foreach (Message message in thisLobby.Messages)
+            return database.getLobby(lobby.Name).Messages
+                .Where(m => m.UserList.Contains(currUser) || m.UserList.Contains(null)).ToList();
+        }
+
+        public void AddMessage(Lobby lobby, User user1, User user2)
+        {
+            Log($"Adding message between {user1.Name} and {user2.Name} in lobby {lobby.Name}");
+            Lobby thisLobby = database.getLobby(lobby.Name);
+
+            if (thisLobby != null)
             {
-                if (message.UserList.Contains(null) || message.UserList.Contains(currUser))
-                {
-                    lobMes.Add(message);
-                }
+                Message newMessage = new Message(new User[] { user1, user2 });
+                thisLobby.Messages.Add(newMessage);
+                Log($"Message added successfully between {user1.Name} and {user2.Name}.");
             }
-            return lobMes;
+            else
+            {
+                throw new ArgumentException($"Lobby '{lobby.Name}' not found.");
+            }
+        }
+
+        public Message GetMessage(User user1, User user2, Lobby lobby)
+        {
+            return database.getLobby(lobby.Name).getMessage(user1, user2);
+        }
+
+        public Lobby GetLobby(Lobby lobby)
+        {
+            return database.getLobby(lobby.Name);
+        }
+
+        // Add file upload method
+        public void saveFile(string fileName, byte[] fileData)
+        {
+            string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SharedFiles", fileName);
+            Directory.CreateDirectory(Path.GetDirectoryName(filePath));  // Ensure the directory exists
+            File.WriteAllBytes(filePath, fileData);
+            Log($"File {fileName} saved to {filePath}");
+        }
+
+        // Add file download method
+        public byte[] downloadFile(string fileName)
+        {
+            string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SharedFiles", fileName);
+            if (File.Exists(filePath))
+            {
+                Log($"File {fileName} downloaded from {filePath}");
+                return File.ReadAllBytes(filePath);
+            }
+            else
+            {
+                throw new FileNotFoundException($"File {fileName} not found.");
+            }
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
@@ -146,23 +160,6 @@ namespace DataLayer
             logNumber++;
             string logMsg = $"Log #{logNumber}: {logString} at {DateTime.Now}";
             Console.WriteLine(logMsg);
-        }
-
-        public void AddMessage(Lobby lobby, User user1, User user2)
-        {
-            Lobby thisLobby = database.getLobby(lobby.Name);
-            thisLobby.Messages.Add(new Message(new User[] {user1, user2 }));
-        }
-
-        public Message GetMessage(User user1, User user2, Lobby lobby)
-        {
-            Lobby thisLobby = database.getLobby(lobby.Name);
-            return thisLobby.getMessage(user1, user2);
-        }
-
-        public Lobby GetLobby(Lobby lobby)
-        {
-            return database.getLobby(lobby.Name);
         }
     }
 }

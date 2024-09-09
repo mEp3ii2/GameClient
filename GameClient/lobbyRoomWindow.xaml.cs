@@ -24,8 +24,7 @@ namespace GameClient
     /// Interaction logic for lobbyRoomWindow.xaml
     /// </summary>
     public partial class lobbyRoomWindow : Window
-    {
-        
+    {   
         private User currUser, selectedUser;
         private List<User> lobbyList;
         private IBusinessServerInterface foob;
@@ -55,8 +54,6 @@ namespace GameClient
 
         }
 
-
-
         private void logOutBtn_Click(object sender, RoutedEventArgs e)
         {
             foob.RemoveUserFromLobby(thisLobby, currUser);
@@ -85,9 +82,7 @@ namespace GameClient
             currentMessage.MessageList.Add(msg);
             foob.UpdateMessage(currentMessage, thisLobby);
             displayMsgs();
-        }
-
-        
+        }     
 
         private void attachmentBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -100,6 +95,32 @@ namespace GameClient
 
                 //
                 foob.UploadFile(fileData,fileName);
+
+                // Display uploaded file in the file list
+                Paragraph paragraph = new Paragraph();
+                Hyperlink link = new Hyperlink(new Run(fileName))
+                {
+                    NavigateUri = new Uri(fileName, UriKind.RelativeOrAbsolute)
+                };
+                link.Click += (s, args) => DownloadFile(fileName);
+                paragraph.Inlines.Add(link);
+                filesList.Document.Blocks.Add(paragraph);
+            }
+        }
+
+        private void DownloadFile(string fileName)
+        {
+            try
+            {
+                byte[] fileData = foob.DownloadFile(fileName);
+                string filePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Downloads", fileName);  // Explicit reference to System.IO.Path
+                Directory.CreateDirectory(System.IO.Path.GetDirectoryName(filePath));  // Explicit reference to System.IO.Path
+                File.WriteAllBytes(filePath, fileData);
+                MessageBox.Show($"File downloaded successfully to {filePath}");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error downloading file: {ex.Message}");
             }
         }
 

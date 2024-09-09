@@ -52,6 +52,5 @@ namespace GameLobbyLib
             get { return userList; }
             set { userList = value; }
         }
-
     }
 }

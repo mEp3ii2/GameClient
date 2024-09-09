@@ -55,7 +55,10 @@ namespace DataLayer
 
         [OperationContract]
         void saveFile(string fileName, byte[] fileData);
-        
+
+        [OperationContract]
+        byte[] downloadFile(string fileName);
+
         [OperationContract]
         void RemoveUserFromLobby(Lobby lobby, User user);
 

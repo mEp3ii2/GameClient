@@ -49,12 +49,12 @@ namespace BusinessLayer
 
         [OperationContract]
         bool UniqueUser(string userName);
-        
+
         [OperationContract]
         void UploadFile(byte[] fileData, string fileName);
 
         [OperationContract]
-        void DownloadFile();
+        byte[] DownloadFile(string fileName);
 
         [OperationContract]
         void RemoveUserFromLobby(Lobby lobby,User user);

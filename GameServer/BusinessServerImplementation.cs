@@ -12,8 +12,6 @@ using System.Collections.Concurrent;
 
 namespace BusinessLayer    
 {
-    
-
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, UseSynchronizationContext = false)]
     internal class BusinessServerImplementation : IBusinessServerInterface
     {
@@ -23,12 +21,9 @@ namespace BusinessLayer
 
             ChannelFactory<IDataServerInterface> foobFactory;
             NetTcpBinding tcp = new NetTcpBinding();
-            
-
             string URL = "net.tcp://localhost:8200/DataService";
             foobFactory = new ChannelFactory<IDataServerInterface>(tcp, URL);
             foob = foobFactory.CreateChannel();
-            
         }
 
         public List<Lobby> GetAllLobbies()
@@ -132,8 +127,6 @@ namespace BusinessLayer
             return foob.GetChats(lobby, currUser);
         }
 
-        
-
         [MethodImpl(MethodImplOptions.Synchronized)]
         private void Log(string logString)
         {
@@ -143,16 +136,18 @@ namespace BusinessLayer
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
+        // Upload a file to the server
         public void UploadFile(byte[] fileData, string fileName)
         {
-            Log($"Recieved file upload: {fileName}");
-
+            Log($"Received file upload request: {fileName}");
             foob.saveFile(fileName, fileData);
         }
 
-        public void DownloadFile()
+        // Download a file from the server
+        public byte[] DownloadFile(string fileName)
         {
-            Log($"File download by ?");
+            Log($"Received file download request: {fileName}");
+            return foob.downloadFile(fileName);
         }
 
         public void UpdateMessage(Message msg, Lobby lobby)
