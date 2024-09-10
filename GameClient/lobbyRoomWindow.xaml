@@ -9,14 +9,14 @@
     <Grid>
         <Button x:Name="logOutBtn" Content="Log Out" HorizontalAlignment="Left" Margin="10,385,0,0" VerticalAlignment="Top" Width="99" Height="24" Click="logOutBtn_Click"/>
         <TextBox x:Name="userMessageBox" HorizontalAlignment="Left" Height="24" Margin="186,344,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="500"/>
-        <Label Content="Users" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="169"/>
+        <Label Content="Chats" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="169"/>
         <Label x:Name="lobbyNameBlock" Content="Messages" HorizontalAlignment="Left" Margin="184,10,0,0" VerticalAlignment="Top" Width="108"/>
         <Button x:Name="backButton" Content="Back" HorizontalAlignment="Left" Height="24" Margin="10,344,0,0" VerticalAlignment="Top" Width="99" Click="backButton_Click"/>
         <Button x:Name="messageBtn" Content="Send" HorizontalAlignment="Left" Height="24" Margin="691,344,0,0" VerticalAlignment="Top" Width="99" Click="messageBtn_Click"/>
         <RichTextBox Name = "messageList"  Margin="186,34,164,148" IsReadOnly="True" VerticalScrollBarVisibility="Auto" Grid.Row="0">
             <FlowDocument>
                 <Paragraph>
-                    <Run Text="RichTextBox"/>
+                    <Run Text=""/>
                 </Paragraph>
             </FlowDocument>
         </RichTextBox>
@@ -24,7 +24,7 @@
         <RichTextBox x:Name="filesList" Height="302" Margin="691,34,10,0" VerticalAlignment="Top" Width="149" IsDocumentEnabled="True">
             <FlowDocument>
                 <Paragraph>
-                    <Run Text="RichTextBox"/>
+                    <Run Text=""/>
                 </Paragraph>
             </FlowDocument>
         </RichTextBox>

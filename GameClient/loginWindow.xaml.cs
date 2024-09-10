@@ -39,14 +39,16 @@ namespace GameClient
 
             DuplexChannelFactory<IBusinessServerInterface> foobFactory;
             NetTcpBinding tcp = new NetTcpBinding();
-            
-            string URL = "net.tcp://localhost:8100/GameService";
-            foobCallback = new ProcessServiceCallBackImpl(this);
-            
-            foobFactory = new DuplexChannelFactory<IBusinessServerInterface>
-                (foobCallback, tcp, URL); 
-            foob = foobFactory.CreateChannel();
 
+            string URL = "net.tcp://localhost:8100/GameService";
+
+
+
+            foobCallback = new ProcessServiceCallBackImpl(this);
+
+            foobFactory = new DuplexChannelFactory<IBusinessServerInterface>
+                (foobCallback, tcp, URL);
+            foob = foobFactory.CreateChannel();
 
             userNumber.Text = "Number of Users: " + foob.GetAllUsers().Count(); 
             
@@ -95,7 +97,7 @@ namespace GameClient
                     userNumber.Text = "Number of Users: " + userAmount.ToString();
                 });
             }
-            
+
         }
 
         public void refreshBtn_click(object sender, RoutedEventArgs e)

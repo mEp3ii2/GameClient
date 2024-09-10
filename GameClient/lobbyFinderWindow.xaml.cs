@@ -93,7 +93,6 @@ namespace GameClient
             lobbyRoomWindow curWindow = new lobbyRoomWindow(selectedLobby, currUser, foob);
             curWindow.Show();
             this.Close();
-            //need to modify lobby to reflect new user
         }
 
         // option window for creating new lobby

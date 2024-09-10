@@ -30,11 +30,8 @@ namespace GameLobbyLib
             UploadedFiles = new List<string>();  // Initialize file list
             Id = nextID++;
             Name = name;
-            users = new List<User>();
-            User lobbyUser = new User("lobby");
-            users.Add(lobbyUser);
             messages = new List<Message>();
-            Message defaultMessage = new Message(new User[] { lobbyUser, null });
+            Message defaultMessage = new Message(new User[] { null, null });
             defaultMessage.MessageList.Add("Lobby chat is now open!");
             messages.Add(defaultMessage);
             Description = description;
@@ -108,7 +105,7 @@ namespace GameLobbyLib
         {
             foreach (User searchUser in users)
             {
-                if (searchUser.Name.Equals(user.Name))
+                if (searchUser.Equals(user))
                 {
                     users.Remove(searchUser);
                     break;

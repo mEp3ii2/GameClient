@@ -27,7 +27,6 @@ namespace GameClient
     public partial class lobbyRoomWindow : Window
     {   
         private User currUser, selectedUser;
-        private List<User> lobbyList;
         private IBusinessServerInterface foob;
         private Message currentMessage;
         private Lobby thisLobby;
@@ -84,6 +83,7 @@ namespace GameClient
 
         private void messageBtn_Click(object sender, RoutedEventArgs e)
         {
+            refreshBtn_click(sender, e);
             string msg =$"{currUser.Name}: {userMessageBox.Text.ToString()}\n";
             currentMessage.MessageList.Add(msg);
             foob.UpdateMessage(currentMessage, thisLobby);
@@ -195,17 +195,15 @@ namespace GameClient
         {
             // user has selected user or lobby
             // change message box to relect chat with said entity
-            string selectedChat;
             if (userlistBox.SelectedItem == null)
             {
-                selectedChat = "lobby";
+                selectedUser = null;
             }
             else
             {
-                selectedChat = userlistBox.SelectedItem.ToString();
+                string selectedChat = userlistBox.SelectedItem.ToString();
+                selectedUser = foob.GetUser(selectedChat);
             }
-            
-            selectedUser = foob.GetUser(selectedChat);
 
             Message selectedMessage = foob.GetMessage(currUser, selectedUser, thisLobby);
             currentMessage = selectedMessage;
@@ -257,8 +255,9 @@ namespace GameClient
 
         private void updateUsers()
         {
-            lobbyList = foob.GetUsers(thisLobby);
+            List<User> lobbyList = foob.GetUsers(thisLobby);
             lobbyList.Remove(currUser);
+            lobbyList.Add(new User("Lobby"));
             userlistBox.ItemsSource = lobbyList;
         }
 
