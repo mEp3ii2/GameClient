@@ -29,11 +29,11 @@ namespace GameClient
         private List<string> tags;
         private IBusinessServerInterface foob;
         
-        public createLobbyWindow(string currUser, IBusinessServerInterface foob)
+        public createLobbyWindow()
         {
             InitializeComponent();
 
-            this.foob = foob;
+            this.foob = App.Instance.foob;
             //passing foob instead
             /*ChannelFactory<BusinessServerInterface> foobFactory;
             NetTcpBinding tcp = new NetTcpBinding();
@@ -41,7 +41,7 @@ namespace GameClient
             foobFactory = new ChannelFactory<BusinessServerInterface>(tcp, URL);
             foob = foobFactory.CreateChannel();
             */
-            this.currUser = currUser;
+            this.currUser = App.Instance.UserName;
             
             modeSelBox.ItemsSource = foob.GetAllModeTypes();
             //tagSelBox.ItemsSource = Database.getAllTagTypes();
@@ -67,7 +67,7 @@ namespace GameClient
             desc = descTxtBox.Text;
             MessageBox.Show(mode+" "+tagString + " " +roomName + " " + desc);
             foob.AddLobby(roomName, desc, mode, tags);
-            lobbyRoomWindow curWindow = new lobbyRoomWindow(roomName,currUser,foob);
+            lobbyRoomWindow curWindow = new lobbyRoomWindow(roomName);
             curWindow.Show();
             this.Close();
         }
@@ -82,7 +82,7 @@ namespace GameClient
 
         private void backBtn_Click(object sender, RoutedEventArgs e)
         {
-            lobbyFinderWindow curWindow = new lobbyFinderWindow(currUser, foob);
+            lobbyFinderWindow curWindow = new lobbyFinderWindow();
             curWindow.Show();
             this.Close();
         }

@@ -31,12 +31,12 @@ namespace GameClient
         private IBusinessServerInterface foob;
         private List<string> currentMessage;
         private string thisLobby;
-        public lobbyRoomWindow(string selectedLobby, string currUser,IBusinessServerInterface foob) 
+        public lobbyRoomWindow(string selectedLobby) 
         {
             
             InitializeComponent();
-            this.currUser = currUser;
-            this.foob = foob;
+            this.currUser = App.Instance.UserName;
+            this.foob = App.Instance.foob;
             this.thisLobby = selectedLobby;
             messageList.Document.Blocks.Clear();
             
@@ -69,7 +69,7 @@ namespace GameClient
         private void backButton_Click(object sender, RoutedEventArgs e)
         {
             foob.RemoveUserFromLobby(thisLobby, currUser);
-            lobbyFinderWindow curWindow = new lobbyFinderWindow(currUser, foob);
+            lobbyFinderWindow curWindow = new lobbyFinderWindow();
             this.Close();
             curWindow.Show();
         }
@@ -188,7 +188,7 @@ namespace GameClient
         {
             // user has selected user or lobby
             // change message box to relect chat with said entity
-            if (userlistBox.SelectedItem.Equals("lobby"))
+            if (userlistBox.SelectedItem==null || userlistBox.SelectedItem.Equals("lobby"))
             {
                 selectedUser = null;
             }

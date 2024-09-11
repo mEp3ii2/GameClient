@@ -30,12 +30,12 @@ namespace GameClient
         private string currentTagFilter;
         private IBusinessServerInterface foob;
 
-        public lobbyFinderWindow(string currUser, IBusinessServerInterface foob)
+        public lobbyFinderWindow()
         {
             InitializeComponent();
-            this.foob = foob;// connection to business layer
+            this.foob = App.Instance.foob;// connection to business layer
 
-            this.currUser = currUser; 
+            this.currUser = App.Instance.UserName; 
             currentList = foob.GetAllLobbies();
             lobbyList.ItemsSource = currentList;
             loadModeFilterBox();
@@ -89,7 +89,7 @@ namespace GameClient
             string selectedLobby = ((Lobby) lobbyList.SelectedItem).Name;
             foob.joinLobby(selectedLobby, currUser);
             
-            lobbyRoomWindow curWindow = new lobbyRoomWindow(selectedLobby, currUser, foob);
+            lobbyRoomWindow curWindow = new lobbyRoomWindow(selectedLobby);
             curWindow.Show();
             this.Close();
         }
@@ -98,7 +98,7 @@ namespace GameClient
         private void createBtn_Click(object sender, RoutedEventArgs e)
         {
             // user creating room
-            createLobbyWindow curWindow = new createLobbyWindow(currUser,foob);
+            createLobbyWindow curWindow = new createLobbyWindow();
             curWindow.Show();
             this.Close();
             

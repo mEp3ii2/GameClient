@@ -35,12 +35,8 @@ namespace GameClient
         {
             InitializeComponent();
 
-
-            ChannelFactory<IBusinessServerInterface> foobFactory;
-            NetTcpBinding tcp = new NetTcpBinding();
-            string URL = "net.tcp://localhost:8100/GameService";
-            foobFactory = new ChannelFactory<IBusinessServerInterface>(tcp, URL);
-            foob = foobFactory.CreateChannel();
+            foob = App.Instance.foob;
+            
 
             userNumber.Text = "Number of Users: " + foob.GetUserCount(); 
             
@@ -48,16 +44,16 @@ namespace GameClient
 
         private async void loginBtn_Click(object sender, RoutedEventArgs e)
         {
-            string userName = userNameBox.Text;
+            App.Instance.UserName = userNameBox.Text;
             
-            bool uniqueUser = await Task.Run(()=> VerifyUser(userName));
+            bool uniqueUser = await Task.Run(()=> VerifyUser(App.Instance.UserName));
 
             if (uniqueUser)
             {
                 // open main window and close this one
                 // send across user name as well    
-                foob.AddUser(userName);
-                lobbyFinderWindow curWindow = new lobbyFinderWindow(userName,foob);
+                foob.AddUser(App.Instance.UserName);
+                lobbyFinderWindow curWindow = new lobbyFinderWindow();
                 curWindow.Show();
                 this.Close();
 

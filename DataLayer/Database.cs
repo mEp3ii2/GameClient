@@ -97,9 +97,19 @@ namespace DataLayer
         //Remove user from database
         public void RemoveUser(User user)
         {
+            //Remove user from any lobbies they are in
+            foreach (Lobby lobby in lobbies)
+            {
+                if (lobby.Users.Contains(user))
+                {
+                    RemoveUser(lobby, user);
+                }
+            }
+
+            //Remove user from the application
             foreach (User searchUser in users)
             {
-                if (searchUser.Name.Equals(user.Name))
+                if (searchUser.Equals(user))
                 {
                     users.Remove(searchUser);
                     break;
