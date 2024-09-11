@@ -5,11 +5,12 @@ using System.Runtime.Serialization;
 using System.ServiceModel.Channels;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel;
 
 namespace GameLobbyLib
 {
 
-    public class Lobby
+    public class Lobby : INotifyPropertyChanged
     {
         private static int nextID = 1;
         private string name;
@@ -20,6 +21,7 @@ namespace GameLobbyLib
         private List<string> tags;
         public int Id; // if set to private id doesnt get passed to businesss layer and its set to 0 so idk
         public List<string> UploadedFiles { get; set; }  // New list to store uploaded file names
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public Lobby() { } //I dont fully understand why this works but DO NOT REMOVE. It fucks with something to do with serialization
 
@@ -67,13 +69,28 @@ namespace GameLobbyLib
             set { name = value; }
         }
 
-        public List<User> Users 
-        { 
-            get => users;  
-            set => users = value;
+        public List<User> Users
+        {
+            get => users;
+            set
+            {
+                if (users != value)
+                {
+                    users = value;
+                    OnPropertyChanged(nameof(Users));
+                    OnPropertyChanged(nameof(UserCount)); // Update the user count as well
+                }
+            }
         }
 
-        public List<Message> Messages
+        public int UserCount => Users?.Count ?? 0;
+
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+    public List<Message> Messages
         {
             get => messages;
             set => messages = value;

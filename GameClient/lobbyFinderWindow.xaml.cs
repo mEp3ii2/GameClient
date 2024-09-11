@@ -217,5 +217,35 @@ namespace GameClient
                 await foob.RemoveUserFromLobbyAsync(selectedLobby.Name, currUser);
             }
         }
+
+        private void StartUserCountUpdateTimer()
+        {
+            lobbyUpdateTimer = new System.Timers.Timer(1000); // Update every second
+            lobbyUpdateTimer.Elapsed += async (sender, e) => await UpdateLobbiesWithUserCountAsync();
+            lobbyUpdateTimer.AutoReset = true;
+            lobbyUpdateTimer.Enabled = true;
+        }
+
+        private async Task UpdateLobbiesWithUserCountAsync()
+        {
+            var lobbies = await foob.GetAllLobbiesAsync();
+
+            foreach (var lobby in lobbies)
+            {
+                // Fetch the latest user names as a list of strings
+                var userNames = await foob.GetUsersAsync(lobby.Name);
+
+                // Convert the list of user names (strings) to a list of User objects
+                var users = userNames.Select(userName => new User(userName)).ToList();
+
+                // Assign the list of User objects to the lobby's Users property
+                lobby.Users = users;  // This will trigger UI updates through INotifyPropertyChanged
+            }
+
+            Dispatcher.Invoke(() =>
+            {
+                lobbyList.ItemsSource = lobbies;  // Rebind the updated lobbies to the DataGrid
+            });
+        }
     }
 }

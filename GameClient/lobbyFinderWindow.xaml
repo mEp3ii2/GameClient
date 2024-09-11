@@ -16,6 +16,7 @@
                 <DataGridTextColumn Header ="Name" Binding ="{Binding Name}" />
                 <DataGridTextColumn Header="Description" Binding="{Binding Description}"/>
                 <DataGridTextColumn Header="Mode" Binding="{Binding Mode}" />
+                <DataGridTextColumn Header="User Count" Binding="{Binding UserCount}" />
                 <DataGridTemplateColumn Header="User Count">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
