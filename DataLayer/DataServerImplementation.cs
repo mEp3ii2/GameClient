@@ -102,16 +102,15 @@ namespace DataLayer
                 .Where(m => m.UserList.Contains(currUser) || m.UserList.Contains(null)).ToList());
         }
 
-        public async Task AddMessageAsync(Lobby lobby, User user1, User user2)
+        public async Task AddMessageAsync(Lobby lobby, User user, string messageContent)
         {
-            Log($"Adding message between {user1.Name} and {user2.Name} in lobby {lobby.Name}");
             Lobby thisLobby = database.getLobby(lobby);
 
             if (thisLobby != null)
             {
-                Message newMessage = new Message(new User[] { user1, user2 });
-                await Task.Run(() => thisLobby.Messages.Add(newMessage));
-                Log($"Message added successfully between {user1.Name} and {user2.Name}.");
+                Message newMessage = new Message(new User[] { user, null });
+                newMessage.AddMessage(user.Name, messageContent); // Add message with username
+                await Task.Run(() => thisLobby.Messages.Add(newMessage)); // Save the message
             }
             else
             {

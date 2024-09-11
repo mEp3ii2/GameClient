@@ -206,11 +206,10 @@ namespace GameClient
         private void displayMsgs()
         {
             messageList.Document.Blocks.Clear(); // Clears the current message list
-            List<string> msgList = currentMessage; // Current message list
 
-            foreach (string msgItem in msgList)
+            foreach (string msgItem in currentMessage)
             {
-                var paragraph = new Paragraph(new Run(msgItem)); // Each message now contains the username and message
+                var paragraph = new Paragraph(new Run(msgItem)); // Each string already includes the username
                 messageList.Document.Blocks.Add(paragraph); // Add to RichTextBox
             }
         }

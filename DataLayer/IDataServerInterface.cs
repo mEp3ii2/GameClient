@@ -19,7 +19,7 @@ public interface IDataServerInterface
     Task<List<User>> GetAllUsersAsync();
 
     [OperationContract]
-    Task AddUserAsync(User user);
+    Task AddMessageAsync(Lobby lobby, User user, string messageContent);
 
     [OperationContract]
     Task<List<string>> GetUniqueModesAsync(List<Lobby> curLobbyList);
@@ -55,9 +55,6 @@ public interface IDataServerInterface
     Task<List<Message>> GetChatsAsync(Lobby lobby, User currUser);
 
     [OperationContract]
-    Task AddMessageAsync(Lobby lobby, User user1, User user2);
-
-    [OperationContract]
     Task<Message> GetMessageAsync(User user1, User user2, Lobby lobby);
 
     [OperationContract]
@@ -74,4 +71,7 @@ public interface IDataServerInterface
 
     [OperationContract]
     Task<int> GetUserCountAsync();
+
+    [OperationContract]
+    Task AddUserAsync(User user);
 }

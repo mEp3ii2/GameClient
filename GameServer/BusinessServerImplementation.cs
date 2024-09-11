@@ -53,9 +53,22 @@ namespace BusinessLayer
             await foob.RemoveUserFromLobbyAsync(lobby, user);
         }
 
-        public async Task AddMessageAsync(Lobby lobby, User user1, User user2)
+        public async Task AddMessageAsync(Lobby lobby, User user, string messageContent)
         {
-            await foob.AddMessageAsync(lobby, user1, user2);
+            Log($"Adding message from {user.Name} in lobby {lobby.Name}");
+            Lobby thisLobby = await foob.GetLobbyAsync(lobby.Name);
+
+            if (thisLobby != null)
+            {
+                Message lobbyMessage = thisLobby.getMessage(user, null); // Get the current lobby message
+                lobbyMessage.AddMessage(user.Name, messageContent); // Add message with username in content
+                await Task.Run(() => thisLobby.Messages.Add(lobbyMessage)); // Add the message to the list
+                Log($"Message added successfully from {user.Name}.");
+            }
+            else
+            {
+                throw new ArgumentException($"Lobby '{lobby.Name}' not found.");
+            }
         }
 
         public async Task RemoveUserAsync(string userName)

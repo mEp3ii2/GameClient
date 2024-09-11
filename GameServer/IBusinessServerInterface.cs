@@ -18,7 +18,7 @@ namespace BusinessLayer
         Task<User> GetUserAsync(string name);
 
         [OperationContract]
-        Task AddMessageAsync(Lobby lobby, User user1, User user2);
+        Task AddMessageAsync(Lobby lobby, User user, string messageContent);
 
         [OperationContract]
         Task<List<User>> GetAllUsersAsync();
