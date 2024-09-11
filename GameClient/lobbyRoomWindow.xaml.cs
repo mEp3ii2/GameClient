@@ -37,8 +37,8 @@ namespace GameClient
         {
             InitializeComponent();
             this.foob = App.Instance.foob;
+            this.currUser = App.Instance.UserName; // Assign the current user
             this.thisLobby = selectedLobby;
-
             StartMessageUpdateTimer(); // Start polling for messages
         }
 
@@ -61,15 +61,15 @@ namespace GameClient
             });
         }
 
-        private async Task LoadUsersAsync()
+        private void LoadUsersAsync()
         {
             updateUsers();
         }
 
-        private void logOutBtn_Click(object sender, RoutedEventArgs e)
+        private async void logOutBtn_Click(object sender, RoutedEventArgs e)
         {
-            foob.RemoveUserFromLobbyAsync(thisLobby, currUser);
-            foob.RemoveUserAsync(currUser);
+            await foob.RemoveUserFromLobbyAsync(thisLobby, currUser); // Add 'await'
+            await foob.RemoveUserAsync(currUser); // Add 'await'
             this.Close();
         }
 
@@ -85,7 +85,7 @@ namespace GameClient
         {
             string msg = $"{currUser}: {userMessageBox.Text.ToString()}\n"; // Add the current user's name to the message
             currentMessage.Add(msg); // Add message with username to the current message list
-            await foob.UpdateMessageAsync(currentMessage, thisLobby, currUser, selectedUser); // Send message to server
+            await foob.UpdateMessageAsync(currentMessage, thisLobby, currUser, selectedUser);
             displayMsgs(); // Display the updated message list
         }
 
@@ -113,7 +113,10 @@ namespace GameClient
         {
             Paragraph paragraph = new Paragraph();
             Hyperlink link = new Hyperlink(new Run(fileName));
-            link.Click += (s, args) => OpenFileAsync(fileName);  // Set up the click event handler
+
+            // Make the event handler async and await the OpenFileAsync call
+            link.Click += async (s, args) => await OpenFileAsync(fileName);
+
             paragraph.Inlines.Add(link);
 
             // Add the hyperlink to the RichTextBox for file list
@@ -121,15 +124,15 @@ namespace GameClient
         }
 
         // Handle hyperlink click event to open the file
-        private void Hyperlink_Click(object sender, RoutedEventArgs e)
+        private async void Hyperlink_Click(object sender, RoutedEventArgs e)
         {
             if (e.OriginalSource is Hyperlink link)
             {
                 // Retrieve the file name from the hyperlink
                 string fileName = link.NavigateUri.ToString();
 
-                // Download and open the file
-                _ = OpenFileAsync(fileName);
+                // Download and open the file - await the async method
+                await OpenFileAsync(fileName);
             }
         }
 
@@ -162,11 +165,12 @@ namespace GameClient
             // Display each file as a clickable hyperlink
             foreach (string fileName in uploadedFiles)
             {
-                Paragraph paragraph = new Paragraph();
+                AddFileToRichTextBox(fileName);
+                /*Paragraph paragraph = new Paragraph();
                 Hyperlink link = new Hyperlink(new Run(fileName));
                 link.Click += (s, args) => OpenFileAsync(fileName);  // Set up the click event handler
                 paragraph.Inlines.Add(link);
-                filesList.Document.Blocks.Add(paragraph);  // Add the paragraph to the RichTextBox
+                filesList.Document.Blocks.Add(paragraph);*/  // Add the paragraph to the RichTextBox
             }
         }
 

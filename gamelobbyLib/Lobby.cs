@@ -50,6 +50,11 @@ namespace GameLobbyLib
             return false;
         }
 
+        public override int GetHashCode()
+        {
+            return Name.GetHashCode() ^ Id.GetHashCode();
+        }
+
         public int ID
         {
             get { return Id; }

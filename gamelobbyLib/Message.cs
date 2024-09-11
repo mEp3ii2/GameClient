@@ -8,6 +8,8 @@ public class Message
     private List<string> messageList; // Keep this as List<string>
     private User[] userList;
 
+    public Message() { }//I dont fully understand why this works but DO NOT REMOVE. It fucks with something to do with serialization
+
     public Message(User[] userList = null)
     {
         id = nextID++;

@@ -34,13 +34,13 @@ namespace GameClient
         {
             InitializeComponent();
             this.foob = App.Instance.foob;
-
+            this.currUser = App.Instance.UserName; // Assign the current user
             StartLobbyUpdateTimer(); // Start polling for lobbies
         }
 
         private void StartLobbyUpdateTimer()
         {
-            System.Timers.Timer lobbyUpdateTimer = new System.Timers.Timer(5000); // Update every 5 seconds
+            lobbyUpdateTimer = new System.Timers.Timer(1000); // Update every second
             lobbyUpdateTimer.Elapsed += async (sender, e) =>
             {
                 await LoadLobbiesAsync(); // Load lobbies asynchronously

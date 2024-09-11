@@ -24,6 +24,11 @@ namespace GameLobbyLib
             return name == user.name;
         }
 
+        public override int GetHashCode()
+        {
+            return Name.GetHashCode();
+        }
+
         public string Name { get { return name; } set { name = value; } }
 
         public override string ToString()

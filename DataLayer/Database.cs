@@ -25,7 +25,7 @@ namespace DataLayer
 
         List<Lobby> lobbies;
         List<User> users;
-        static List<UploadedFile> uploadedFiles;
+        // static List<UploadedFile> uploadedFiles;
 
         List<string> tags;        //test value to be removed later
 
