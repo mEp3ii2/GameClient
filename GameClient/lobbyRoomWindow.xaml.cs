@@ -26,65 +26,67 @@ namespace GameClient
     /// Interaction logic for lobbyRoomWindow.xaml
     /// </summary>
     public partial class lobbyRoomWindow : Window
-    {   
+    {
         private string currUser, selectedUser;
         private IBusinessServerInterface foob;
         private List<string> currentMessage;
         private string thisLobby;
-        public lobbyRoomWindow(string selectedLobby) 
+        public lobbyRoomWindow(string selectedLobby)
         {
-            
             InitializeComponent();
             this.currUser = App.Instance.UserName;
             this.foob = App.Instance.foob;
             this.thisLobby = selectedLobby;
             messageList.Document.Blocks.Clear();
-            
-            
-            List<string> lobbyMessages = foob.GetMessage(null, currUser, thisLobby);
-            currentMessage = lobbyMessages;
-            displayMsgs();
+
+            // Load messages and users asynchronously
+            Task task = LoadMessagesAsync();
+            Task task2 = LoadUsersAsync();
 
             filesList.AddHandler(Hyperlink.RequestNavigateEvent, new RoutedEventHandler(Hyperlink_Click)); // Enable hyperlink click handling for the RichTextBox
 
             // Load previously shared files for the lobby
-            LoadSharedFiles();
+            _ = LoadSharedFilesAsync();
+        }
 
-            //fill userList
+        private async Task LoadMessagesAsync()
+        {
+            var lobbyMessages = await foob.GetMessageAsync(null, currUser, thisLobby);
+            currentMessage = lobbyMessages;
+            displayMsgs();
+        }
+
+        private async Task LoadUsersAsync()
+        {
             updateUsers();
-
-            //get all users to populate user box
-            //load current chat history
-
-
         }
 
         private void logOutBtn_Click(object sender, RoutedEventArgs e)
         {
-            foob.RemoveUserFromLobby(thisLobby, currUser);
-            foob.RemoveUser(currUser);
+            foob.RemoveUserFromLobbyAsync(thisLobby, currUser);
+            foob.RemoveUserAsync(currUser);
             this.Close();
         }
 
         private void backButton_Click(object sender, RoutedEventArgs e)
         {
-            foob.RemoveUserFromLobby(thisLobby, currUser);
+            foob.RemoveUserFromLobbyAsync(thisLobby, currUser);
             lobbyFinderWindow curWindow = new lobbyFinderWindow();
             this.Close();
             curWindow.Show();
         }
 
-        private void messageBtn_Click(object sender, RoutedEventArgs e)
+        private async void messageBtn_Click(object sender, RoutedEventArgs e)
         {
-            refreshBtn_click(sender, e);
-            string msg =$"{currUser}: {userMessageBox.Text.ToString()}\n";
+            //await refreshBtn_click(sender, e);
+            string msg = $"{currUser}: {userMessageBox.Text.ToString()}\n";
             currentMessage.Add(msg);
-            foob.UpdateMessage(currentMessage, thisLobby, currUser, selectedUser);
+            await foob.UpdateMessageAsync(currentMessage, thisLobby, currUser, selectedUser);
             displayMsgs();
         }
 
         // Upload file button click handler
-        private void attachmentBtn_Click(object sender, RoutedEventArgs e)
+        private async void attachmentBtn_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             if (openFileDialog.ShowDialog() == true)
@@ -94,7 +96,7 @@ namespace GameClient
                 string fileName = System.IO.Path.GetFileName(filePath);
 
                 // Pass the lobby name when uploading the file
-                foob.UploadFile(fileData, fileName, thisLobby);
+                await foob.UploadFileAsync(fileData, fileName, thisLobby);
 
                 // Immediately display the uploaded file as a clickable hyperlink in the file list
                 AddFileToRichTextBox(fileName);
@@ -106,7 +108,7 @@ namespace GameClient
         {
             Paragraph paragraph = new Paragraph();
             Hyperlink link = new Hyperlink(new Run(fileName));
-            link.Click += (s, args) => OpenFile(fileName);  // Set up the click event handler
+            link.Click += (s, args) => OpenFileAsync(fileName);  // Set up the click event handler
             paragraph.Inlines.Add(link);
 
             // Add the hyperlink to the RichTextBox for file list
@@ -122,18 +124,18 @@ namespace GameClient
                 string fileName = link.NavigateUri.ToString();
 
                 // Download and open the file
-                OpenFile(fileName);
+                _ = OpenFileAsync(fileName);
             }
         }
 
         // Open the file using the default application for its type
-        private void OpenFile(string fileName)
+        private async Task OpenFileAsync(string fileName)
         {
             try
             {
                 // Download the file and save it locally before opening
                 string filePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Downloads", fileName);
-                byte[] fileData = foob.DownloadFile(fileName);  // Download the file from the server
+                byte[] fileData = await foob.DownloadFileAsync(fileName);  // Download the file from the server
                 Directory.CreateDirectory(System.IO.Path.GetDirectoryName(filePath));  // Ensure directory exists
                 File.WriteAllBytes(filePath, fileData);  // Save the file locally
 
@@ -147,29 +149,29 @@ namespace GameClient
         }
 
         // Method to load shared files when re-entering the lobby
-        private void LoadSharedFiles()
+        private async Task LoadSharedFilesAsync()
         {
             // Fetch the list of previously shared files for the current lobby
-            List<string> uploadedFiles = foob.GetLobbyFiles(thisLobby);  // Ensure thisLobby.Name is passed correctly
+            List<string> uploadedFiles = await foob.GetLobbyFilesAsync(thisLobby);  // Ensure thisLobby.Name is passed correctly
 
             // Display each file as a clickable hyperlink
             foreach (string fileName in uploadedFiles)
             {
                 Paragraph paragraph = new Paragraph();
                 Hyperlink link = new Hyperlink(new Run(fileName));
-                link.Click += (s, args) => OpenFile(fileName);  // Set up the click event handler
+                link.Click += (s, args) => OpenFileAsync(fileName);  // Set up the click event handler
                 paragraph.Inlines.Add(link);
                 filesList.Document.Blocks.Add(paragraph);  // Add the paragraph to the RichTextBox
             }
         }
 
-        private void DownloadFile(string fileName)
+        private async Task DownloadFileAsync(string fileName)
         {
             try
             {
-                byte[] fileData = foob.DownloadFile(fileName);
-                string filePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Downloads", fileName);  // Explicit reference to System.IO.Path otherwise its an ambiguous reference between that and System.Windows.Shapes.Path.
-                Directory.CreateDirectory(System.IO.Path.GetDirectoryName(filePath));  // Explicit reference to System.IO.Path otherwise its an ambiguous reference between that and System.Windows.Shapes.Path.
+                byte[] fileData = await foob.DownloadFileAsync(fileName);
+                string filePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Downloads", fileName);
+                Directory.CreateDirectory(System.IO.Path.GetDirectoryName(filePath));  // Ensure directory exists
                 File.WriteAllBytes(filePath, fileData);
                 MessageBox.Show($"File downloaded successfully to {filePath}");
             }
@@ -179,16 +181,9 @@ namespace GameClient
             }
         }
 
-        private void userList_TextChanged(object sender, TextChangedEventArgs e)
+        private async void userlistBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            //load chat related to selected user
-        }
-
-        private void userlistBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            // user has selected user or lobby
-            // change message box to relect chat with said entity
-            if (userlistBox.SelectedItem==null || userlistBox.SelectedItem.Equals("lobby"))
+            if (userlistBox.SelectedItem == null || userlistBox.SelectedItem.Equals("lobby"))
             {
                 selectedUser = null;
             }
@@ -197,7 +192,7 @@ namespace GameClient
                 selectedUser = userlistBox.SelectedItem.ToString();
             }
 
-            List<string> selectedMessage = foob.GetMessage(currUser, selectedUser, thisLobby);
+            var selectedMessage = await foob.GetMessageAsync(currUser, selectedUser, thisLobby);
             currentMessage = selectedMessage;
 
             displayMsgs();
@@ -216,27 +211,27 @@ namespace GameClient
             }
         }
 
-        private void refreshBtn_click(object sender, RoutedEventArgs e)
+        /*private async Task refreshBtn_click(object sender, RoutedEventArgs e)
         {
             // Update messages from server
-            currentMessage = foob.GetMessage(currUser, selectedUser, thisLobby);
+            currentMessage = await foob.GetMessageAsync(currUser, selectedUser, thisLobby);
             displayMsgs();
 
             // Update users in the server
             updateUsers();
 
             // Update the file list in the RichTextBox
-            updateFiles();
-        }
+            await updateFilesAsync();
+        }*/
 
         // Helper method to update the file list
-        private void updateFiles()
+        private async Task updateFilesAsync()
         {
             // Clear the existing file list from the RichTextBox
             filesList.Document.Blocks.Clear();
 
             // Retrieve the list of uploaded files for the current lobby
-            List<string> uploadedFiles = foob.GetLobbyFiles(thisLobby);
+            List<string> uploadedFiles = await foob.GetLobbyFilesAsync(thisLobby);
 
             // Display each file as a clickable hyperlink in the RichTextBox
             foreach (string fileName in uploadedFiles)
@@ -245,20 +240,12 @@ namespace GameClient
             }
         }
 
-        private void app_Exit(object sender, CancelEventArgs e)
+        private async void updateUsers()
         {
-            //foob.RemoveUserFromLobby(thisLobby,currUser);
-            //foob.RemoveUser(currUser);
-
-        }
-
-        private void updateUsers()
-        {
-            List<string> lobbyList = foob.GetUsers(thisLobby);
+            List<string> lobbyList = await foob.GetUsersAsync(thisLobby);
             lobbyList.Remove(currUser);
             lobbyList.Add("Lobby");
             userlistBox.ItemsSource = lobbyList;
         }
-
     }
 }

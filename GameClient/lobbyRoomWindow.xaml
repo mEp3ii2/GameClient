@@ -30,8 +30,5 @@
         </RichTextBox>
         <Label Content="Files" HorizontalAlignment="Left" Height="25" Margin="691,11,0,0" VerticalAlignment="Top" Width="149"/>
         <ListBox x:Name="userlistBox" Margin="10,34,671,148" SelectionChanged="userlistBox_SelectionChanged"/>
-        <Button HorizontalAlignment="Left" Margin="642,8,0,0" VerticalAlignment="Top" Name="refreshBtn" Height="21" Width="44" Click="refreshBtn_click">
-            <Image Source="./Resources/refresh.png"/>
-        </Button>
     </Grid>
 </Window>

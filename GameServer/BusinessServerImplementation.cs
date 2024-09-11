@@ -6,20 +6,17 @@ using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 using DataLayer;
-using System.Runtime.CompilerServices;
-using System.IO;
-using System.Collections.Concurrent;
-using System.Security.Cryptography;
 
-namespace BusinessLayer    
+namespace BusinessLayer
 {
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, UseSynchronizationContext = false)]
     internal class BusinessServerImplementation : IBusinessServerInterface
     {
         private IDataServerInterface foob;
         private static uint logNumber = 0;
-        public BusinessServerImplementation() {
 
+        public BusinessServerImplementation()
+        {
             ChannelFactory<IDataServerInterface> foobFactory;
             NetTcpBinding tcp = new NetTcpBinding();
             string URL = "net.tcp://localhost:8200/DataService";
@@ -27,94 +24,94 @@ namespace BusinessLayer
             foob = foobFactory.CreateChannel();
         }
 
-        public List<Lobby> GetAllLobbies()
+        public async Task<List<Lobby>> GetAllLobbiesAsync()
         {
-            Log($"Retriving Lobbies from data layer");            
-            return foob.GetAllLobbies();
+            Log("Retrieving Lobbies from data layer");
+            return await foob.GetAllLobbiesAsync();
         }
 
-        public List<string> GetUsers(string lobbyName)
+        public async Task<List<string>> GetUsersAsync(string lobbyName)
         {
-            Lobby lobby = foob.GetLobby(lobbyName);
+            Lobby lobby = await foob.GetLobbyAsync(lobbyName);
             List<string> userNames = new List<string>();
-            foreach (User user in foob.GetUsers(lobby))
+            foreach (User user in await foob.GetUsersAsync(lobby))
             {
                 userNames.Add(user.Name);
             }
             return userNames;
         }
 
-        public User GetUser(string name)
+        public async Task<User> GetUserAsync(string name)
         {
-            return foob.GetUser(name);
+            return await foob.GetUserAsync(name);
         }
 
-        public void RemoveUserFromLobby(string lobbyName, string userName)
+        public async Task RemoveUserFromLobbyAsync(string lobbyName, string userName)
         {
-            User user = foob.GetUser(userName);
-            Lobby lobby = foob.GetLobby(lobbyName);
-            foob.RemoveUserFromLobby(lobby, user);
+            User user = await foob.GetUserAsync(userName);
+            Lobby lobby = await foob.GetLobbyAsync(lobbyName);
+            await foob.RemoveUserFromLobbyAsync(lobby, user);
         }
 
-        public void AddMessage(Lobby lobby, User user1, User user2)
+        public async Task AddMessageAsync(Lobby lobby, User user1, User user2)
         {
-            foob.AddMessage(lobby, user1, user2);
+            await foob.AddMessageAsync(lobby, user1, user2);
         }
 
-        public void RemoveUser(string userName)
+        public async Task RemoveUserAsync(string userName)
         {
-            User user = foob.GetUser(userName);
-            foob.RemoveUser(user);
+            User user = await foob.GetUserAsync(userName);
+            await foob.RemoveUserAsync(user);
         }
 
-        public List<User> GetAllUsers()
+        public async Task<List<User>> GetAllUsersAsync()
         {
-            return foob.GetAllUsers();
+            return await foob.GetAllUsersAsync();
         }
 
-        public void AddUser(string userName)
+        public async Task AddUserAsync(string userName)
         {
             Log($"Added new user: {userName}");
-            foob.AddUser(new User(userName));
+            await foob.AddUserAsync(new User(userName));
         }
 
-        public List<string> GetUniqueModes(List<Lobby> curLobbyList)
+        public async Task<List<string>> GetUniqueModesAsync(List<Lobby> curLobbyList)
         {
-            return foob.GetUniqueModes(curLobbyList);
+            return await foob.GetUniqueModesAsync(curLobbyList);
         }
 
-        public List<string> GetUniqueTags(List<Lobby> curLobbyList)
+        public async Task<List<string>> GetUniqueTagsAsync(List<Lobby> curLobbyList)
         {
-            return foob.GetUniqueTags(curLobbyList);
+            return await foob.GetUniqueTagsAsync(curLobbyList);
         }
 
-        public List<Lobby> GetfilterdLobbiesList(string mode = null, string tag = null)
+        public async Task<List<Lobby>> GetFilteredLobbiesListAsync(string mode = null, string tag = null)
         {
-            return foob.GetfilterdLobbiesList(mode, tag);
+            return await foob.GetFilteredLobbiesListAsync(mode, tag);
         }
 
-        public List<string> GetAllModeTypes()
+        public async Task<List<string>> GetAllModeTypesAsync()
         {
-            return foob.GetAllModeTypes();
+            return await foob.GetAllModeTypesAsync();
         }
 
-        public List<string> GetAllTagTypes()
+        public async Task<List<string>> GetAllTagTypesAsync()
         {
-            return foob.GetAllTagTypes();
+            return await foob.GetAllTagTypesAsync();
         }
 
-        public void AddLobby(string roomName, string desc, string mode, List<string> tags)
+        public async Task AddLobbyAsync(string roomName, string desc, string mode, List<string> tags)
         {
             Log($"New lobby created: {roomName}");
             Lobby lobby = new Lobby(roomName, desc, mode, tags);
-            foob.AddLobby(lobby);
+            await foob.AddLobbyAsync(lobby);
         }
 
-        public bool UniqueUser(string userName)
+        public async Task<bool> UniqueUserAsync(string userName)
         {
-            Log($"Attempted Login with username {userName}");
-            List<User> users = foob.GetAllUsers();
-            
+            Log($"Attempted login with username {userName}");
+            List<User> users = await foob.GetAllUsersAsync();
+
             foreach (User user in users)
             {
                 if (user.Name.Equals(userName))
@@ -123,16 +120,15 @@ namespace BusinessLayer
                     return false;
                 }
             }
-            Log($"Login for {userName} successful ");
+            Log($"Login for {userName} successful");
             return true;
         }
 
-        public List<Message> getChats(Lobby lobby, User currUser)
+        public async Task<List<Message>> GetChatsAsync(Lobby lobby, User currUser)
         {
-            return foob.GetChats(lobby, currUser);
+            return await foob.GetChatsAsync(lobby, currUser);
         }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
         private void Log(string logString)
         {
             logNumber++;
@@ -140,57 +136,53 @@ namespace BusinessLayer
             Console.WriteLine(logMsg);
         }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        public void UploadFile(byte[] fileData, string fileName, string lobbyName)
+        public async Task UploadFileAsync(byte[] fileData, string fileName, string lobbyName)
         {
-            Lobby lobby = foob.GetLobby(lobbyName);
-            // Delegate to the data server with the lobby name
-            foob.saveFile(fileName, fileData, lobby);
+            Lobby lobby = await foob.GetLobbyAsync(lobbyName);
+            await foob.SaveFileAsync(fileName, fileData, lobby);
         }
 
-        // Download a file from the server
-        public byte[] DownloadFile(string fileName)
+        public async Task<byte[]> DownloadFileAsync(string fileName)
         {
             Log($"Received file download request: {fileName}");
-            return foob.downloadFile(fileName);
+            return await foob.DownloadFileAsync(fileName);
         }
 
-        public void UpdateMessage(List<string> messageText, string lobbyName, string userName1, string userName2)
+        public async Task UpdateMessageAsync(List<string> messageText, string lobbyName, string userName1, string userName2)
         {
-            User user1 = foob.GetUser(userName1 );
-            User user2 = foob.GetUser(userName2 );
-            Lobby lobby = foob.GetLobby(lobbyName);
-            Message msg = foob.GetMessage(user1 , user2, lobby);
+            User user1 = await foob.GetUserAsync(userName1);
+            User user2 = await foob.GetUserAsync(userName2);
+            Lobby lobby = await foob.GetLobbyAsync(lobbyName);
+            Message msg = await foob.GetMessageAsync(user1, user2, lobby);
             msg.MessageList = messageText;
-            foob.UpdateMessage(msg, lobby);
+            await foob.UpdateMessageAsync(msg, lobby);
         }
 
-        public void joinLobby(string lobbyName, string userName)
+        public async Task JoinLobbyAsync(string lobbyName, string userName)
         {
-            User user = foob.GetUser(userName);
-            Lobby lobby = foob.GetLobby(lobbyName);
-            foob.joinLobby(lobby,user);
+            User user = await foob.GetUserAsync(userName);
+            Lobby lobby = await foob.GetLobbyAsync(lobbyName);
+            await foob.JoinLobbyAsync(lobby, user);
         }
 
-        public List<string> GetMessage(string userName1, string userName2, string lobbyName)
+        public async Task<List<string>> GetMessageAsync(string userName1, string userName2, string lobbyName)
         {
-            User user1 = foob.GetUser(userName1);
-            User user2 = foob.GetUser(userName2);
-            Lobby lobby = foob.GetLobby(lobbyName);
-            Message message = foob.GetMessage(user1 ,user2, lobby);
+            User user1 = await foob.GetUserAsync(userName1);
+            User user2 = await foob.GetUserAsync(userName2);
+            Lobby lobby = await foob.GetLobbyAsync(lobbyName);
+            Message message = await foob.GetMessageAsync(user1, user2, lobby);
             return message.MessageList;
         }
 
-        // Fetch previously uploaded files for the specified lobby
-        public List<string> GetLobbyFiles(string lobbyName)
+        public async Task<List<string>> GetLobbyFilesAsync(string lobbyName)
         {
-            Lobby lobby = foob.GetLobby(lobbyName);
-            return foob.GetLobbyFiles(lobby);  // Delegate the call to the Data Layer
+            Lobby lobby = await foob.GetLobbyAsync(lobbyName);
+            return await foob.GetLobbyFilesAsync(lobby);
         }
 
-        public int GetUserCount()
+        public async Task<int> GetUserCountAsync()
         {
-            return foob.GetUserCount();
+            return await foob.GetUserCountAsync();
         }
     }
 }

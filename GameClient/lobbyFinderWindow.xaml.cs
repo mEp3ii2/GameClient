@@ -24,8 +24,7 @@ namespace GameClient
     public partial class lobbyFinderWindow : Window
     {
         private string currUser;
-        
-        private List<Lobby> currentList;//list of lobbies retrieved from business layer
+        private List<Lobby> currentList; // list of lobbies retrieved from business layer
         private string currentModeFilter;
         private string currentTagFilter;
         private IBusinessServerInterface foob;
@@ -33,97 +32,88 @@ namespace GameClient
         public lobbyFinderWindow()
         {
             InitializeComponent();
-            this.foob = App.Instance.foob;// connection to business layer
+            this.foob = App.Instance.foob; // connection to business layer
 
-            this.currUser = App.Instance.UserName; 
-            currentList = foob.GetAllLobbies();
-            lobbyList.ItemsSource = currentList;
-            loadModeFilterBox();
-            loadTagFilterBox();
+            this.currUser = App.Instance.UserName;
+            Task task = LoadLobbiesAsync();
+            Task task1 = loadModeFilterBoxAsync();
+            Task task2 = loadTagFilterBoxAsync();
             currentModeFilter = null;
             currentTagFilter = null;
+        }
+
+        private async Task LoadLobbiesAsync()
+        {
+            currentList = await foob.GetAllLobbiesAsync();
+            lobbyList.ItemsSource = currentList;
             updateLobbyCountLabel(currentList.Count);
         }
 
-        private void refreshBtn_click(object sender, EventArgs e)
-        {
-            currentList = foob.GetAllLobbies();
-            lobbyList.ItemsSource = currentList;
-            loadModeFilterBox();
-            loadTagFilterBox();
-            currentModeFilter = null;
-            currentTagFilter = null;
-            updateLobbyCountLabel(currentList.Count);
-        }
-
-        private void updateLobbyCountLabel(int lobbyCount)
-        {
-            lobbyCountLabel.Content =$"Active Lobbies: {lobbyCount}";
-        }
-
-        //loads list of unique modes plus a blank option for user to be able to unselect mode filter
-        private void loadModeFilterBox()
+        private async Task loadModeFilterBoxAsync()
         {
             List<string> modelist = new List<string>();
             modelist.Add("");
-            List<string> modes = foob.GetUniqueModes(null);
+            List<string> modes = await foob.GetUniqueModesAsync(null);
             modelist.AddRange(modes);
             modeFilterBox.ItemsSource = modelist;
         }
 
-        //loads list of unique modes plus a blank option for user to be able to unselect mode filter
-        private void loadTagFilterBox()
+        private async Task loadTagFilterBoxAsync()
         {
             List<string> tagList = new List<string>();
             tagList.Add("");
-            List<string> tags = foob.GetUniqueTags(null);
+            List<string> tags = await foob.GetUniqueTagsAsync(null);
             tagList.AddRange(tags);
             tagFilterBox.ItemsSource = tagList;
         }
 
-        // user has double clicked on lobby
-        // send user to lobby
+        /*private void refreshBtn_click(object sender, EventArgs e)
+        {
+            LoadLobbiesAsync();
+            loadModeFilterBoxAsync();
+            loadTagFilterBoxAsync();
+            currentModeFilter = null;
+            currentTagFilter = null;
+        }*/
+
+        private void updateLobbyCountLabel(int lobbyCount)
+        {
+            lobbyCountLabel.Content = $"Active Lobbies: {lobbyCount}";
+        }
+
         private void lobbyList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            
-            string selectedLobby = ((Lobby) lobbyList.SelectedItem).Name;
-            foob.joinLobby(selectedLobby, currUser);
-            
+            string selectedLobby = ((Lobby)lobbyList.SelectedItem).Name;
+            foob.JoinLobbyAsync(selectedLobby, currUser);  // Correct method name
             lobbyRoomWindow curWindow = new lobbyRoomWindow(selectedLobby);
             curWindow.Show();
             this.Close();
         }
 
-        // option window for creating new lobby
         private void createBtn_Click(object sender, RoutedEventArgs e)
         {
-            // user creating room
             createLobbyWindow curWindow = new createLobbyWindow();
             curWindow.Show();
             this.Close();
-            
         }
 
-        // user had select a mode to filter on
-        private void modeFilterBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void modeFilterBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (modeFilterBox.SelectedItem.ToString() == "")
             {
                 currentModeFilter = null;
-                
             }
             else
             {
                 currentModeFilter = modeFilterBox.SelectedItem.ToString();
             }
-            setLobbyList();
-            updateFilterList(1);
-            
+            await setLobbyListAsync();
+            await updateFilterListAsync(1);
         }
 
-        private void tagFilterBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void tagFilterBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if(tagFilterBox.SelectedItem.ToString() == "")
+            if (tagFilterBox.SelectedItem.ToString() == "")
             {
                 currentTagFilter = null;
             }
@@ -131,49 +121,38 @@ namespace GameClient
             {
                 currentTagFilter = tagFilterBox.SelectedItem.ToString();
             }
-            setLobbyList();
-            updateFilterList(2);
+            await setLobbyListAsync();
+            await updateFilterListAsync(2);
         }
 
         private void clearBtn_Click(object sender, RoutedEventArgs e)
         {
-            currentList = foob.GetAllLobbies();
-            lobbyList.ItemsSource = currentList;
+            Task task = LoadLobbiesAsync();
             modeFilterBox.SelectedItem = "";
             tagFilterBox.SelectedItem = "";
         }
 
-        private void app_Exit(object sender, CancelEventArgs e)
+        private async Task setLobbyListAsync()
         {
-            //foob.RemoveUser(currUser);
-            
-        }
-
-        private void setLobbyList()
-        {
-            currentList = foob.GetfilterdLobbiesList(mode: currentModeFilter, tag: currentTagFilter);
+            currentList = await foob.GetFilteredLobbiesListAsync(currentModeFilter, currentTagFilter);
             lobbyList.ItemsSource = currentList;
         }
 
-        //update the other filter list when one is selected
-        //e.g is deathmatch is the selected mode the tag list will be refreshed to only show tags
-        // that are present on deathmatch lobbies
-        private void updateFilterList(int i)
+        private async Task updateFilterListAsync(int i)
         {
-            //mode selected update tags
-            if(i == 1)
+            if (i == 1)
             {
                 List<string> tagList = new List<string>();
                 tagList.Add("");
-                List<string> tags = foob.GetUniqueTags(currentList);
+                List<string> tags = await foob.GetUniqueTagsAsync(currentList);
                 tagList.AddRange(tags);
                 tagFilterBox.ItemsSource = tagList;
             }
-            else//tag selected update mode
+            else
             {
                 List<string> modelist = new List<string>();
                 modelist.Add("");
-                List<string> modes = foob.GetUniqueModes(currentList);
+                List<string> modes = await foob.GetUniqueModesAsync(currentList);
                 modelist.AddRange(modes);
                 modeFilterBox.ItemsSource = modelist;
             }
@@ -181,8 +160,13 @@ namespace GameClient
 
         private void logOutBtn_Click(object sender, EventArgs e)
         {
-            foob.RemoveUser(currUser);
+            foob.RemoveUserAsync(currUser);
             this.Close();
+        }
+
+        private void lobbyFinderWindow_Closing(object sender, CancelEventArgs e)
+        {
+            App.Instance.app_Exit(sender, null);  // Call the App-level exit handling.
         }
     }
 }

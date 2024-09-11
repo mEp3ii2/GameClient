@@ -1,10 +1,6 @@
 ﻿using GameLobbyLib;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
 using System.ServiceModel;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace BusinessLayer
@@ -13,72 +9,72 @@ namespace BusinessLayer
     public interface IBusinessServerInterface
     {
         [OperationContract]
-        List<string> GetUsers(string lobbyName);
+        Task<List<string>> GetUsersAsync(string lobbyName);
 
         [OperationContract]
-        List<Lobby> GetAllLobbies();
+        Task<List<Lobby>> GetAllLobbiesAsync();
 
         [OperationContract]
-        User GetUser(string name);
+        Task<User> GetUserAsync(string name);
 
         [OperationContract]
-        void AddMessage(Lobby lobby, User user1, User user2);
+        Task AddMessageAsync(Lobby lobby, User user1, User user2);
 
         [OperationContract]
-        List<User> GetAllUsers();
+        Task<List<User>> GetAllUsersAsync();
 
         [OperationContract]
-        void AddUser(string userName);
+        Task AddUserAsync(string userName);
 
         [OperationContract]
-        List<string> GetUniqueModes(List<Lobby> currLobbyList);
+        Task<List<string>> GetUniqueModesAsync(List<Lobby> currLobbyList);
 
         [OperationContract]
-        List<string> GetUniqueTags(List<Lobby> curLobbyList);
+        Task<List<string>> GetUniqueTagsAsync(List<Lobby> curLobbyList);
 
         [OperationContract]
-        List<Lobby> GetfilterdLobbiesList(string mode = null, string tag = null);
+        Task<List<Lobby>> GetFilteredLobbiesListAsync(string mode = null, string tag = null);
 
         [OperationContract]
-        List<string> GetAllModeTypes();
+        Task<List<string>> GetAllModeTypesAsync();
 
         [OperationContract]
-        List<string> GetAllTagTypes();
+        Task<List<string>> GetAllTagTypesAsync();
 
         [OperationContract]
-        void AddLobby(string roomName, string desc, string mode, List<string> tags);
+        Task AddLobbyAsync(string roomName, string desc, string mode, List<string> tags);
 
         [OperationContract]
-        bool UniqueUser(string userName);
+        Task<bool> UniqueUserAsync(string userName);
 
         [OperationContract]
-        void UploadFile(byte[] fileData, string fileName, string lobbyName);
+        Task UploadFileAsync(byte[] fileData, string fileName, string lobbyName);
 
         [OperationContract]
-        byte[] DownloadFile(string fileName);
+        Task<byte[]> DownloadFileAsync(string fileName);
 
         [OperationContract]
-        void RemoveUserFromLobby(string lobbyName,string userName);
+        Task RemoveUserFromLobbyAsync(string lobbyName, string userName);
 
         [OperationContract]
-        void RemoveUser(string user);
+        Task RemoveUserAsync(string userName);
 
         [OperationContract]
-        List<Message> getChats(Lobby lobby, User currUser);
+        Task<List<Message>> GetChatsAsync(Lobby lobby, User currUser);
 
         [OperationContract]
-        void UpdateMessage(List<string> messageText, string lobby, string userName1, string userName2);
+        Task UpdateMessageAsync(List<string> messageText, string lobby, string userName1, string userName2);
 
         [OperationContract]
-        void joinLobby(string lobbyName, string userName);
+        Task JoinLobbyAsync(string lobbyName, string userName);  // Add this method
 
         [OperationContract]
-        List<string> GetMessage(string userName1, string userName2, string lobbyName);
+        Task<List<string>> GetMessageAsync(string userName1, string userName2, string lobbyName);
 
         [OperationContract]
-        List<string> GetLobbyFiles(string lobbyName);
+        Task<List<string>> GetLobbyFilesAsync(string lobbyName);
 
         [OperationContract]
-        int GetUserCount();
+        Task<int> GetUserCountAsync();
     }
 }

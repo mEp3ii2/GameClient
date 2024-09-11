@@ -21,28 +21,41 @@ namespace GameClient
         public string UserName { get; set; }
         public IBusinessServerInterface foob;
 
-
-        protected override void OnStartup(StartupEventArgs e)
+        protected override async void OnStartup(StartupEventArgs e)
         {
-            UserName = null;
             base.OnStartup(e);
-            SoundPlayer player = new SoundPlayer("Resources/Mortal_Kombat.wav");
-            player.LoadCompleted += delegate (object sender, AsyncCompletedEventArgs er) {
-                player.PlayLooping();
-            };
-            player.LoadAsync();
 
+            await InitializeConnectionAsync();
+        }
+
+        private async Task InitializeConnectionAsync()
+        {
             ChannelFactory<IBusinessServerInterface> foobFactory;
             NetTcpBinding tcp = new NetTcpBinding();
             string URL = "net.tcp://localhost:8100/GameService";
             foobFactory = new ChannelFactory<IBusinessServerInterface>(tcp, URL);
             foob = foobFactory.CreateChannel();
 
-
+            // Add a simple awaitable test call to check the connection
+            await foob.GetUserCountAsync();
         }
-        private void app_Exit(object sender, ExitEventArgs e)
+
+        private async Task InitializeSoundAsync()
         {
-            foob.RemoveUser(UserName);
+            SoundPlayer player = new SoundPlayer("Resources/Mortal_Kombat.wav");
+            player.LoadCompleted += delegate (object sender, AsyncCompletedEventArgs er)
+            {
+                player.PlayLooping();
+            };
+            await Task.Run(() => player.LoadAsync());
+        }
+
+        public async void app_Exit(object sender, ExitEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(UserName))
+            {
+                await foob.RemoveUserAsync(UserName);
+            }
             MessageBox.Show("Goodbye");
         }
     }
