@@ -28,6 +28,7 @@ namespace GameClient
         private string currentModeFilter;
         private string currentTagFilter;
         private IBusinessServerInterface foob;
+        private Lobby selectedLobby;
         private System.Timers.Timer lobbyUpdateTimer;
 
         public lobbyFinderWindow()
@@ -103,14 +104,35 @@ namespace GameClient
         {
             if (lobbyList.SelectedItem == null)
             {
-                return;  // No selection
+                return;  // No selection made, so return early
             }
 
-            var selectedLobby = lobbyList.SelectedItem as Lobby;  // Correct cast to Lobby
+            // Retrieve the selected lobby and store it in the selectedLobby field
+            selectedLobby = lobbyList.SelectedItem as Lobby;
+
             if (selectedLobby != null)
             {
-                lobbyRoomWindow lobbyRoom = new lobbyRoomWindow(selectedLobby.Name);  // Pass the lobby name
+                // Stop any timers or background operations related to lobbyFinderWindow
+                StopLobbyUpdateTimer();
+
+                // Open the lobby room window for the selected lobby
+                lobbyRoomWindow lobbyRoom = new lobbyRoomWindow(selectedLobby.Name);
+
+                // Safely close the lobbyFinderWindow
+                this.Close();
+
+                // Show the new window
                 lobbyRoom.Show();
+            }
+        }
+
+        private void StopLobbyUpdateTimer()
+        {
+            if (lobbyUpdateTimer != null)
+            {
+                lobbyUpdateTimer.Stop();
+                lobbyUpdateTimer.Dispose();
+                lobbyUpdateTimer = null;
             }
         }
 
@@ -190,9 +212,9 @@ namespace GameClient
 
         private async void lobbyFinderWindow_Closing(object sender, CancelEventArgs e)
         {
-            if (!string.IsNullOrEmpty(currUser) && foob != null)
+            if (!string.IsNullOrEmpty(currUser) && foob != null && selectedLobby != null)
             {
-                await foob.RemoveUserFromLobbyAsync("lobbyName", currUser); // Replace "lobbyName" with the actual lobby's name
+                await foob.RemoveUserFromLobbyAsync(selectedLobby.Name, currUser);
             }
         }
     }

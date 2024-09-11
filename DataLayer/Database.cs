@@ -89,9 +89,22 @@ namespace DataLayer
         //Remove user from lobby
         public void RemoveUser(Lobby lobby, User user)
         {
-            Lobby editLobby = getLobby(lobby);
-            editLobby.removeUser(user);
+            // Check if the lobby is null before proceeding
+            if (lobby == null)
+            {
+                throw new ArgumentNullException(nameof(lobby), "The provided lobby is null.");
+            }
 
+            // Rest of the logic to remove the user
+            Lobby editLobby = getLobby(lobby);
+
+            // Check if editLobby is null before proceeding
+            if (editLobby == null)
+            {
+                throw new Exception($"Lobby '{lobby.Name}' not found in the database.");
+            }
+
+            editLobby.removeUser(user);
         }
 
         //Remove user from database
@@ -200,13 +213,22 @@ namespace DataLayer
 
         public Lobby getLobby(Lobby lobby)
         {
+            if (lobby == null)
+            {
+                throw new ArgumentNullException(nameof(lobby), "Lobby cannot be null.");
+            }
+
             foreach (Lobby searchLobby in lobbies)
             {
                 if (lobby.Equals(searchLobby))
+                {
                     return searchLobby;
+                }
             }
-            return null;
 
+            // If no lobby was found, log the issue
+            Console.WriteLine($"Lobby '{lobby.Name}' not found.");
+            return null;
         }
 
         public void joinLobby(Lobby lobby, User user)

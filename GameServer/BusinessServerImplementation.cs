@@ -48,8 +48,24 @@ namespace BusinessLayer
 
         public async Task RemoveUserFromLobbyAsync(string lobbyName, string userName)
         {
-            User user = await foob.GetUserAsync(userName);
+            if (string.IsNullOrEmpty(lobbyName) || string.IsNullOrEmpty(userName))
+            {
+                throw new ArgumentException("Lobby name and user name must not be null or empty.");
+            }
+
             Lobby lobby = await foob.GetLobbyAsync(lobbyName);
+            User user = await foob.GetUserAsync(userName);
+
+            if (lobby == null)
+            {
+                throw new Exception($"Lobby '{lobbyName}' not found.");
+            }
+
+            if (user == null)
+            {
+                throw new Exception($"User '{userName}' not found.");
+            }
+
             await foob.RemoveUserFromLobbyAsync(lobby, user);
         }
 
