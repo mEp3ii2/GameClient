@@ -83,12 +83,12 @@ namespace GameClient
 
         private async void messageBtn_Click(object sender, RoutedEventArgs e)
         {
-            //await refreshBtn_click(sender, e);
-            string msg = $"{currUser}: {userMessageBox.Text.ToString()}\n";
-            currentMessage.Add(msg);
-            await foob.UpdateMessageAsync(currentMessage, thisLobby, currUser, selectedUser);
-            displayMsgs();
+            string msg = $"{currUser}: {userMessageBox.Text.ToString()}\n"; // Add the current user's name to the message
+            currentMessage.Add(msg); // Add message with username to the current message list
+            await foob.UpdateMessageAsync(currentMessage, thisLobby, currUser, selectedUser); // Send message to server
+            displayMsgs(); // Display the updated message list
         }
+
 
         // Upload file button click handler
         private async void attachmentBtn_Click(object sender, RoutedEventArgs e)
@@ -205,14 +205,13 @@ namespace GameClient
 
         private void displayMsgs()
         {
-            messageList.Document.Blocks.Clear();
-            List<string> msgList = currentMessage;
+            messageList.Document.Blocks.Clear(); // Clears the current message list
+            List<string> msgList = currentMessage; // Current message list
 
             foreach (string msgItem in msgList)
             {
-                // Create a new paragraph for each message item
-                var paragraph = new Paragraph(new Run(msgItem));
-                messageList.Document.Blocks.Add(paragraph);
+                var paragraph = new Paragraph(new Run(msgItem)); // Each message now contains the username and message
+                messageList.Document.Blocks.Add(paragraph); // Add to RichTextBox
             }
         }
 

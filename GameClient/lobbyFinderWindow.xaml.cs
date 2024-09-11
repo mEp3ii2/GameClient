@@ -101,19 +101,15 @@ namespace GameClient
 
         private void lobbyList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            // Ensure the selected item is not null before proceeding
             if (lobbyList.SelectedItem == null)
             {
-                return;  // Do nothing if there's no selection
+                return;  // No selection
             }
 
-            // Assuming lobbyList.SelectedItem is expected to be of a certain type
-            var selectedLobby = lobbyList.SelectedItem as string; // Or the appropriate type
-
+            var selectedLobby = lobbyList.SelectedItem as Lobby;  // Correct cast to Lobby
             if (selectedLobby != null)
             {
-                // Handle the selected lobby here
-                lobbyRoomWindow lobbyRoom = new lobbyRoomWindow(selectedLobby);
+                lobbyRoomWindow lobbyRoom = new lobbyRoomWindow(selectedLobby.Name);  // Pass the lobby name
                 lobbyRoom.Show();
             }
         }
