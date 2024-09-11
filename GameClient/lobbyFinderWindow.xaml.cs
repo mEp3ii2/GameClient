@@ -181,9 +181,8 @@ namespace GameClient
 
         private void logOutBtn_Click(object sender, EventArgs e)
         {
-            //foob.RemoveUser(currUser);
+            foob.RemoveUser(currUser);
             this.Close();
         }
-
     }
 }
