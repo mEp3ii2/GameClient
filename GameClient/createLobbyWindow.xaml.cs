@@ -22,14 +22,14 @@ namespace GameClient
     /// </summary>
     public partial class createLobbyWindow : Window
     {
-        private User currUser;
+        private string currUser;
         private string mode;
         private string desc;
         private string roomName;
         private List<string> tags;
         private IBusinessServerInterface foob;
         
-        public createLobbyWindow(User currUser, IBusinessServerInterface foob)
+        public createLobbyWindow(string currUser, IBusinessServerInterface foob)
         {
             InitializeComponent();
 
@@ -66,9 +66,8 @@ namespace GameClient
             roomName = nameTxtBox.Text;
             desc = descTxtBox.Text;
             MessageBox.Show(mode+" "+tagString + " " +roomName + " " + desc);
-            Lobby tempLob = new Lobby(roomName,desc, mode, tags);
-            foob.AddLobby(tempLob);
-            lobbyRoomWindow curWindow = new lobbyRoomWindow(tempLob,currUser,foob);
+            foob.AddLobby(roomName, desc, mode, tags);
+            lobbyRoomWindow curWindow = new lobbyRoomWindow(roomName,currUser,foob);
             curWindow.Show();
             this.Close();
         }

@@ -34,7 +34,7 @@ namespace DataLayer
 
         public User GetUser(string name)
         {
-            return database.getUser(name);
+            return database.GetUser(name);
         }
 
         public List<User> GetAllUsers()
@@ -89,7 +89,7 @@ namespace DataLayer
 
         public void UpdateMessage(Message msg, Lobby lobby)
         {
-            database.getLobby(lobby.Name).updateMessage(msg);
+            database.getLobby(lobby).updateMessage(msg);
         }
 
         public void joinLobby(Lobby lobby, User user)
@@ -99,14 +99,14 @@ namespace DataLayer
 
         public List<Message> GetChats(Lobby lobby, User currUser)
         {
-            return database.getLobby(lobby.Name).Messages
+            return database.getLobby(lobby).Messages
                 .Where(m => m.UserList.Contains(currUser) || m.UserList.Contains(null)).ToList();
         }
 
         public void AddMessage(Lobby lobby, User user1, User user2)
         {
             Log($"Adding message between {user1.Name} and {user2.Name} in lobby {lobby.Name}");
-            Lobby thisLobby = database.getLobby(lobby.Name);
+            Lobby thisLobby = database.getLobby(lobby);
 
             if (thisLobby != null)
             {
@@ -122,16 +122,16 @@ namespace DataLayer
 
         public Message GetMessage(User user1, User user2, Lobby lobby)
         {
-            return database.getLobby(lobby.Name).getMessage(user1, user2);
+            return database.getLobby(lobby).getMessage(user1, user2);
         }
 
-        public Lobby GetLobby(Lobby lobby)
+        public Lobby GetLobby(string lobbyName)
         {
-            return database.getLobby(lobby.Name);
+            return database.getLobby(lobbyName);
         }
 
         // Save the file and record the file name in the lobby
-        public void saveFile(string fileName, byte[] fileData, string lobbyName)
+        public void saveFile(string fileName, byte[] fileData, Lobby lobby)
         {
             string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SharedFiles", fileName);
             Directory.CreateDirectory(Path.GetDirectoryName(filePath));  // Ensure the directory exists
@@ -140,15 +140,15 @@ namespace DataLayer
             Log($"File {fileName} saved to {filePath}");
 
             // Retrieve the current lobby using the passed lobby name
-            Lobby currentLobby = database.getLobby(lobbyName);
+            Lobby currentLobby = database.getLobby(lobby);
             currentLobby?.AddFile(fileName);  // Add the file to the lobby's list of uploaded files
         }
 
         // Retrieve the list of previously uploaded files for a given lobby
-        public List<string> GetLobbyFiles(string lobbyName)
+        public List<string> GetLobbyFiles(Lobby lobby)
         {
-            Lobby lobby = database.getLobby(lobbyName);
-            return lobby?.UploadedFiles ?? new List<string>();
+            Lobby searchLobby = database.getLobby(lobby);
+            return searchLobby?.UploadedFiles ?? new List<string>();
         }
 
         // Add file download method
@@ -172,6 +172,11 @@ namespace DataLayer
             logNumber++;
             string logMsg = $"Log #{logNumber}: {logString} at {DateTime.Now}";
             Console.WriteLine(logMsg);
+        }
+
+        public int GetUserCount()
+        {
+            return database.GetUserCount();
         }
     }
 }

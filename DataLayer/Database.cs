@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using GameLobbyLib;
 
 namespace DataLayer
@@ -22,8 +23,8 @@ namespace DataLayer
         }
         
 
-        static List<Lobby> lobbies;
-        static List<User> users;
+        List<Lobby> lobbies;
+        List<User> users;
         static List<UploadedFile> uploadedFiles;
 
         List<string> tags;        //test value to be removed later
@@ -63,13 +64,12 @@ namespace DataLayer
 
         public List<User> getLobbyUsers(Lobby lobby)
         {
-            Lobby thisLobby = getLobby(lobby.Name);
-            List<User> users = thisLobby.Users;
-            return users;
+            return lobby.Users;
         }
 
-        public User getUser(string name)
+        public User GetUser(string name)
         {
+            
             foreach (User user in users)
             {
                 if (user.Name.Equals(name))
@@ -77,7 +77,9 @@ namespace DataLayer
                     return user;
                 }
             }
+            
             return null;
+
         }
         public List<User> getAllUsers()
         {
@@ -87,7 +89,7 @@ namespace DataLayer
         //Remove user from lobby
         public void RemoveUser(Lobby lobby, User user)
         {
-            Lobby editLobby = getLobby(lobby.Name);
+            Lobby editLobby = getLobby(lobby);
             editLobby.removeUser(user);
 
         }
@@ -176,22 +178,38 @@ namespace DataLayer
             users.Add(user);
         }
 
-        public Lobby getLobby(string name)
+        public Lobby getLobby(string lobbyName)
         {
-            foreach (Lobby lobby in lobbies)
+            foreach (Lobby searchLobby in lobbies)
             {
-                if (lobby.Name.Equals(name))
-                    return lobby;
+                if (lobbyName.Equals(searchLobby.Name))
+                    return searchLobby;
             }
             return null;
         }
 
-        public void joinLobby(Lobby lobby, User user)
+        public Lobby getLobby(Lobby lobby)
         {
-            Lobby changeLobby = getLobby(lobby.Name);
-            changeLobby.Users.Add(user);
+            foreach (Lobby searchLobby in lobbies)
+            {
+                if (lobby.Equals(searchLobby))
+                    return searchLobby;
+            }
+            return null;
+
         }
 
+        public void joinLobby(Lobby lobby, User user)
+        {
+            Lobby thisLobby = getLobby(lobby);
+            User thisUser = GetUser(user.Name);
+            lobby.Users.Add(thisUser);
+        }
+
+        public int GetUserCount()
+        {
+            return users.Count;
+        }
         
 
 

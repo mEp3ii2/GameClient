@@ -23,14 +23,14 @@ namespace GameClient
     /// </summary>
     public partial class lobbyFinderWindow : Window
     {
-        private User currUser;
+        private string currUser;
         
         private List<Lobby> currentList;//list of lobbies retrieved from business layer
         private string currentModeFilter;
         private string currentTagFilter;
         private IBusinessServerInterface foob;
 
-        public lobbyFinderWindow(User currUser, IBusinessServerInterface foob)
+        public lobbyFinderWindow(string currUser, IBusinessServerInterface foob)
         {
             InitializeComponent();
             this.foob = foob;// connection to business layer
@@ -86,9 +86,8 @@ namespace GameClient
         private void lobbyList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             
-            Lobby selectedLobby = (Lobby) lobbyList.SelectedItem;
+            string selectedLobby = ((Lobby) lobbyList.SelectedItem).Name;
             foob.joinLobby(selectedLobby, currUser);
-            MessageBox.Show(selectedLobby.Users.Count().ToString());
             
             lobbyRoomWindow curWindow = new lobbyRoomWindow(selectedLobby, currUser, foob);
             curWindow.Show();
@@ -144,12 +143,9 @@ namespace GameClient
             tagFilterBox.SelectedItem = "";
         }
 
-
-        //temp fucn will be changed later on so that on closing message is passed to server
-        // to remove user name
         private void app_Exit(object sender, CancelEventArgs e)
         {
-            //
+            //foob.RemoveUser(currUser);
             
         }
 
@@ -185,16 +181,9 @@ namespace GameClient
 
         private void logOutBtn_Click(object sender, EventArgs e)
         {
-            foob.RemoveUser(currUser);
+            //foob.RemoveUser(currUser);
             this.Close();
         }
-
-        protected override void OnClosed(EventArgs e)
-        {
-            foob.RemoveUser(currUser);
-            this.Close();
-        }
-
 
     }
 }

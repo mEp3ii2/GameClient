@@ -30,6 +30,7 @@ namespace GameClient
         }
         private void app_Exit(object sender, ExitEventArgs e)
         {
+
             MessageBox.Show("Goodbye");
         }
     }

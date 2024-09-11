@@ -29,7 +29,6 @@ namespace GameClient
     public partial class MainWindow : Window
     {
         private IBusinessServerInterface foob;
-        private ProcessServiceCallBack foobCallback;
 
 
         public MainWindow()
@@ -37,20 +36,13 @@ namespace GameClient
             InitializeComponent();
 
 
-            DuplexChannelFactory<IBusinessServerInterface> foobFactory;
+            ChannelFactory<IBusinessServerInterface> foobFactory;
             NetTcpBinding tcp = new NetTcpBinding();
-
             string URL = "net.tcp://localhost:8100/GameService";
-
-
-
-            foobCallback = new ProcessServiceCallBackImpl(this);
-
-            foobFactory = new DuplexChannelFactory<IBusinessServerInterface>
-                (foobCallback, tcp, URL);
+            foobFactory = new ChannelFactory<IBusinessServerInterface>(tcp, URL);
             foob = foobFactory.CreateChannel();
 
-            userNumber.Text = "Number of Users: " + foob.GetAllUsers().Count(); 
+            userNumber.Text = "Number of Users: " + foob.GetUserCount(); 
             
         }
 
@@ -63,10 +55,9 @@ namespace GameClient
             if (uniqueUser)
             {
                 // open main window and close this one
-                // send across user name as well
-                User currUser = new User(userName);
-                foob.AddUser(currUser);
-                lobbyFinderWindow curWindow = new lobbyFinderWindow(currUser,foob);
+                // send across user name as well    
+                foob.AddUser(userName);
+                lobbyFinderWindow curWindow = new lobbyFinderWindow(userName,foob);
                 curWindow.Show();
                 this.Close();
 
@@ -84,25 +75,10 @@ namespace GameClient
             return foob.UniqueUser(userName);
         }
 
-        public void UpdateUserCount(int userAmount)
-        {
-            if (userNumber.Dispatcher.CheckAccess())
-            {
-                userNumber.Text = "Number of Users: " + userAmount.ToString();
-            }
-            else
-            {
-                userNumber.Dispatcher.Invoke(() =>
-                {
-                    userNumber.Text = "Number of Users: " + userAmount.ToString();
-                });
-            }
-
-        }
 
         public void refreshBtn_click(object sender, RoutedEventArgs e)
         {
-            userNumber.Text = "Number of Users: " + foob.GetAllUsers().Count();
+            userNumber.Text = "Number of Users: " + foob.GetUserCount();
         }
     }
 }
