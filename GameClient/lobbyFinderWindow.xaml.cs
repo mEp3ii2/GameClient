@@ -36,6 +36,13 @@ namespace GameClient
             InitializeComponent();
             this.foob = App.Instance.foob;
             this.currUser = App.Instance.UserName; // Assign the current user
+
+            // Load filters as soon as the window opens
+            Task.Run(async () => {
+                await loadModeFilterBoxAsync();
+                await loadTagFilterBoxAsync();
+            });
+
             StartLobbyUpdateTimer(); // Start polling for lobbies
         }
 
@@ -52,7 +59,19 @@ namespace GameClient
 
         private async Task LoadLobbiesAsync()
         {
-            var lobbies = await foob.GetAllLobbiesAsync();
+            List<Lobby> lobbies;
+
+            // Check if any filters are applied
+            if (!string.IsNullOrEmpty(currentModeFilter) || !string.IsNullOrEmpty(currentTagFilter))
+            {
+                // Apply filters when reloading the lobby list
+                lobbies = await foob.GetFilteredLobbiesListAsync(currentModeFilter, currentTagFilter);
+            }
+            else
+            {
+                // If no filters are applied, load all lobbies
+                lobbies = await foob.GetAllLobbiesAsync();
+            }
 
             // Ensure UI update is done on the main thread
             Dispatcher.Invoke(() =>
@@ -60,40 +79,35 @@ namespace GameClient
                 if (lobbies != null && lobbies.Any())
                 {
                     lobbyList.ItemsSource = lobbies; // Update lobby list in the UI
+                    updateLobbyCountLabel(lobbies.Count); // Update lobby count
                 }
                 else
                 {
                     lobbyList.ItemsSource = null;  // Clear the lobby list if no lobbies are found
+                    updateLobbyCountLabel(0); // Update lobby count to 0 if no lobbies
                 }
             });
         }
 
         private async Task loadModeFilterBoxAsync()
         {
-            List<string> modelist = new List<string>();
-            modelist.Add("");
+            List<string> modelist = new List<string> { "" };
             List<string> modes = await foob.GetUniqueModesAsync(null);
             modelist.AddRange(modes);
-            modeFilterBox.ItemsSource = modelist;
+            Dispatcher.Invoke(() => {
+                modeFilterBox.ItemsSource = modelist;
+            });
         }
 
         private async Task loadTagFilterBoxAsync()
         {
-            List<string> tagList = new List<string>();
-            tagList.Add("");
+            List<string> tagList = new List<string> { "" };
             List<string> tags = await foob.GetUniqueTagsAsync(null);
             tagList.AddRange(tags);
-            tagFilterBox.ItemsSource = tagList;
+            Dispatcher.Invoke(() => {
+                tagFilterBox.ItemsSource = tagList;
+            });
         }
-
-        /*private void refreshBtn_click(object sender, EventArgs e)
-        {
-            LoadLobbiesAsync();
-            loadModeFilterBoxAsync();
-            loadTagFilterBoxAsync();
-            currentModeFilter = null;
-            currentTagFilter = null;
-        }*/
 
         private void updateLobbyCountLabel(int lobbyCount)
         {
@@ -176,12 +190,19 @@ namespace GameClient
             Task task = LoadLobbiesAsync();
             modeFilterBox.SelectedItem = "";
             tagFilterBox.SelectedItem = "";
+
+            // Reload the filters after clearing
+            Task.Run(async () => {
+                await loadModeFilterBoxAsync();
+                await loadTagFilterBoxAsync();
+            });
         }
 
         private async Task setLobbyListAsync()
         {
             currentList = await foob.GetFilteredLobbiesListAsync(currentModeFilter, currentTagFilter);
             lobbyList.ItemsSource = currentList;
+            updateLobbyCountLabel(currentList.Count); // Update the lobby count with the filtered list
         }
 
         private async Task updateFilterListAsync(int i)
@@ -216,36 +237,6 @@ namespace GameClient
             {
                 await foob.RemoveUserFromLobbyAsync(selectedLobby.Name, currUser);
             }
-        }
-
-        private void StartUserCountUpdateTimer()
-        {
-            lobbyUpdateTimer = new System.Timers.Timer(1000); // Update every second
-            lobbyUpdateTimer.Elapsed += async (sender, e) => await UpdateLobbiesWithUserCountAsync();
-            lobbyUpdateTimer.AutoReset = true;
-            lobbyUpdateTimer.Enabled = true;
-        }
-
-        private async Task UpdateLobbiesWithUserCountAsync()
-        {
-            var lobbies = await foob.GetAllLobbiesAsync();
-
-            foreach (var lobby in lobbies)
-            {
-                // Fetch the latest user names as a list of strings
-                var userNames = await foob.GetUsersAsync(lobby.Name);
-
-                // Convert the list of user names (strings) to a list of User objects
-                var users = userNames.Select(userName => new User(userName)).ToList();
-
-                // Assign the list of User objects to the lobby's Users property
-                lobby.Users = users;  // This will trigger UI updates through INotifyPropertyChanged
-            }
-
-            Dispatcher.Invoke(() =>
-            {
-                lobbyList.ItemsSource = lobbies;  // Rebind the updated lobbies to the DataGrid
-            });
         }
     }
 }
