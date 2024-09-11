@@ -16,16 +16,25 @@
                 <DataGridTextColumn Header ="Name" Binding ="{Binding Name}" />
                 <DataGridTextColumn Header="Description" Binding="{Binding Description}"/>
                 <DataGridTextColumn Header="Mode" Binding="{Binding Mode}" />
-                <DataGridTextColumn Header="User Count" Binding="{Binding UserCount}" />
+                <DataGridTemplateColumn Header="User Count">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Users.Count}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
                 <DataGridTextColumn Header="Tags" Binding="{Binding TagDis}" />
             </DataGrid.Columns>
         </DataGrid>
-        <Button x:Name="logOutBtn" Content="Log Out" HorizontalAlignment="Left" Height="27" Margin="184,373,0,0" VerticalAlignment="Top" Width="131"/>
+        <Button x:Name="logOutBtn" Content="Log Out" HorizontalAlignment="Left" Height="27" Margin="184,373,0,0" VerticalAlignment="Top" Width="131" Click="logOutBtn_Click"/>
         <ComboBox x:Name="modeFilterBox" HorizontalAlignment="Left" Margin="25,36,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="modeFilterBox_SelectionChanged"/>
         <Label Content="Modes:" HorizontalAlignment="Left" Margin="25,5,0,0" VerticalAlignment="Top" Foreground="White"/>
         <Button x:Name="clearBtn" Content="Clear" HorizontalAlignment="Left" Margin="652,36,0,0" VerticalAlignment="Top" Width="120" Click="clearBtn_Click"/>
         <Label Content="Tag: " HorizontalAlignment="Left" Height="31" Margin="164,2,0,0" VerticalAlignment="Top" Width="86" Foreground="White"/>
         <ComboBox x:Name="tagFilterBox" HorizontalAlignment="Left" Margin="164,36,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="tagFilterBox_SelectionChanged" />
         <Label x:Name="lobbyCountLabel" Content="Active Lobbies: " HorizontalAlignment="Left" Margin="327,373,0,0" VerticalAlignment="Top" Width="169" Foreground="White"/>
+        <Button HorizontalAlignment="Left" Margin="300,40,0,0" VerticalAlignment="Top" Name="refreshBtn" Height="16" Width="24" Click="refreshBtn_click">
+            <Image Source="./Resources/refresh.png"/>
+        </Button>
     </Grid>
 </Window>

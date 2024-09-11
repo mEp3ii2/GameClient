@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using GameLobbyLib;
 
 namespace DataLayer
@@ -19,11 +21,11 @@ namespace DataLayer
             }
             return Instance;
         }
+        
 
         List<Lobby> lobbies;
         List<User> users;
-        List<Message> messages;
-        List<UploadedFile> uploadedFiles;
+        static List<UploadedFile> uploadedFiles;
 
         List<string> tags;        //test value to be removed later
 
@@ -38,7 +40,6 @@ namespace DataLayer
         public Database()
         {
             lobbies = new List<Lobby>();
-            messages = new List<Message>();
             User user1 = new User("me");
             User user2 = new User("frank");
             users = new List<User>();
@@ -48,10 +49,12 @@ namespace DataLayer
             tags = new List<string> { "newbie", "friendly", "casual" };
 
 
-            addNewLobby("test", "testing arena", "deathmatch", tags);
-            addNewLobby("test", "testing arena", "King of the Hill", tags);
-            addNewLobby("test", "testing arena", "deathmatch", tags);
-            addNewLobby("test", "testing arena", "King of the Hill", new List<string> {"Solo"});
+            addNewLobby("test1", "testing arena", "deathmatch", tags);
+            addNewLobby("test2", "testing arena", "King of the Hill", tags);
+            addNewLobby("test3", "testing arena", "deathmatch", tags);
+            addNewLobby("test4", "testing arena", "King of the Hill", new List<string> {"Solo"});
+            lobbies[0].Users.Add(user1);
+            lobbies[0].Users.Add(user2);
         }
 
         public List<Lobby> getAllLobbies()
@@ -64,14 +67,54 @@ namespace DataLayer
             return lobby.Users;
         }
 
+        public User GetUser(string name)
+        {
+            
+            foreach (User user in users)
+            {
+                if (user.Name.Equals(name))
+                {
+                    return user;
+                }
+            }
+            
+            return null;
+
+        }
         public List<User> getAllUsers()
         {
             return users;
         }
 
+        //Remove user from lobby
         public void RemoveUser(Lobby lobby, User user)
         {
-            lobby.Users.Remove(user);
+            Lobby editLobby = getLobby(lobby);
+            editLobby.removeUser(user);
+
+        }
+
+        //Remove user from database
+        public void RemoveUser(User user)
+        {
+            //Remove user from any lobbies they are in
+            foreach (Lobby lobby in lobbies)
+            {
+                if (lobby.Users.Contains(user))
+                {
+                    RemoveUser(lobby, user);
+                }
+            }
+
+            //Remove user from the application
+            foreach (User searchUser in users)
+            {
+                if (searchUser.Equals(user))
+                {
+                    users.Remove(searchUser);
+                    break;
+                }
+            }
         }
 
         //returns a list of all unique modes
@@ -112,12 +155,12 @@ namespace DataLayer
             return lobbies.Where(lobby =>(mode == null || lobby.Mode == mode)&&(tag == null || lobby.Tags.Contains(tag))).ToList();
         }
 
-        public static List<string> getAllModeTypes()
+        public List<string> getAllModeTypes()
         {
             return gameModes;
         }
 
-        public static List<string> getAllTagTypes()
+        public List<string> getAllTagTypes()
         {
             return allTags;
         }
@@ -125,40 +168,60 @@ namespace DataLayer
         public void addNewLobby(string name,string desc, string mode, List<string> tags)
         {
             Lobby lobby = new Lobby(name, desc, mode, tags);
+            foreach (Lobby thislobby in lobbies)
+            {
+                if (name.Equals(thislobby.Name))
+                {
+                    throw new Exception("Lobbies cannot have the same name");
+                }
+            }
+
             lobbies.Add(lobby);//need to make a call to the server to update lobby list for other clients
-            newChat(lobby.ID, null);
         }
 
         public void addNewLobby(Lobby lobby) {
             lobbies.Add(lobby);
-            newChat(lobby.ID, null);
         }
 
         public void addUser(User user)
         {
             users.Add(user);
         }
-    
-        public void newChat(int lobbyID,User[] userList = null)
-        {
-            messages.Add(new Message(lobbyID, userList));
-        }
 
-        public Lobby getLobby(int id)
+        public Lobby getLobby(string lobbyName)
         {
-            foreach (Lobby lobby in lobbies)
+            foreach (Lobby searchLobby in lobbies)
             {
-                if (lobby.ID == id)
-                    return lobby;
+                if (lobbyName.Equals(searchLobby.Name))
+                    return searchLobby;
             }
             return null;
         }
 
-        public List<Message> getChats(int id, User currUser)
+        public Lobby getLobby(Lobby lobby)
         {
-            
-            return messages.Where(m => m.LobbyID == id && (m.UserList == null || m.UserList.Contains(currUser))).ToList();
+            foreach (Lobby searchLobby in lobbies)
+            {
+                if (lobby.Equals(searchLobby))
+                    return searchLobby;
+            }
+            return null;
+
         }
+
+        public void joinLobby(Lobby lobby, User user)
+        {
+            Lobby changeLobby = getLobby(lobby.Name);
+            changeLobby.Users.Add(user);
+        }
+
+        public int GetUserCount()
+        {
+            return users.Count;
+        }
+        
+
+
         //public void addFile(int lobbyID,!fileDetails here not sure yet)
 
         

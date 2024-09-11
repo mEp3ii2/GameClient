@@ -21,6 +21,12 @@ namespace DataLayer
         List<User> GetAllUsers();
 
         [OperationContract]
+        User GetUser(string name);
+
+        [OperationContract]
+        void AddMessage(Lobby lobby, User user1, User user2);
+
+        [OperationContract]
         void AddUser(User user);
 
         [OperationContract]
@@ -42,14 +48,36 @@ namespace DataLayer
         void AddLobby(Lobby lobby);
         
         [OperationContract]
-        List<Message> GetChats(int lobbyId, User currUser);
+        List<Message> GetChats(Lobby lobby, User currUser);
 
-       
-        
         [OperationContract]
-        void saveFile(string fileName, byte[] fileData);
-        
+        void joinLobby(Lobby lobby, User user);
+
         [OperationContract]
-        void RemoveUser(Lobby lobby, User user);
+        void saveFile(string fileName, byte[] fileData, Lobby lobby);
+
+        [OperationContract]
+        byte[] downloadFile(string fileName);
+
+        [OperationContract]
+        void RemoveUserFromLobby(Lobby lobby, User user);
+
+        [OperationContract]
+        void RemoveUser(User user);
+
+        [OperationContract]
+        void UpdateMessage(Message msg, Lobby lobby);
+
+        [OperationContract]
+        Message GetMessage(User user1, User user2, Lobby lobby);
+
+        [OperationContract]
+        Lobby GetLobby(string lobby);
+
+        [OperationContract]
+        List<string> GetLobbyFiles(Lobby lobby);
+
+        [OperationContract]
+        int GetUserCount();
     }
 }

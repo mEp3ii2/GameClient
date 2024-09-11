@@ -25,14 +25,7 @@ namespace DataLayer
             host.AddServiceEndpoint(typeof(IDataServerInterface), tcp, "net.tcp://0.0.0.0:8200/DataService");
             //And open the host for business!
             host.Open();
-            Console.WriteLine("Server Online");
-
-           
-            
-
-            // Start the stats printing task
-            
-
+            Console.WriteLine("Data Server Online");
             Console.ReadLine();
             //Don't forget to close the host after you're done!
             host.Close();

@@ -17,6 +17,8 @@ using System.ServiceModel;
 using BusinessLayer;
 using Microsoft.Win32;
 using System.IO;
+using System.Diagnostics;
+using System.ComponentModel;
 
 namespace GameClient
 {
@@ -24,93 +26,156 @@ namespace GameClient
     /// Interaction logic for lobbyRoomWindow.xaml
     /// </summary>
     public partial class lobbyRoomWindow : Window
-    {
-        
-        private User currUser;
-        private List<User> lobbyList;
-        private List<Message> messages;
+    {   
+        private string currUser, selectedUser;
         private IBusinessServerInterface foob;
-        private Message displayedChat;
-        public lobbyRoomWindow(Lobby selectedLobby, User currUser,IBusinessServerInterface foob) 
+        private List<string> currentMessage;
+        private string thisLobby;
+        public lobbyRoomWindow(string selectedLobby) 
         {
             
             InitializeComponent();
-            this.currUser = currUser;
-            this.foob = foob;
+            this.currUser = App.Instance.UserName;
+            this.foob = App.Instance.foob;
+            this.thisLobby = selectedLobby;
             messageList.Document.Blocks.Clear();
             
-            lobbyList = selectedLobby.Users.ToList();
-            userlistBox.ItemsSource = lobbyList;
-            MessageBox.Show(selectedLobby.Name+ selectedLobby.ID.ToString());
-            messages = foob.getChats(selectedLobby.ID, currUser);
-            displayedChat = messages.FirstOrDefault(m => m.UserList == null);
-            displayMsgs(displayedChat);
+            
+            List<string> lobbyMessages = foob.GetMessage(null, currUser, thisLobby);
+            currentMessage = lobbyMessages;
+            displayMsgs();
+
+            filesList.AddHandler(Hyperlink.RequestNavigateEvent, new RoutedEventHandler(Hyperlink_Click)); // Enable hyperlink click handling for the RichTextBox
+
+            // Load previously shared files for the lobby
+            LoadSharedFiles();
 
             //fill userList
-            
+            updateUsers();
 
             //get all users to populate user box
             //load current chat history
-            
+
 
         }
 
-
-
         private void logOutBtn_Click(object sender, RoutedEventArgs e)
         {
+            foob.RemoveUserFromLobby(thisLobby, currUser);
+            foob.RemoveUser(currUser);
             this.Close();
         }
 
         private void backButton_Click(object sender, RoutedEventArgs e)
         {
-            lobbyFinderWindow curWindow = new lobbyFinderWindow(currUser, foob);
+            foob.RemoveUserFromLobby(thisLobby, currUser);
+            lobbyFinderWindow curWindow = new lobbyFinderWindow();
             this.Close();
             curWindow.Show();
         }
 
         private void messageBtn_Click(object sender, RoutedEventArgs e)
         {
-            addNewMessage(currUser, userMessageBox.Text.ToString());
-            userMessageBox.Clear();
+            refreshBtn_click(sender, e);
+            string msg =$"{currUser}: {userMessageBox.Text.ToString()}\n";
+            currentMessage.Add(msg);
+            foob.UpdateMessage(currentMessage, thisLobby, currUser, selectedUser);
+            displayMsgs();
         }
 
-        private void addNewMessage(User currUser, string message)
-        {
-            Paragraph pg = new Paragraph();
-
-            Run userNameRun = new Run(currUser.Name + ": ")
-            {
-                FontWeight = FontWeights.Bold,
-                Foreground = Brushes.Red
-            };
-
-            Run messageRun = new Run(message)
-            {
-                Foreground = Brushes.Black
-            };
-
-            pg.Inlines.Add(userNameRun);
-            pg.Inlines.Add(messageRun);
-
-            
-            messageList.Document.Blocks.Add(pg);
-
-            
-            messageList.ScrollToEnd();
-        }
-
+        // Upload file button click handler
         private void attachmentBtn_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
-            if(openFileDialog.ShowDialog() == true)
+            if (openFileDialog.ShowDialog() == true)
             {
                 string filePath = openFileDialog.FileName;
                 byte[] fileData = File.ReadAllBytes(filePath);
                 string fileName = System.IO.Path.GetFileName(filePath);
 
-                //
-                foob.UploadFile(fileData,fileName);
+                // Pass the lobby name when uploading the file
+                foob.UploadFile(fileData, fileName, thisLobby);
+
+                // Immediately display the uploaded file as a clickable hyperlink in the file list
+                AddFileToRichTextBox(fileName);
+            }
+        }
+
+        // Helper method to add the file as a hyperlink to the RichTextBox
+        private void AddFileToRichTextBox(string fileName)
+        {
+            Paragraph paragraph = new Paragraph();
+            Hyperlink link = new Hyperlink(new Run(fileName));
+            link.Click += (s, args) => OpenFile(fileName);  // Set up the click event handler
+            paragraph.Inlines.Add(link);
+
+            // Add the hyperlink to the RichTextBox for file list
+            filesList.Document.Blocks.Add(paragraph);
+        }
+
+        // Handle hyperlink click event to open the file
+        private void Hyperlink_Click(object sender, RoutedEventArgs e)
+        {
+            if (e.OriginalSource is Hyperlink link)
+            {
+                // Retrieve the file name from the hyperlink
+                string fileName = link.NavigateUri.ToString();
+
+                // Download and open the file
+                OpenFile(fileName);
+            }
+        }
+
+        // Open the file using the default application for its type
+        private void OpenFile(string fileName)
+        {
+            try
+            {
+                // Download the file and save it locally before opening
+                string filePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Downloads", fileName);
+                byte[] fileData = foob.DownloadFile(fileName);  // Download the file from the server
+                Directory.CreateDirectory(System.IO.Path.GetDirectoryName(filePath));  // Ensure directory exists
+                File.WriteAllBytes(filePath, fileData);  // Save the file locally
+
+                // Now open the file with the default application for its type
+                Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error opening file: {ex.Message}");
+            }
+        }
+
+        // Method to load shared files when re-entering the lobby
+        private void LoadSharedFiles()
+        {
+            // Fetch the list of previously shared files for the current lobby
+            List<string> uploadedFiles = foob.GetLobbyFiles(thisLobby);  // Ensure thisLobby.Name is passed correctly
+
+            // Display each file as a clickable hyperlink
+            foreach (string fileName in uploadedFiles)
+            {
+                Paragraph paragraph = new Paragraph();
+                Hyperlink link = new Hyperlink(new Run(fileName));
+                link.Click += (s, args) => OpenFile(fileName);  // Set up the click event handler
+                paragraph.Inlines.Add(link);
+                filesList.Document.Blocks.Add(paragraph);  // Add the paragraph to the RichTextBox
+            }
+        }
+
+        private void DownloadFile(string fileName)
+        {
+            try
+            {
+                byte[] fileData = foob.DownloadFile(fileName);
+                string filePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Downloads", fileName);  // Explicit reference to System.IO.Path otherwise its an ambiguous reference between that and System.Windows.Shapes.Path.
+                Directory.CreateDirectory(System.IO.Path.GetDirectoryName(filePath));  // Explicit reference to System.IO.Path otherwise its an ambiguous reference between that and System.Windows.Shapes.Path.
+                File.WriteAllBytes(filePath, fileData);
+                MessageBox.Show($"File downloaded successfully to {filePath}");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error downloading file: {ex.Message}");
             }
         }
 
@@ -123,20 +188,77 @@ namespace GameClient
         {
             // user has selected user or lobby
             // change message box to relect chat with said entity
-            string selectedChat = userlistBox.SelectedItem.ToString();
-
-        }
-
-        private void displayMsgs(Message currChat)
-        {
-            List<string> msg = currChat.MessageList;
-            
-            foreach (string msgItem in msg)
+            if (userlistBox.SelectedItem==null || userlistBox.SelectedItem.Equals("lobby"))
             {
-                messageList.AppendText(msgItem + Environment.NewLine);
+                selectedUser = null;
+            }
+            else
+            {
+                selectedUser = userlistBox.SelectedItem.ToString();
             }
 
-            
+            List<string> selectedMessage = foob.GetMessage(currUser, selectedUser, thisLobby);
+            currentMessage = selectedMessage;
+
+            displayMsgs();
         }
+
+        private void displayMsgs()
+        {
+            messageList.Document.Blocks.Clear();
+            List<string> msgList = currentMessage;
+
+            foreach (string msgItem in msgList)
+            {
+                // Create a new paragraph for each message item
+                var paragraph = new Paragraph(new Run(msgItem));
+                messageList.Document.Blocks.Add(paragraph);
+            }
+        }
+
+        private void refreshBtn_click(object sender, RoutedEventArgs e)
+        {
+            // Update messages from server
+            currentMessage = foob.GetMessage(currUser, selectedUser, thisLobby);
+            displayMsgs();
+
+            // Update users in the server
+            updateUsers();
+
+            // Update the file list in the RichTextBox
+            updateFiles();
+        }
+
+        // Helper method to update the file list
+        private void updateFiles()
+        {
+            // Clear the existing file list from the RichTextBox
+            filesList.Document.Blocks.Clear();
+
+            // Retrieve the list of uploaded files for the current lobby
+            List<string> uploadedFiles = foob.GetLobbyFiles(thisLobby);
+
+            // Display each file as a clickable hyperlink in the RichTextBox
+            foreach (string fileName in uploadedFiles)
+            {
+                AddFileToRichTextBox(fileName);  // Reuse the existing helper method
+            }
+        }
+
+        private void app_Exit(object sender, CancelEventArgs e)
+        {
+            //foob.RemoveUserFromLobby(thisLobby,currUser);
+            //foob.RemoveUser(currUser);
+
+        }
+
+        private void updateUsers()
+        {
+            List<string> lobbyList = foob.GetUsers(thisLobby);
+            lobbyList.Remove(currUser);
+            lobbyList.Add("Lobby");
+            userlistBox.ItemsSource = lobbyList;
+        }
+
     }
 }

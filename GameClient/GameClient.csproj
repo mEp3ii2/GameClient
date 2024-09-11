@@ -56,7 +56,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Classes\ProcessServiceCallBackImpl.cs" />
     <Compile Include="Classes\textBoxFilled.cs" />
     <Page Include="createLobbyWindow.xaml">
       <SubType>Designer</SubType>
@@ -143,6 +142,7 @@
     <Content Include="Resources\Mortal_Kombat.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Resources\refresh.png" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
