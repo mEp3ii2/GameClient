@@ -22,18 +22,18 @@ namespace GameClient
     /// </summary>
     public partial class createLobbyWindow : Window
     {
-        private User currUser;
+        private string currUser;
         private string mode;
         private string desc;
         private string roomName;
         private List<string> tags;
         private IBusinessServerInterface foob;
         
-        public createLobbyWindow(User currUser, IBusinessServerInterface foob)
+        public createLobbyWindow()
         {
             InitializeComponent();
 
-            this.foob = foob;
+            this.foob = App.Instance.foob;
             //passing foob instead
             /*ChannelFactory<BusinessServerInterface> foobFactory;
             NetTcpBinding tcp = new NetTcpBinding();
@@ -41,7 +41,7 @@ namespace GameClient
             foobFactory = new ChannelFactory<BusinessServerInterface>(tcp, URL);
             foob = foobFactory.CreateChannel();
             */
-            this.currUser = currUser;
+            this.currUser = App.Instance.UserName;
             
             modeSelBox.ItemsSource = foob.GetAllModeTypes();
             //tagSelBox.ItemsSource = Database.getAllTagTypes();
@@ -66,9 +66,8 @@ namespace GameClient
             roomName = nameTxtBox.Text;
             desc = descTxtBox.Text;
             MessageBox.Show(mode+" "+tagString + " " +roomName + " " + desc);
-            Lobby tempLob = new Lobby(roomName,desc, mode, tags);
-            foob.AddLobby(tempLob);
-            lobbyRoomWindow curWindow = new lobbyRoomWindow(tempLob,currUser,foob);
+            foob.AddLobby(roomName, desc, mode, tags);
+            lobbyRoomWindow curWindow = new lobbyRoomWindow(roomName);
             curWindow.Show();
             this.Close();
         }
@@ -83,7 +82,7 @@ namespace GameClient
 
         private void backBtn_Click(object sender, RoutedEventArgs e)
         {
-            lobbyFinderWindow curWindow = new lobbyFinderWindow(currUser, foob);
+            lobbyFinderWindow curWindow = new lobbyFinderWindow();
             curWindow.Show();
             this.Close();
         }

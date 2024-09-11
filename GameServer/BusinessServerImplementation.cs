@@ -9,6 +9,7 @@ using DataLayer;
 using System.Runtime.CompilerServices;
 using System.IO;
 using System.Collections.Concurrent;
+using System.Security.Cryptography;
 
 namespace BusinessLayer    
 {
@@ -28,18 +29,19 @@ namespace BusinessLayer
 
         public List<Lobby> GetAllLobbies()
         {
-            Log($"Retriving Lobbies from data layer");
-            List<Lobby> lobbyList = foob.GetAllLobbies();
-            foreach (Lobby lob in lobbyList)
-            {
-                Log($"Lobby {lob.Name}, {lob.ID}");
-            }
-            return lobbyList;
+            Log($"Retriving Lobbies from data layer");            
+            return foob.GetAllLobbies();
         }
 
-        public List<User> GetUsers(Lobby lobby)
+        public List<string> GetUsers(string lobbyName)
         {
-            return foob.GetUsers(lobby);
+            Lobby lobby = foob.GetLobby(lobbyName);
+            List<string> userNames = new List<string>();
+            foreach (User user in foob.GetUsers(lobby))
+            {
+                userNames.Add(user.Name);
+            }
+            return userNames;
         }
 
         public User GetUser(string name)
@@ -47,8 +49,10 @@ namespace BusinessLayer
             return foob.GetUser(name);
         }
 
-        public void RemoveUserFromLobby(Lobby lobby, User user)
+        public void RemoveUserFromLobby(string lobbyName, string userName)
         {
+            User user = foob.GetUser(userName);
+            Lobby lobby = foob.GetLobby(lobbyName);
             foob.RemoveUserFromLobby(lobby, user);
         }
 
@@ -57,8 +61,9 @@ namespace BusinessLayer
             foob.AddMessage(lobby, user1, user2);
         }
 
-        public void RemoveUser(User user)
+        public void RemoveUser(string userName)
         {
+            User user = foob.GetUser(userName);
             foob.RemoveUser(user);
         }
 
@@ -67,16 +72,15 @@ namespace BusinessLayer
             return foob.GetAllUsers();
         }
 
-        public void AddUser(User user)
+        public void AddUser(string userName)
         {
-            Log($"Added new user: {user.Name}");
-            foob.AddUser(user);
-            OperationContext.Current.GetCallbackChannel<ProcessServiceCallBack>().UpdateUserCount(foob.GetAllUsers().Count());
+            Log($"Added new user: {userName}");
+            foob.AddUser(new User(userName));
         }
 
         public List<string> GetUniqueModes(List<Lobby> curLobbyList)
         {
-           return foob.GetUniqueModes(curLobbyList);
+            return foob.GetUniqueModes(curLobbyList);
         }
 
         public List<string> GetUniqueTags(List<Lobby> curLobbyList)
@@ -99,9 +103,10 @@ namespace BusinessLayer
             return foob.GetAllTagTypes();
         }
 
-        public void AddLobby(Lobby lobby)
+        public void AddLobby(string roomName, string desc, string mode, List<string> tags)
         {
-            Log($"New lobby created: {lobby.Name}");
+            Log($"New lobby created: {roomName}");
+            Lobby lobby = new Lobby(roomName, desc, mode, tags);
             foob.AddLobby(lobby);
         }
 
@@ -138,8 +143,9 @@ namespace BusinessLayer
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void UploadFile(byte[] fileData, string fileName, string lobbyName)
         {
+            Lobby lobby = foob.GetLobby(lobbyName);
             // Delegate to the data server with the lobby name
-            foob.saveFile(fileName, fileData, lobbyName);
+            foob.saveFile(fileName, fileData, lobby);
         }
 
         // Download a file from the server
@@ -149,30 +155,42 @@ namespace BusinessLayer
             return foob.downloadFile(fileName);
         }
 
-        public void UpdateMessage(Message msg, Lobby lobby)
+        public void UpdateMessage(List<string> messageText, string lobbyName, string userName1, string userName2)
         {
+            User user1 = foob.GetUser(userName1 );
+            User user2 = foob.GetUser(userName2 );
+            Lobby lobby = foob.GetLobby(lobbyName);
+            Message msg = foob.GetMessage(user1 , user2, lobby);
+            msg.MessageList = messageText;
             foob.UpdateMessage(msg, lobby);
         }
 
-        public void joinLobby(Lobby lobby, User user)
+        public void joinLobby(string lobbyName, string userName)
         {
+            User user = foob.GetUser(userName);
+            Lobby lobby = foob.GetLobby(lobbyName);
             foob.joinLobby(lobby,user);
         }
 
-        public Message GetMessage(User user1, User user2, Lobby lobby)
+        public List<string> GetMessage(string userName1, string userName2, string lobbyName)
         {
-            return foob.GetMessage(user1, user2, lobby);
-        }
-
-        public Lobby GetLobby(Lobby lobby)
-        {
-            return foob.GetLobby(lobby);
+            User user1 = foob.GetUser(userName1);
+            User user2 = foob.GetUser(userName2);
+            Lobby lobby = foob.GetLobby(lobbyName);
+            Message message = foob.GetMessage(user1 ,user2, lobby);
+            return message.MessageList;
         }
 
         // Fetch previously uploaded files for the specified lobby
         public List<string> GetLobbyFiles(string lobbyName)
         {
-            return foob.GetLobbyFiles(lobbyName);  // Delegate the call to the Data Layer
+            Lobby lobby = foob.GetLobby(lobbyName);
+            return foob.GetLobbyFiles(lobby);  // Delegate the call to the Data Layer
+        }
+
+        public int GetUserCount()
+        {
+            return foob.GetUserCount();
         }
     }
 }

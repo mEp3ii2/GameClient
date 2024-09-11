@@ -2,17 +2,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace BusinessLayer
 {
-    [ServiceContract(CallbackContract =typeof(ProcessServiceCallBack))]
+    [ServiceContract]
     public interface IBusinessServerInterface
     {
         [OperationContract]
-        List<User> GetUsers(Lobby lobby);
+        List<string> GetUsers(string lobbyName);
 
         [OperationContract]
         List<Lobby> GetAllLobbies();
@@ -27,7 +28,7 @@ namespace BusinessLayer
         List<User> GetAllUsers();
 
         [OperationContract]
-        void AddUser(User user);
+        void AddUser(string userName);
 
         [OperationContract]
         List<string> GetUniqueModes(List<Lobby> currLobbyList);
@@ -45,7 +46,7 @@ namespace BusinessLayer
         List<string> GetAllTagTypes();
 
         [OperationContract]
-        void AddLobby(Lobby lobby);
+        void AddLobby(string roomName, string desc, string mode, List<string> tags);
 
         [OperationContract]
         bool UniqueUser(string userName);
@@ -57,33 +58,27 @@ namespace BusinessLayer
         byte[] DownloadFile(string fileName);
 
         [OperationContract]
-        void RemoveUserFromLobby(Lobby lobby,User user);
+        void RemoveUserFromLobby(string lobbyName,string userName);
 
         [OperationContract]
-        void RemoveUser(User user);
+        void RemoveUser(string user);
 
         [OperationContract]
         List<Message> getChats(Lobby lobby, User currUser);
 
         [OperationContract]
-        void UpdateMessage(Message msg, Lobby lobby);
+        void UpdateMessage(List<string> messageText, string lobby, string userName1, string userName2);
 
         [OperationContract]
-        void joinLobby(Lobby lobby, User user);
+        void joinLobby(string lobbyName, string userName);
 
         [OperationContract]
-        Message GetMessage(User user1, User user2, Lobby lobby);
-
-        [OperationContract]
-        Lobby GetLobby(Lobby lobby);
+        List<string> GetMessage(string userName1, string userName2, string lobbyName);
 
         [OperationContract]
         List<string> GetLobbyFiles(string lobbyName);
-    }
 
-    public interface ProcessServiceCallBack
-    {
-        [OperationContract(IsOneWay = true)]
-        void UpdateUserCount(int userCount);
+        [OperationContract]
+        int GetUserCount();
     }
 }

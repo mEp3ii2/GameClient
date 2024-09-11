@@ -54,7 +54,7 @@ namespace DataLayer
         void joinLobby(Lobby lobby, User user);
 
         [OperationContract]
-        void saveFile(string fileName, byte[] fileData, string lobbyName);
+        void saveFile(string fileName, byte[] fileData, Lobby lobby);
 
         [OperationContract]
         byte[] downloadFile(string fileName);
@@ -72,9 +72,12 @@ namespace DataLayer
         Message GetMessage(User user1, User user2, Lobby lobby);
 
         [OperationContract]
-        Lobby GetLobby(Lobby lobby);
+        Lobby GetLobby(string lobby);
 
         [OperationContract]
-        List<string> GetLobbyFiles(string lobbyName);
+        List<string> GetLobbyFiles(Lobby lobby);
+
+        [OperationContract]
+        int GetUserCount();
     }
 }

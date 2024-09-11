@@ -18,6 +18,7 @@ using BusinessLayer;
 using Microsoft.Win32;
 using System.IO;
 using System.Diagnostics;
+using System.ComponentModel;
 
 namespace GameClient
 {
@@ -26,24 +27,22 @@ namespace GameClient
     /// </summary>
     public partial class lobbyRoomWindow : Window
     {   
-        private User currUser, selectedUser;
-        private List<User> lobbyList;
+        private string currUser, selectedUser;
         private IBusinessServerInterface foob;
-        private Message currentMessage;
-        private Lobby thisLobby;
-        public lobbyRoomWindow(Lobby selectedLobby, User currUser,IBusinessServerInterface foob) 
+        private List<string> currentMessage;
+        private string thisLobby;
+        public lobbyRoomWindow(string selectedLobby) 
         {
             
             InitializeComponent();
-            this.currUser = currUser;
-            this.foob = foob;
+            this.currUser = App.Instance.UserName;
+            this.foob = App.Instance.foob;
             this.thisLobby = selectedLobby;
             messageList.Document.Blocks.Clear();
             
-            updateUsers();
-            MessageBox.Show(selectedLobby.Name+ selectedLobby.ID.ToString());
-            Message lobbyMessage = foob.GetMessage(null, currUser, thisLobby);
-            currentMessage = lobbyMessage;
+            
+            List<string> lobbyMessages = foob.GetMessage(null, currUser, thisLobby);
+            currentMessage = lobbyMessages;
             displayMsgs();
 
             filesList.AddHandler(Hyperlink.RequestNavigateEvent, new RoutedEventHandler(Hyperlink_Click)); // Enable hyperlink click handling for the RichTextBox
@@ -52,7 +51,7 @@ namespace GameClient
             LoadSharedFiles();
 
             //fill userList
-
+            updateUsers();
 
             //get all users to populate user box
             //load current chat history
@@ -70,16 +69,17 @@ namespace GameClient
         private void backButton_Click(object sender, RoutedEventArgs e)
         {
             foob.RemoveUserFromLobby(thisLobby, currUser);
-            lobbyFinderWindow curWindow = new lobbyFinderWindow(currUser, foob);
+            lobbyFinderWindow curWindow = new lobbyFinderWindow();
             this.Close();
             curWindow.Show();
         }
 
         private void messageBtn_Click(object sender, RoutedEventArgs e)
         {
-            string msg =$"{currUser.Name}: {userMessageBox.Text.ToString()}\n";
-            currentMessage.MessageList.Add(msg);
-            foob.UpdateMessage(currentMessage, thisLobby);
+            refreshBtn_click(sender, e);
+            string msg =$"{currUser}: {userMessageBox.Text.ToString()}\n";
+            currentMessage.Add(msg);
+            foob.UpdateMessage(currentMessage, thisLobby, currUser, selectedUser);
             displayMsgs();
         }
 
@@ -94,7 +94,7 @@ namespace GameClient
                 string fileName = System.IO.Path.GetFileName(filePath);
 
                 // Pass the lobby name when uploading the file
-                foob.UploadFile(fileData, fileName, thisLobby.Name);
+                foob.UploadFile(fileData, fileName, thisLobby);
 
                 // Immediately display the uploaded file as a clickable hyperlink in the file list
                 AddFileToRichTextBox(fileName);
@@ -150,7 +150,7 @@ namespace GameClient
         private void LoadSharedFiles()
         {
             // Fetch the list of previously shared files for the current lobby
-            List<string> uploadedFiles = foob.GetLobbyFiles(thisLobby.Name);  // Ensure thisLobby.Name is passed correctly
+            List<string> uploadedFiles = foob.GetLobbyFiles(thisLobby);  // Ensure thisLobby.Name is passed correctly
 
             // Display each file as a clickable hyperlink
             foreach (string fileName in uploadedFiles)
@@ -188,19 +188,16 @@ namespace GameClient
         {
             // user has selected user or lobby
             // change message box to relect chat with said entity
-            string selectedChat;
-            if (userlistBox.SelectedItem == null)
+            if (userlistBox.SelectedItem==null || userlistBox.SelectedItem.Equals("lobby"))
             {
-                selectedChat = "lobby";
+                selectedUser = null;
             }
             else
             {
-                selectedChat = userlistBox.SelectedItem.ToString();
+                selectedUser = userlistBox.SelectedItem.ToString();
             }
-            
-            selectedUser = foob.GetUser(selectedChat);
 
-            Message selectedMessage = foob.GetMessage(currUser, selectedUser, thisLobby);
+            List<string> selectedMessage = foob.GetMessage(currUser, selectedUser, thisLobby);
             currentMessage = selectedMessage;
 
             displayMsgs();
@@ -209,7 +206,7 @@ namespace GameClient
         private void displayMsgs()
         {
             messageList.Document.Blocks.Clear();
-            List<string> msgList = currentMessage.MessageList;
+            List<string> msgList = currentMessage;
 
             foreach (string msgItem in msgList)
             {
@@ -239,7 +236,7 @@ namespace GameClient
             filesList.Document.Blocks.Clear();
 
             // Retrieve the list of uploaded files for the current lobby
-            List<string> uploadedFiles = foob.GetLobbyFiles(thisLobby.Name);
+            List<string> uploadedFiles = foob.GetLobbyFiles(thisLobby);
 
             // Display each file as a clickable hyperlink in the RichTextBox
             foreach (string fileName in uploadedFiles)
@@ -248,10 +245,18 @@ namespace GameClient
             }
         }
 
+        private void app_Exit(object sender, CancelEventArgs e)
+        {
+            //foob.RemoveUserFromLobby(thisLobby,currUser);
+            //foob.RemoveUser(currUser);
+
+        }
+
         private void updateUsers()
         {
-            lobbyList = foob.GetUsers(thisLobby);
+            List<string> lobbyList = foob.GetUsers(thisLobby);
             lobbyList.Remove(currUser);
+            lobbyList.Add("Lobby");
             userlistBox.ItemsSource = lobbyList;
         }
 

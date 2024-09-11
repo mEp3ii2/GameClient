@@ -23,19 +23,19 @@ namespace GameClient
     /// </summary>
     public partial class lobbyFinderWindow : Window
     {
-        private User currUser;
+        private string currUser;
         
         private List<Lobby> currentList;//list of lobbies retrieved from business layer
         private string currentModeFilter;
         private string currentTagFilter;
         private IBusinessServerInterface foob;
 
-        public lobbyFinderWindow(User currUser, IBusinessServerInterface foob)
+        public lobbyFinderWindow()
         {
             InitializeComponent();
-            this.foob = foob;// connection to business layer
+            this.foob = App.Instance.foob;// connection to business layer
 
-            this.currUser = currUser; 
+            this.currUser = App.Instance.UserName; 
             currentList = foob.GetAllLobbies();
             lobbyList.ItemsSource = currentList;
             loadModeFilterBox();
@@ -86,21 +86,19 @@ namespace GameClient
         private void lobbyList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             
-            Lobby selectedLobby = (Lobby) lobbyList.SelectedItem;
+            string selectedLobby = ((Lobby) lobbyList.SelectedItem).Name;
             foob.joinLobby(selectedLobby, currUser);
-            MessageBox.Show(selectedLobby.Users.Count().ToString());
             
-            lobbyRoomWindow curWindow = new lobbyRoomWindow(selectedLobby, currUser, foob);
+            lobbyRoomWindow curWindow = new lobbyRoomWindow(selectedLobby);
             curWindow.Show();
             this.Close();
-            //need to modify lobby to reflect new user
         }
 
         // option window for creating new lobby
         private void createBtn_Click(object sender, RoutedEventArgs e)
         {
             // user creating room
-            createLobbyWindow curWindow = new createLobbyWindow(currUser,foob);
+            createLobbyWindow curWindow = new createLobbyWindow();
             curWindow.Show();
             this.Close();
             
@@ -145,12 +143,9 @@ namespace GameClient
             tagFilterBox.SelectedItem = "";
         }
 
-
-        //temp fucn will be changed later on so that on closing message is passed to server
-        // to remove user name
         private void app_Exit(object sender, CancelEventArgs e)
         {
-            //
+            //foob.RemoveUser(currUser);
             
         }
 
@@ -189,7 +184,5 @@ namespace GameClient
             foob.RemoveUser(currUser);
             this.Close();
         }
-
-
     }
 }
