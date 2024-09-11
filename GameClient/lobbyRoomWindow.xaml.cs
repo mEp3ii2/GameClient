@@ -75,13 +75,6 @@ namespace GameClient
             curWindow.Show();
         }
 
-        protected override void OnClosed(EventArgs e)
-        {
-            foob.RemoveUserFromLobby(thisLobby, currUser);
-            foob.RemoveUser(currUser);
-            this.Close();
-        }
-
         private void messageBtn_Click(object sender, RoutedEventArgs e)
         {
             string msg =$"{currUser.Name}: {userMessageBox.Text.ToString()}\n";
