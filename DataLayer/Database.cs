@@ -201,9 +201,8 @@ namespace DataLayer
 
         public void joinLobby(Lobby lobby, User user)
         {
-            Lobby thisLobby = getLobby(lobby);
-            User thisUser = GetUser(user.Name);
-            lobby.Users.Add(thisUser);
+            Lobby changeLobby = getLobby(lobby.Name);
+            changeLobby.Users.Add(user);
         }
 
         public int GetUserCount()
