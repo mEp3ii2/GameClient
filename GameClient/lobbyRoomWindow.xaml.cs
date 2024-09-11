@@ -81,6 +81,7 @@ namespace GameClient
             currentMessage.Add(msg);
             foob.UpdateMessage(currentMessage, thisLobby, currUser, selectedUser);
             displayMsgs();
+            userMessageBox.Clear();
         }
 
         // Upload file button click handler
@@ -97,20 +98,15 @@ namespace GameClient
                 foob.UploadFile(fileData, fileName, thisLobby);
 
                 // Immediately display the uploaded file as a clickable hyperlink in the file list
-                AddFileToRichTextBox(fileName);
+                AddFileToListBox(fileName);
             }
         }
 
         // Helper method to add the file as a hyperlink to the RichTextBox
-        private void AddFileToRichTextBox(string fileName)
+        private void AddFileToListBox(string fileName)
         {
-            Paragraph paragraph = new Paragraph();
-            Hyperlink link = new Hyperlink(new Run(fileName));
-            link.Click += (s, args) => OpenFile(fileName);  // Set up the click event handler
-            paragraph.Inlines.Add(link);
-
             // Add the hyperlink to the RichTextBox for file list
-            filesList.Document.Blocks.Add(paragraph);
+            filesList.Items.Add(fileName);
         }
 
         // Handle hyperlink click event to open the file
@@ -152,14 +148,11 @@ namespace GameClient
             // Fetch the list of previously shared files for the current lobby
             List<string> uploadedFiles = foob.GetLobbyFiles(thisLobby);  // Ensure thisLobby.Name is passed correctly
 
+            filesList.Items.Clear();
             // Display each file as a clickable hyperlink
             foreach (string fileName in uploadedFiles)
             {
-                Paragraph paragraph = new Paragraph();
-                Hyperlink link = new Hyperlink(new Run(fileName));
-                link.Click += (s, args) => OpenFile(fileName);  // Set up the click event handler
-                paragraph.Inlines.Add(link);
-                filesList.Document.Blocks.Add(paragraph);  // Add the paragraph to the RichTextBox
+                filesList.Items.Add(fileName);  // Add the paragraph to the RichTextBox
             }
         }
 
@@ -233,7 +226,7 @@ namespace GameClient
         private void updateFiles()
         {
             // Clear the existing file list from the RichTextBox
-            filesList.Document.Blocks.Clear();
+            filesList.Items.Clear();
 
             // Retrieve the list of uploaded files for the current lobby
             List<string> uploadedFiles = foob.GetLobbyFiles(thisLobby);
@@ -241,15 +234,32 @@ namespace GameClient
             // Display each file as a clickable hyperlink in the RichTextBox
             foreach (string fileName in uploadedFiles)
             {
-                AddFileToRichTextBox(fileName);  // Reuse the existing helper method
+                filesList.Items.Add(fileName);  // Reuse the existing helper method
             }
         }
 
+        //depreciated 
         private void app_Exit(object sender, CancelEventArgs e)
         {
             //foob.RemoveUserFromLobby(thisLobby,currUser);
             //foob.RemoveUser(currUser);
 
+        }
+
+        private void filesList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (filesList.SelectedItem != null)
+            {
+                string fileName = filesList.SelectedItem.ToString();
+                if (!string.IsNullOrEmpty(fileName))
+                {
+                    MessageBoxResult result = MessageBox.Show($"Do you want to download {fileName}", "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        DownloadFile(fileName);
+                    }
+                }
+            }
         }
 
         private void updateUsers()

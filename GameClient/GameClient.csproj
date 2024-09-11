@@ -90,15 +90,8 @@
     <Compile Include="loginWindow.xaml.cs">
       <DependentUpon>loginWindow.xaml</DependentUpon>
     </Compile>
-    <Page Include="messageForm.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="messageForm.xaml.cs">
-      <DependentUpon>messageForm.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Classes\musicplayer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
