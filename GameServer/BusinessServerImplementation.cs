@@ -32,6 +32,14 @@ namespace BusinessLayer
             Log($"Retriving Lobbies from data layer");            
             return foob.GetAllLobbies(); ;
         }
+                Log($"Lobby {lob.Name}, {lob.ID}");
+            }
+            return lobbyList;
+        }
+                Log($"Lobby {lob.Name}, {lob.ID}");
+            }
+            return lobbyList;
+        }
 
         public List<string> GetUsers(string lobbyName)
         {
