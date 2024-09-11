@@ -50,11 +50,11 @@ namespace GameClient
             await Task.Run(() => player.LoadAsync());
         }
 
-        public async void app_Exit(object sender, ExitEventArgs e)
+        private void app_Exit(object sender, ExitEventArgs e)
         {
             if (!string.IsNullOrEmpty(UserName))
             {
-                await foob.RemoveUserAsync(UserName);
+                foob.RemoveUserAsync(UserName);  // Make sure this only runs on actual app exit
             }
             MessageBox.Show("Goodbye");
         }

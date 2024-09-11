@@ -31,29 +31,34 @@ namespace GameClient
         private IBusinessServerInterface foob;
         private List<string> currentMessage;
         private string thisLobby;
+        private System.Timers.Timer messageUpdateTimer;
+
         public lobbyRoomWindow(string selectedLobby)
         {
             InitializeComponent();
-            this.currUser = App.Instance.UserName;
             this.foob = App.Instance.foob;
             this.thisLobby = selectedLobby;
-            messageList.Document.Blocks.Clear();
 
-            // Load messages and users asynchronously
-            Task task = LoadMessagesAsync();
-            Task task2 = LoadUsersAsync();
+            StartMessageUpdateTimer(); // Start polling for messages
+        }
 
-            filesList.AddHandler(Hyperlink.RequestNavigateEvent, new RoutedEventHandler(Hyperlink_Click)); // Enable hyperlink click handling for the RichTextBox
-
-            // Load previously shared files for the lobby
-            _ = LoadSharedFilesAsync();
+        private void StartMessageUpdateTimer()
+        {
+            messageUpdateTimer = new System.Timers.Timer(2000); // Poll every 2 seconds
+            messageUpdateTimer.Elapsed += async (sender, e) => await LoadMessagesAsync();
+            messageUpdateTimer.AutoReset = true;
+            messageUpdateTimer.Enabled = true;
         }
 
         private async Task LoadMessagesAsync()
         {
             var lobbyMessages = await foob.GetMessageAsync(null, currUser, thisLobby);
             currentMessage = lobbyMessages;
-            displayMsgs();
+
+            Dispatcher.Invoke(() =>
+            {
+                displayMsgs();
+            });
         }
 
         private async Task LoadUsersAsync()
@@ -210,19 +215,6 @@ namespace GameClient
                 messageList.Document.Blocks.Add(paragraph);
             }
         }
-
-        /*private async Task refreshBtn_click(object sender, RoutedEventArgs e)
-        {
-            // Update messages from server
-            currentMessage = await foob.GetMessageAsync(currUser, selectedUser, thisLobby);
-            displayMsgs();
-
-            // Update users in the server
-            updateUsers();
-
-            // Update the file list in the RichTextBox
-            await updateFilesAsync();
-        }*/
 
         // Helper method to update the file list
         private async Task updateFilesAsync()

@@ -17,27 +17,33 @@ namespace GameClient
     public partial class MainWindow : Window
     {
         private IBusinessServerInterface foob;
+        private System.Timers.Timer userCountTimer;
 
         public MainWindow()
         {
             InitializeComponent();
             foob = App.Instance.foob;
+            StartUserCountTimer(); // Start polling for user count updates
+        }
 
-            // Async operation to fetch user count
-            Task task = LoadUserCountAsync();
+        // Method to start a timer
+        private void StartUserCountTimer()
+        {
+            userCountTimer = new System.Timers.Timer(5000); // Poll every 5 seconds
+            userCountTimer.Elapsed += async (sender, e) => await LoadUserCountAsync();
+            userCountTimer.AutoReset = true;
+            userCountTimer.Enabled = true;
         }
 
         private async Task LoadUserCountAsync()
         {
-            if (App.Instance.foob != null)
+            int userCount = await foob.GetUserCountAsync();
+
+            // Update the UI using Dispatcher to ensure it runs on the UI thread
+            Dispatcher.Invoke(() =>
             {
-                int userCount = await App.Instance.foob.GetUserCountAsync();
                 userNumber.Text = "Number of Users: " + userCount;
-            }
-            else
-            {
-                MessageBox.Show("Server connection is not established.");
-            }
+            });
         }
 
         private async void loginBtn_Click(object sender, RoutedEventArgs e)

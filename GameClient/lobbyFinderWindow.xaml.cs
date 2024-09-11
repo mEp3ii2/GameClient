@@ -28,25 +28,43 @@ namespace GameClient
         private string currentModeFilter;
         private string currentTagFilter;
         private IBusinessServerInterface foob;
+        private System.Timers.Timer lobbyUpdateTimer;
 
         public lobbyFinderWindow()
         {
             InitializeComponent();
-            this.foob = App.Instance.foob; // connection to business layer
+            this.foob = App.Instance.foob;
 
-            this.currUser = App.Instance.UserName;
-            Task task = LoadLobbiesAsync();
-            Task task1 = loadModeFilterBoxAsync();
-            Task task2 = loadTagFilterBoxAsync();
-            currentModeFilter = null;
-            currentTagFilter = null;
+            StartLobbyUpdateTimer(); // Start polling for lobbies
+        }
+
+        private void StartLobbyUpdateTimer()
+        {
+            System.Timers.Timer lobbyUpdateTimer = new System.Timers.Timer(5000); // Update every 5 seconds
+            lobbyUpdateTimer.Elapsed += async (sender, e) =>
+            {
+                await LoadLobbiesAsync(); // Load lobbies asynchronously
+            };
+            lobbyUpdateTimer.AutoReset = true;
+            lobbyUpdateTimer.Enabled = true;
         }
 
         private async Task LoadLobbiesAsync()
         {
-            currentList = await foob.GetAllLobbiesAsync();
-            lobbyList.ItemsSource = currentList;
-            updateLobbyCountLabel(currentList.Count);
+            var lobbies = await foob.GetAllLobbiesAsync();
+
+            // Ensure UI update is done on the main thread
+            Dispatcher.Invoke(() =>
+            {
+                if (lobbies != null && lobbies.Any())
+                {
+                    lobbyList.ItemsSource = lobbies; // Update lobby list in the UI
+                }
+                else
+                {
+                    lobbyList.ItemsSource = null;  // Clear the lobby list if no lobbies are found
+                }
+            });
         }
 
         private async Task loadModeFilterBoxAsync()
@@ -83,11 +101,21 @@ namespace GameClient
 
         private void lobbyList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            string selectedLobby = ((Lobby)lobbyList.SelectedItem).Name;
-            foob.JoinLobbyAsync(selectedLobby, currUser);  // Correct method name
-            lobbyRoomWindow curWindow = new lobbyRoomWindow(selectedLobby);
-            curWindow.Show();
-            this.Close();
+            // Ensure the selected item is not null before proceeding
+            if (lobbyList.SelectedItem == null)
+            {
+                return;  // Do nothing if there's no selection
+            }
+
+            // Assuming lobbyList.SelectedItem is expected to be of a certain type
+            var selectedLobby = lobbyList.SelectedItem as string; // Or the appropriate type
+
+            if (selectedLobby != null)
+            {
+                // Handle the selected lobby here
+                lobbyRoomWindow lobbyRoom = new lobbyRoomWindow(selectedLobby);
+                lobbyRoom.Show();
+            }
         }
 
         private void createBtn_Click(object sender, RoutedEventArgs e)
@@ -164,9 +192,12 @@ namespace GameClient
             this.Close();
         }
 
-        private void lobbyFinderWindow_Closing(object sender, CancelEventArgs e)
+        private async void lobbyFinderWindow_Closing(object sender, CancelEventArgs e)
         {
-            App.Instance.app_Exit(sender, null);  // Call the App-level exit handling.
+            if (!string.IsNullOrEmpty(currUser) && foob != null)
+            {
+                await foob.RemoveUserFromLobbyAsync("lobbyName", currUser); // Replace "lobbyName" with the actual lobby's name
+            }
         }
     }
 }
