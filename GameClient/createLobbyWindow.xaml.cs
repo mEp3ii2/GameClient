@@ -66,6 +66,7 @@ namespace GameClient
             roomName = nameTxtBox.Text;
             desc = descTxtBox.Text;
             foob.AddLobby(roomName, desc, mode, tags);
+            foob.joinLobby(roomName, currUser);
             lobbyRoomWindow curWindow = new lobbyRoomWindow(roomName);
             curWindow.Show();
             this.Close();
