@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
@@ -53,7 +54,7 @@ namespace DataLayer
             addNewLobby("Beginner Deathmatch", "A beginner friendly chat lobby for Deathmatch players.", "Deathmatch", new List<string> { "Beginner Friendly" });
             addNewLobby("Beginner King of the Hill", "A beginner friendly chat lobby for King of the Hill players.", "King of the Hill", new List<string> { "Beginner Friendly" });
             addNewLobby("Hardcore Deathmatch", "A chat lobby for hardcore Deathmatch players.", "Deathmatch", new List<string> { "Ranked Match" });
-            addNewLobby("Hardcore King of the Hill", "A chat lobby for hardcore King of the Hill players.", "King of the Hill", new List<string> { "Ranked Match" });
+            addNewLobby("Hardcore King of the Hill", "A chat lobby for hardcore King of the Hill players.", "King of the Hill", new List<string> {"Ranked Match"});
             lobbies[0].Users.Add(user1);
             lobbies[0].Users.Add(user2);
         }
@@ -220,11 +221,20 @@ namespace DataLayer
         {
             return users.Count;
         }
-        
 
+        public void SaveFilePath(string fileName, Lobby lobby)
+        {
+            string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SharedFiles", fileName);
+            Directory.CreateDirectory(Path.GetDirectoryName(filePath));  // Ensure the directory exists
 
-        //public void addFile(int lobbyID,!fileDetails here not sure yet)
+            Lobby currentLobby = getLobby(lobby);
+            currentLobby?.AddFile(filePath);  // Store the file path instead of file content
+        }
 
-        
+        public List<string> GetLobbyFilePaths(Lobby lobby)
+        {
+            Lobby searchLobby = getLobby(lobby);
+            return searchLobby?.UploadedFiles ?? new List<string>();
+        }
     }
 }

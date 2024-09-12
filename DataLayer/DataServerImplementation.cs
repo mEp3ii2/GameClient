@@ -148,7 +148,7 @@ namespace DataLayer
         public List<string> GetLobbyFiles(Lobby lobby)
         {
             Lobby searchLobby = database.getLobby(lobby);
-            return searchLobby?.UploadedFiles ?? new List<string>();
+            return searchLobby?.UploadedFiles ?? new List<string>();  // Return file names only
         }
 
         // Add file download method
@@ -158,7 +158,7 @@ namespace DataLayer
             if (File.Exists(filePath))
             {
                 Log($"File {fileName} downloaded from {filePath}");
-                return File.ReadAllBytes(filePath);
+                return File.ReadAllBytes(filePath);  // Send file data only when requested
             }
             else
             {
