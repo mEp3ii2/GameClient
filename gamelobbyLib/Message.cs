@@ -1,38 +1,56 @@
-﻿using GameLobbyLib;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Runtime.Serialization;
 
-public class Message
+namespace GameLobbyLib
 {
-    public int id;
-    private static int nextID = 1;
-    private List<string> messageList; // Keep this as List<string>
-    private User[] userList;
-
-    public Message() { }//I dont fully understand why this works but DO NOT REMOVE. It fucks with something to do with serialization
-
-    public Message(User[] userList = null)
+    
+    public class Message
     {
-        id = nextID++;
-        this.messageList = new List<string>();
-        this.userList = userList;
-    }
+        public int id;
+        private static int nextID = 1;
+        private List<string> messageList;
+        private User[] userList;
 
-    // Add a method to format and store a message with username
-    public void AddMessage(string userName, string messageContent)
-    {
-        string formattedMessage = $"{userName}: {messageContent}"; // Format message with username
-        messageList.Add(formattedMessage);
-    }
+        public Message() { }//I dont fully understand why this works but DO NOT REMOVE. It fucks with something to do with serialization
 
-    public List<string> MessageList
-    {
-        get { return messageList; }
-        set { messageList = value; }
-    }
+        //userList can be null in the case of the lobby group chat
+        public Message(User[] userList = null)
+        {
+            id = nextID++; 
+            this.messageList = new List<string>();
+            this.userList = userList;
+        }
 
-    public User[] UserList
-    {
-        get { return userList; }
-        set { userList = value; }
+        public override bool Equals(object obj)
+        {
+            Message other = obj as Message;
+            if (other.userList.Contains(userList[0]) && other.userList.Contains(userList[1]))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public int ID
+        {
+            get { return id; }
+        }
+    
+        public List<string> MessageList
+        {
+            get { return messageList; }
+            set { messageList = value; }
+        }
+
+        [DataMember]
+        public User[] UserList
+        {
+            get { return userList; }
+            set { userList = value; }
+        }
     }
 }

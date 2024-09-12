@@ -28,38 +28,45 @@ namespace GameClient
         private string roomName;
         private List<string> tags;
         private IBusinessServerInterface foob;
-
+        
         public createLobbyWindow()
         {
             InitializeComponent();
+
             this.foob = App.Instance.foob;
+            //passing foob instead
+            /*ChannelFactory<BusinessServerInterface> foobFactory;
+            NetTcpBinding tcp = new NetTcpBinding();
+            string URL = "net.tcp://localhost:8100/GameService";
+            foobFactory = new ChannelFactory<BusinessServerInterface>(tcp, URL);
+            foob = foobFactory.CreateChannel();
+            */
             this.currUser = App.Instance.UserName;
+            
+            modeSelBox.ItemsSource = foob.GetAllModeTypes();
+            //tagSelBox.ItemsSource = Database.getAllTagTypes();
+            
 
-            // Call async method after the constructor
-            Task task = InitializeLobbyCreationAsync();
+            optionsBox.ItemsSource = foob.GetAllTagTypes();
         }
 
-        // Make this method async to use await inside
-        private async Task InitializeLobbyCreationAsync()
-        {
-            // Async calls to populate mode and tag boxes
-            modeSelBox.ItemsSource = await foob.GetAllModeTypesAsync();
-            optionsBox.ItemsSource = await foob.GetAllTagTypesAsync();
-        }
-
-        private async void submitBtn_Click(object sender, RoutedEventArgs e)
+        private void submitBtn_Click(object sender, RoutedEventArgs e)
         {
             mode = modeSelBox.SelectedItem as string;
+            List<string> temp = new List<string>();
+            
+            tags = new List<string>();
             tags = optionsBox.SelectedItems.Cast<string>().ToList();
-
-            string tagString = string.Join(",", tags); // Concatenate tags with commas
+            
+            string tagString= "";
+            foreach (string tag in tags)
+            {
+                tagString = tagString+tag;
+            }
             roomName = nameTxtBox.Text;
             desc = descTxtBox.Text;
-            MessageBox.Show(mode + " " + tagString + " " + roomName + " " + desc);
-
-            // Async call to add lobby
-            await foob.AddLobbyAsync(roomName, desc, mode, tags);
-
+            MessageBox.Show(mode+" "+tagString + " " +roomName + " " + desc);
+            foob.AddLobby(roomName, desc, mode, tags);
             lobbyRoomWindow curWindow = new lobbyRoomWindow(roomName);
             curWindow.Show();
             this.Close();

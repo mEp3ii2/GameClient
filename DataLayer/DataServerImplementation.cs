@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.ServiceModel;
 using System.Threading.Tasks;
 using System.IO;
@@ -19,98 +20,99 @@ namespace DataLayer
             database = Database.getInstance();
         }
 
-        public async Task<List<Lobby>> GetAllLobbiesAsync()
+        public List<Lobby> GetAllLobbies()
         {
-            Log("Grabbing all Lobbies");
-            return await Task.FromResult(database.getAllLobbies());
+            Log($"Grabbing all Lobbies");
+            return database.getAllLobbies();
         }
 
-        public async Task<List<User>> GetUsersAsync(Lobby lobby)
+        public List<User> GetUsers(Lobby lobby)
         {
             Log($"Getting users from lobby {lobby.Name}");
-            return await Task.FromResult(database.getLobbyUsers(lobby));
+            return database.getLobbyUsers(lobby);
         }
 
-        public async Task<User> GetUserAsync(string name)
+        public User GetUser(string name)
         {
-            return await Task.FromResult(database.GetUser(name));
+            return database.GetUser(name);
         }
 
-        public async Task<List<User>> GetAllUsersAsync()
+        public List<User> GetAllUsers()
         {
-            return await Task.FromResult(database.getAllUsers());
+            return database.getAllUsers();
         }
 
-        public async Task AddUserAsync(User user)
+        public void AddUser(User user)
         {
-            await Task.Run(() => database.addUser(user));
+            database.addUser(user);
         }
 
-        public async Task<List<string>> GetUniqueModesAsync(List<Lobby> curLobbyList)
+        public List<string> GetUniqueModes(List<Lobby> curLobbyList)
         {
-            return await Task.FromResult(database.GetUniqueModes(curLobbyList));
+            return database.GetUniqueModes(curLobbyList);
         }
 
-        public async Task<List<string>> GetUniqueTagsAsync(List<Lobby> curLobbyList)
+        public List<string> GetUniqueTags(List<Lobby> curLobbyList)
         {
-            return await Task.FromResult(database.GetUniqueTags(curLobbyList));
+            return database.GetUniqueTags(curLobbyList);
         }
 
-        public async Task<List<Lobby>> GetFilteredLobbiesListAsync(string mode = null, string tag = null)
+        public List<Lobby> GetfilterdLobbiesList(string mode = null, string tag = null)
         {
-            return await Task.FromResult(database.getfilterdLobbiesList(mode, tag));
+            return database.getfilterdLobbiesList(mode, tag);
         }
 
-        public async Task<List<string>> GetAllModeTypesAsync()
+        public List<string> GetAllModeTypes()
         {
-            return await Task.FromResult(database.getAllModeTypes());
+            return database.getAllModeTypes();
         }
 
-        public async Task<List<string>> GetAllTagTypesAsync()
+        public List<string> GetAllTagTypes()
         {
-            return await Task.FromResult(database.getAllTagTypes());
+            return database.getAllTagTypes();
         }
 
-        public async Task AddLobbyAsync(Lobby lobby)
+        public void AddLobby(Lobby lobby)
         {
-            await Task.Run(() => database.addNewLobby(lobby));
+            database.addNewLobby(lobby);
         }
 
-        public async Task RemoveUserFromLobbyAsync(Lobby lobby, User user)
+        public void RemoveUserFromLobby(Lobby lobby, User user)
         {
-            await Task.Run(() => database.RemoveUser(lobby, user));
+            database.RemoveUser(lobby, user);
         }
 
-        public async Task RemoveUserAsync(User user)
+        public void RemoveUser(User user)
         {
-            await Task.Run(() => database.RemoveUser(user));
+            database.RemoveUser(user);
         }
 
-        public async Task UpdateMessageAsync(Message msg, Lobby lobby)
+        public void UpdateMessage(Message msg, Lobby lobby)
         {
-            await Task.Run(() => database.getLobby(lobby).updateMessage(msg));
+            database.getLobby(lobby).updateMessage(msg);
         }
 
-        public async Task JoinLobbyAsync(Lobby lobby, User user)
+        public void joinLobby(Lobby lobby, User user)
         {
-            await Task.Run(() => database.joinLobby(lobby, user));
+            database.joinLobby(lobby, user);
         }
 
-        public async Task<List<Message>> GetChatsAsync(Lobby lobby, User currUser)
+        public List<Message> GetChats(Lobby lobby, User currUser)
         {
-            return await Task.FromResult(database.getLobby(lobby).Messages
-                .Where(m => m.UserList.Contains(currUser) || m.UserList.Contains(null)).ToList());
+            return database.getLobby(lobby).Messages
+                .Where(m => m.UserList.Contains(currUser) || m.UserList.Contains(null)).ToList();
         }
 
-        public async Task AddMessageAsync(Lobby lobby, User user, string messageContent)
+        public void AddMessage(Lobby lobby, User user1, User user2)
         {
+            Log($"Adding message between {user1.Name} and {user2.Name} in lobby {lobby.Name}");
             Lobby thisLobby = database.getLobby(lobby);
 
             if (thisLobby != null)
             {
-                Message newMessage = new Message(new User[] { user, null });
-                newMessage.AddMessage(user.Name, messageContent); // Add message with username
-                await Task.Run(() => thisLobby.Messages.Add(newMessage)); // Save the message
+                Message newMessage = new Message(new User[] { user1, user2 });
+                thisLobby.Messages.Add(newMessage);
+                Log($"Message added successfully between {user1.Name} and {user2.Name}.");
             }
             else
             {
@@ -118,33 +120,30 @@ namespace DataLayer
             }
         }
 
-        public async Task<Message> GetMessageAsync(User user1, User user2, Lobby lobby)
+        public Message GetMessage(User user1, User user2, Lobby lobby)
         {
-            return await Task.FromResult(database.getLobby(lobby).getMessage(user1, user2));
+            return database.getLobby(lobby).getMessage(user1, user2);
         }
 
-        public async Task<Lobby> GetLobbyAsync(string lobbyName)
+        public Lobby GetLobby(string lobbyName)
         {
-            return await Task.FromResult(database.getLobby(lobbyName));
+            return database.getLobby(lobbyName);
         }
 
         // Save the file and record the file name in the lobby
-        public async Task SaveFileAsync(string fileName, byte[] fileData, Lobby lobby)
+        public void saveFile(string fileName, byte[] fileData, Lobby lobby)
         {
             string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SharedFiles", fileName);
             Directory.CreateDirectory(Path.GetDirectoryName(filePath));  // Ensure the directory exists
-            File.WriteAllBytes(filePath, fileData); // Synchronous version used here
+            File.WriteAllBytes(filePath, fileData);
 
             Log($"File {fileName} saved to {filePath}");
 
             // Retrieve the current lobby using the passed lobby name
             Lobby currentLobby = database.getLobby(lobby);
-            await Task.Run(() => currentLobby?.AddFile(fileName));  // Add the file to the lobby's list of uploaded files
+            currentLobby?.AddFile(fileName);  // Add the file to the lobby's list of uploaded files
         }
 
-<<<<<<< HEAD
-        public async Task<byte[]> DownloadFileAsync(string fileName)
-=======
         // Retrieve the list of previously uploaded files for a given lobby
         public List<string> GetLobbyFiles(Lobby lobby)
         {
@@ -154,17 +153,12 @@ namespace DataLayer
 
         // Add file download method
         public byte[] downloadFile(string fileName)
->>>>>>> DevRyanA
         {
             string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SharedFiles", fileName);
             if (File.Exists(filePath))
             {
                 Log($"File {fileName} downloaded from {filePath}");
-<<<<<<< HEAD
-                return await Task.FromResult(File.ReadAllBytes(filePath)); // Synchronous version used here
-=======
                 return File.ReadAllBytes(filePath);  // Send file data only when requested
->>>>>>> DevRyanA
             }
             else
             {
@@ -172,14 +166,7 @@ namespace DataLayer
             }
         }
 
-
-        // Retrieve the list of previously uploaded files for a given lobby
-        public async Task<List<string>> GetLobbyFilesAsync(Lobby lobby)
-        {
-            Lobby searchLobby = database.getLobby(lobby);
-            return await Task.FromResult(searchLobby?.UploadedFiles ?? new List<string>());
-        }
-
+        [MethodImpl(MethodImplOptions.Synchronized)]
         private void Log(string logString)
         {
             logNumber++;
@@ -187,9 +174,9 @@ namespace DataLayer
             Console.WriteLine(logMsg);
         }
 
-        public async Task<int> GetUserCountAsync()
+        public int GetUserCount()
         {
-            return await Task.FromResult(database.GetUserCount());
+            return database.GetUserCount();
         }
     }
 }

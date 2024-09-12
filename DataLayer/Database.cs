@@ -26,7 +26,7 @@ namespace DataLayer
 
         List<Lobby> lobbies;
         List<User> users;
-        // static List<UploadedFile> uploadedFiles;
+        static List<UploadedFile> uploadedFiles;
 
         List<string> tags;        //test value to be removed later
 
@@ -90,22 +90,9 @@ namespace DataLayer
         //Remove user from lobby
         public void RemoveUser(Lobby lobby, User user)
         {
-            // Check if the lobby is null before proceeding
-            if (lobby == null)
-            {
-                throw new ArgumentNullException(nameof(lobby), "The provided lobby is null.");
-            }
-
-            // Rest of the logic to remove the user
             Lobby editLobby = getLobby(lobby);
-
-            // Check if editLobby is null before proceeding
-            if (editLobby == null)
-            {
-                throw new Exception($"Lobby '{lobby.Name}' not found in the database.");
-            }
-
             editLobby.removeUser(user);
+
         }
 
         //Remove user from database
@@ -142,6 +129,8 @@ namespace DataLayer
             return lobbies.Select(lobby => lobby.Mode).Distinct().ToList();
         }
 
+
+
         //returns a list of all unique modes
         // using either the current set or the full list
         public List<string> GetUniqueTags(List<Lobby> curLobbyList)
@@ -150,7 +139,7 @@ namespace DataLayer
             {
                 return curLobbyList.SelectMany(lobby => lobby.Tags).Distinct().ToList();
             }
-            return lobbies.SelectMany(lobby => lobby.Tags).Distinct().ToList();
+            return lobbies.SelectMany(lobby=> lobby.Tags).Distinct().ToList();
         }
 
         public List<Lobby> getfilterdLobbiesList(string mode = null, string tag = null)
@@ -212,22 +201,13 @@ namespace DataLayer
 
         public Lobby getLobby(Lobby lobby)
         {
-            if (lobby == null)
-            {
-                throw new ArgumentNullException(nameof(lobby), "Lobby cannot be null.");
-            }
-
             foreach (Lobby searchLobby in lobbies)
             {
                 if (lobby.Equals(searchLobby))
-                {
                     return searchLobby;
-                }
             }
-
-            // If no lobby was found, log the issue
-            Console.WriteLine($"Lobby '{lobby.Name}' not found.");
             return null;
+
         }
 
         public void joinLobby(Lobby lobby, User user)

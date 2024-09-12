@@ -4,9 +4,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.ComponentModel;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
+
 using System.ServiceModel;
 using GameLobbyLib;
+using System.Configuration;
 using BusinessLayer;
+
 
 namespace GameClient
 {
@@ -14,85 +25,56 @@ namespace GameClient
     /// Interaction logic for loginWindow.xaml
     /// </summary>
 
+    public delegate bool VerifyUser(string userName);
     public partial class MainWindow : Window
     {
         private IBusinessServerInterface foob;
-        private System.Timers.Timer userCountTimer;
+
 
         public MainWindow()
         {
             InitializeComponent();
+
             foob = App.Instance.foob;
-            StartUserCountTimer(); // Start polling for user count updates
-        }
+            
 
-        // Method to start a timer
-        private void StartUserCountTimer()
-        {
-            userCountTimer = new System.Timers.Timer(5000); // Poll every 5 seconds
-            userCountTimer.Elapsed += async (sender, e) => await LoadUserCountAsync();
-            userCountTimer.AutoReset = true;
-            userCountTimer.Enabled = true;
-        }
-
-        private async Task LoadUserCountAsync()
-        {
-            int userCount = await foob.GetUserCountAsync();
-
-            // Update the UI using Dispatcher to ensure it runs on the UI thread
-            Dispatcher.Invoke(() =>
-            {
-                userNumber.Text = "Number of Users: " + userCount;
-            });
+            userNumber.Text = "Number of Users: " + foob.GetUserCount(); 
+            
         }
 
         private async void loginBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (App.Instance.foob != null)
+            App.Instance.UserName = userNameBox.Text;
+            
+            bool uniqueUser = await Task.Run(()=> VerifyUser(App.Instance.UserName));
+
+            if (uniqueUser)
             {
-                App.Instance.UserName = userNameBox.Text;
+                // open main window and close this one
+                // send across user name as well    
+                foob.AddUser(App.Instance.UserName);
+                lobbyFinderWindow curWindow = new lobbyFinderWindow();
+                curWindow.Show();
+                this.Close();
 
-                bool uniqueUser = await VerifyUserAsync(App.Instance.UserName);
-
-                if (uniqueUser)
-                {
-                    // Add user asynchronously
-                    await App.Instance.foob.AddUserAsync(App.Instance.UserName);
-
-                    // Open the main lobby window
-                    lobbyFinderWindow curWindow = new lobbyFinderWindow();
-                    curWindow.Show();
-                    this.Close();
-                }
-                else
-                {
-                    userNameBox.Clear();
-                    MessageBox.Show("Name is taken, please try again");
-                }
             }
             else
             {
-                MessageBox.Show("Server connection is not established.");
+                userNameBox.Clear();
+                MessageBox.Show("Name is taken, please try again");
+                
             }
         }
 
-        private async Task<bool> VerifyUserAsync(string userName)
+        private bool VerifyUser(string userName)
         {
-            if (App.Instance.foob != null)
-            {
-                return await App.Instance.foob.UniqueUserAsync(userName);
-            }
-            else
-            {
-                MessageBox.Show("Server connection is not established.");
-                return false;
-            }
+            return foob.UniqueUser(userName);
         }
 
-        /*private async void refreshBtn_click(object sender, RoutedEventArgs e)
+
+        public void refreshBtn_click(object sender, RoutedEventArgs e)
         {
-            int userCount = await foob.GetUserCountAsync();
-            userNumber.Text = "Number of Users: " + userCount;
-        }*/
+            userNumber.Text = "Number of Users: " + foob.GetUserCount();
+        }
     }
 }

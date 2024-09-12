@@ -18,5 +18,8 @@
         <Button x:Name="loginBtn" Content="Login" HorizontalAlignment="Left" Margin="125,115,0,0" VerticalAlignment="Top" Width="120" Click="loginBtn_Click" IsEnabled="{Binding Text, ElementName=userNameBox, Converter={StaticResource textBoxFilled}}"/>
         <TextBlock HorizontalAlignment="Left" Margin="135,21,0,0" TextWrapping="Wrap" Text="Mortal Combat X" VerticalAlignment="Top" Foreground="White"/>
         <TextBlock x:Name="userNumber" HorizontalAlignment="Left" Margin="265,190,0,0" TextWrapping="Wrap" Text="Number of Users: " VerticalAlignment="Top" Background="White" Width="113"/>
+        <Button HorizontalAlignment="Left" Margin="236,190,0,0" VerticalAlignment="Top" Name="refreshBtn" Height="16" Width="24" Click="refreshBtn_click">
+            <Image Source="./Resources/refresh.png"/>
+        </Button>
     </Grid>
 </Window>

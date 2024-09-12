@@ -21,55 +21,28 @@ namespace GameClient
         public string UserName { get; set; }
         public IBusinessServerInterface foob;
 
-        protected override async void OnStartup(StartupEventArgs e)
+
+        protected override void OnStartup(StartupEventArgs e)
         {
+            UserName = null;
             base.OnStartup(e);
+            SoundPlayer player = new SoundPlayer("Resources/Mortal_Kombat.wav");
+            player.LoadCompleted += delegate (object sender, AsyncCompletedEventArgs er) {
+                player.PlayLooping();
+            };
+            player.LoadAsync();
 
-            await InitializeConnectionAsync();
-        }
-
-        NetTcpBinding tcp = new NetTcpBinding
-        {
-            MaxReceivedMessageSize = 10485760, // 10 MB
-            ReaderQuotas = new System.Xml.XmlDictionaryReaderQuotas
-            {
-                MaxArrayLength = 10485760,
-                MaxBytesPerRead = 4096,
-                MaxDepth = 32,
-                MaxNameTableCharCount = 16384,
-                MaxStringContentLength = 8192
-            }
-        };
-
-
-        private async Task InitializeConnectionAsync()
-        {
             ChannelFactory<IBusinessServerInterface> foobFactory;
             NetTcpBinding tcp = new NetTcpBinding();
             string URL = "net.tcp://localhost:8100/GameService";
             foobFactory = new ChannelFactory<IBusinessServerInterface>(tcp, URL);
             foob = foobFactory.CreateChannel();
 
-            // Add a simple awaitable test call to check the connection
-            await foob.GetUserCountAsync();
-        }
 
-        private async Task InitializeSoundAsync()
-        {
-            SoundPlayer player = new SoundPlayer("Resources/Mortal_Kombat.wav");
-            player.LoadCompleted += delegate (object sender, AsyncCompletedEventArgs er)
-            {
-                player.PlayLooping();
-            };
-            await Task.Run(() => player.LoadAsync());
         }
-
         private void app_Exit(object sender, ExitEventArgs e)
         {
-            if (!string.IsNullOrEmpty(UserName))
-            {
-                foob.RemoveUserAsync(UserName);  // Make sure this only runs on actual app exit
-            }
+            foob.RemoveUser(UserName);
             MessageBox.Show("Goodbye");
         }
     }

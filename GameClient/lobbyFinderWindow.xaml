@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:GameClient"
         mc:Ignorable="d"
         Title="lobbyWindow" Height="450" Width="800"
-        Closing="lobbyFinderWindow_Closing">
+        Closing="app_Exit">
 
     <Grid Background="Black">
 
@@ -33,5 +33,8 @@
         <Label Content="Tag: " HorizontalAlignment="Left" Height="31" Margin="164,2,0,0" VerticalAlignment="Top" Width="86" Foreground="White"/>
         <ComboBox x:Name="tagFilterBox" HorizontalAlignment="Left" Margin="164,36,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="tagFilterBox_SelectionChanged" />
         <Label x:Name="lobbyCountLabel" Content="Active Lobbies: " HorizontalAlignment="Left" Margin="327,373,0,0" VerticalAlignment="Top" Width="169" Foreground="White"/>
+        <Button HorizontalAlignment="Left" Margin="300,40,0,0" VerticalAlignment="Top" Name="refreshBtn" Height="16" Width="24" Click="refreshBtn_click">
+            <Image Source="./Resources/refresh.png"/>
+        </Button>
     </Grid>
 </Window>
