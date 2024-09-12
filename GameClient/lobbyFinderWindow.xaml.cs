@@ -31,6 +31,7 @@ namespace GameClient
         private string currentModeFilter;
         private string currentTagFilter;
         private IBusinessServerInterface foob;
+        private Timer timer;
 
         public lobbyFinderWindow()
         {
@@ -46,7 +47,7 @@ namespace GameClient
             currentTagFilter = null;
             updateLobbyCountLabel(currentList.Count);
 
-            Timer timer = new Timer(Refresh);
+            timer = new Timer(Refresh);
             timer.Change(0, 250);
 
         }
@@ -225,6 +226,12 @@ namespace GameClient
         {
             foob.RemoveUser(currUser);
             this.Close();
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+            timer.Dispose();
         }
     }
 }

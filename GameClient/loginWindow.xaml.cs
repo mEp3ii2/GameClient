@@ -30,6 +30,7 @@ namespace GameClient
     public partial class MainWindow : Window
     {
         private IBusinessServerInterface foob;
+        Timer timer;
 
 
         public MainWindow()
@@ -41,7 +42,7 @@ namespace GameClient
 
             userNumber.Text = "Number of Users: " + foob.GetUserCount();
 
-            Timer timer = new Timer(Refresh);
+            timer = new Timer(Refresh);
             timer.Change(0, 250);
         }
 
@@ -56,6 +57,12 @@ namespace GameClient
             this.Dispatcher.Invoke(new Action(() => {
                 userNumber.Text = "Number of Users: " + NumUsers;
             }));
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+            timer.Dispose();
         }
 
         private async void loginBtn_Click(object sender, RoutedEventArgs e)

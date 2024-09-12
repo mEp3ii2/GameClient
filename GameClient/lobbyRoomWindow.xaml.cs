@@ -22,6 +22,8 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
 using System.Threading;
+using System.Timers;
+using Timer = System.Threading.Timer;
 
 namespace GameClient
 {
@@ -34,6 +36,7 @@ namespace GameClient
         private IBusinessServerInterface foob;
         private List<string> currentMessage;
         private string thisLobby;
+        private Timer timer;
         public lobbyRoomWindow(string selectedLobby) 
         {
             
@@ -58,7 +61,7 @@ namespace GameClient
             //get all users to populate user box
             //load current chat history
 
-            Timer timer = new Timer(Refresh);
+            timer = new Timer(Refresh);
             timer.Change(0, 250);
         }
 
@@ -305,6 +308,12 @@ namespace GameClient
             lobbyList.Remove(currUser);
             lobbyList.Add("Lobby");
             userlistBox.ItemsSource = lobbyList;
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+            timer.Dispose();
         }
 
     }
