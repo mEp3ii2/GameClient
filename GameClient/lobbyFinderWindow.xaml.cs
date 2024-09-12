@@ -15,6 +15,8 @@ using System.ComponentModel;
 using GameLobbyLib;
 using BusinessLayer;
 using System.ServiceModel;
+using System.Threading;
+using System.Xml.Serialization;
 
 namespace GameClient
 {
@@ -43,7 +45,45 @@ namespace GameClient
             currentModeFilter = null;
             currentTagFilter = null;
             updateLobbyCountLabel(currentList.Count);
+
+            Timer timer = new Timer(Refresh);
+            timer.Change(0, 250);
+
         }
+
+        private void Refresh(Object stateInfo)
+        {
+            currentList = foob.GetAllLobbies();
+
+            //Replace loadmodefilterbox functionality in thread
+            List<string> modelist = new List<string>();
+            modelist.Add("");
+            List<string> modes = foob.GetUniqueModes(null);
+            modelist.AddRange(modes);
+
+            //Replace loadtagfilterbox functionality in thread
+            List<string> tagList = new List<string>();
+            tagList.Add("");
+            List<string> tags = foob.GetUniqueTags(null);
+            tagList.AddRange(tags);
+            
+            currentModeFilter = null;
+            currentTagFilter = null;
+
+            UpdateGUI(modelist, tagList, currentList.Count);
+        }
+
+        private void UpdateGUI(List<string> modelist, List<string> tagList, int lobbyCount)
+        {
+            this.Dispatcher.Invoke(() =>
+            {
+                lobbyList.ItemsSource = currentList;
+                modeFilterBox.ItemsSource = modelist;
+                tagFilterBox.ItemsSource = tagList;
+                lobbyCountLabel.Content = $"Active Lobbies: {lobbyCount}";
+            });
+        }
+
 
         private void refreshBtn_click(object sender, EventArgs e)
         {
@@ -85,13 +125,15 @@ namespace GameClient
         // send user to lobby
         private void lobbyList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            
-            string selectedLobby = ((Lobby) lobbyList.SelectedItem).Name;
-            foob.joinLobby(selectedLobby, currUser);
-            
-            lobbyRoomWindow curWindow = new lobbyRoomWindow(selectedLobby);
-            curWindow.Show();
-            this.Close();
+            if (lobbyList.SelectedItem != null)
+            {
+                string selectedLobby = ((Lobby)lobbyList.SelectedItem).Name;
+                foob.joinLobby(selectedLobby, currUser);
+
+                lobbyRoomWindow curWindow = new lobbyRoomWindow(selectedLobby);
+                curWindow.Show();
+                this.Close();
+            }
         }
 
         // option window for creating new lobby

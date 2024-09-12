@@ -17,6 +17,7 @@ using System.ServiceModel;
 using GameLobbyLib;
 using System.Configuration;
 using BusinessLayer;
+using System.Threading;
 
 
 namespace GameClient
@@ -38,8 +39,23 @@ namespace GameClient
             foob = App.Instance.foob;
             
 
-            userNumber.Text = "Number of Users: " + foob.GetUserCount(); 
-            
+            userNumber.Text = "Number of Users: " + foob.GetUserCount();
+
+            Timer timer = new Timer(Refresh);
+            timer.Change(0, 250);
+        }
+
+        private void Refresh(Object stateInfo)
+        {
+            int NumUsers = foob.GetUserCount();
+            UpdateGUI(NumUsers);
+        }
+
+        private void UpdateGUI(int NumUsers)
+        {
+            this.Dispatcher.Invoke(new Action(() => {
+                userNumber.Text = "Number of Users: " + NumUsers;
+            }));
         }
 
         private async void loginBtn_Click(object sender, RoutedEventArgs e)
