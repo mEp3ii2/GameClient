@@ -101,18 +101,6 @@ namespace GameClient
             }
         }
 
-        // Helper method to add the file as a hyperlink to the RichTextBox
-        private void AddFileToRichTextBox(string fileName)
-        {
-            Paragraph paragraph = new Paragraph();
-            Hyperlink link = new Hyperlink(new Run(fileName));
-            link.Click += (s, args) => OpenFile(fileName);  // Set up the click event handler
-            paragraph.Inlines.Add(link);
-
-            // Add the hyperlink to the RichTextBox for file list
-            filesList.Document.Blocks.Add(paragraph);
-        }
-
         // Handle hyperlink click event to open the file
         private void Hyperlink_Click(object sender, RoutedEventArgs e)
         {
@@ -126,40 +114,37 @@ namespace GameClient
             }
         }
 
-        // Open the file using the default application for its type
+        private void LoadSharedFiles()
+        {
+            List<string> uploadedFiles = foob.GetLobbyFiles(thisLobby);  // Fetch file names only
+            foreach (string fileName in uploadedFiles)
+            {
+                AddFileToRichTextBox(fileName);  // Display as clickable hyperlinks
+            }
+        }
+
+        private void AddFileToRichTextBox(string fileName)
+        {
+            Paragraph paragraph = new Paragraph();
+            Hyperlink link = new Hyperlink(new Run(fileName));
+            link.Click += (s, args) => OpenFile(fileName);  // Download and open the file on click
+            paragraph.Inlines.Add(link);
+            filesList.Document.Blocks.Add(paragraph);  // Add hyperlink to file list
+        }
+
         private void OpenFile(string fileName)
         {
             try
             {
-                // Download the file and save it locally before opening
                 string filePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Downloads", fileName);
-                byte[] fileData = foob.DownloadFile(fileName);  // Download the file from the server
-                Directory.CreateDirectory(System.IO.Path.GetDirectoryName(filePath));  // Ensure directory exists
-                File.WriteAllBytes(filePath, fileData);  // Save the file locally
-
-                // Now open the file with the default application for its type
-                Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
+                byte[] fileData = foob.DownloadFile(fileName);  // Fetch file data from server when needed
+                Directory.CreateDirectory(System.IO.Path.GetDirectoryName(filePath));
+                File.WriteAllBytes(filePath, fileData);  // Write file locally
+                Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });  // Open file
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error opening file: {ex.Message}");
-            }
-        }
-
-        // Method to load shared files when re-entering the lobby
-        private void LoadSharedFiles()
-        {
-            // Fetch the list of previously shared files for the current lobby
-            List<string> uploadedFiles = foob.GetLobbyFiles(thisLobby);  // Ensure thisLobby.Name is passed correctly
-
-            // Display each file as a clickable hyperlink
-            foreach (string fileName in uploadedFiles)
-            {
-                Paragraph paragraph = new Paragraph();
-                Hyperlink link = new Hyperlink(new Run(fileName));
-                link.Click += (s, args) => OpenFile(fileName);  // Set up the click event handler
-                paragraph.Inlines.Add(link);
-                filesList.Document.Blocks.Add(paragraph);  // Add the paragraph to the RichTextBox
             }
         }
 
