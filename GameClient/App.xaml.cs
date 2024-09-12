@@ -28,6 +28,20 @@ namespace GameClient
             await InitializeConnectionAsync();
         }
 
+        NetTcpBinding tcp = new NetTcpBinding
+        {
+            MaxReceivedMessageSize = 10485760, // 10 MB
+            ReaderQuotas = new System.Xml.XmlDictionaryReaderQuotas
+            {
+                MaxArrayLength = 10485760,
+                MaxBytesPerRead = 4096,
+                MaxDepth = 32,
+                MaxNameTableCharCount = 16384,
+                MaxStringContentLength = 8192
+            }
+        };
+
+
         private async Task InitializeConnectionAsync()
         {
             ChannelFactory<IBusinessServerInterface> foobFactory;

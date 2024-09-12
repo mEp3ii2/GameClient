@@ -52,13 +52,34 @@ namespace GameClient
 
         private async Task LoadMessagesAsync()
         {
+            // Load the current lobby messages
             var lobbyMessages = await foob.GetMessageAsync(null, currUser, thisLobby);
             currentMessage = lobbyMessages;
 
+            // Load the list of shared files in the lobby
+            var uploadedFiles = await foob.GetLobbyFilesAsync(thisLobby);
+
+            // Ensure UI update is done on the main thread
             Dispatcher.Invoke(() =>
             {
+                // Display the messages in the message list
                 displayMsgs();
+
+                // Update the file list for all users in the lobby
+                UpdateFileList(uploadedFiles);
             });
+        }
+
+        private void UpdateFileList(List<string> fileNames)
+        {
+            // Clear the existing file list
+            filesList.Document.Blocks.Clear();
+
+            // Add each file to the file list in the RichTextBox as a clickable hyperlink
+            foreach (string fileName in fileNames)
+            {
+                AddFileToRichTextBox(fileName);  // This method adds file links to the RichTextBox
+            }
         }
 
         private void LoadUsersAsync()
@@ -100,6 +121,8 @@ namespace GameClient
                 byte[] fileData = File.ReadAllBytes(filePath);
                 string fileName = System.IO.Path.GetFileName(filePath);
 
+                Console.WriteLine($"Attempting to upload file: {fileName} of size {fileData.Length} bytes to lobby {thisLobby}");
+
                 // Pass the lobby name when uploading the file
                 await foob.UploadFileAsync(fileData, fileName, thisLobby);
 
@@ -114,7 +137,7 @@ namespace GameClient
             Paragraph paragraph = new Paragraph();
             Hyperlink link = new Hyperlink(new Run(fileName));
 
-            // Make the event handler async and await the OpenFileAsync call
+            // Make the event handler async to handle file downloads
             link.Click += async (s, args) => await OpenFileAsync(fileName);
 
             paragraph.Inlines.Add(link);

@@ -6,10 +6,11 @@ using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 using DataLayer;
+using System.IO;
 
 namespace BusinessLayer
 {
-    [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, UseSynchronizationContext = false)]
+    [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, UseSynchronizationContext = false, IncludeExceptionDetailInFaults = true)]
     internal class BusinessServerImplementation : IBusinessServerInterface
     {
         private IDataServerInterface foob;
@@ -167,8 +168,32 @@ namespace BusinessLayer
 
         public async Task UploadFileAsync(byte[] fileData, string fileName, string lobbyName)
         {
-            Lobby lobby = await foob.GetLobbyAsync(lobbyName);
-            await foob.SaveFileAsync(fileName, fileData, lobby);
+            try
+            {
+                if (fileData == null || fileData.Length == 0)
+                {
+                    throw new ArgumentException("File data cannot be null or empty");
+                }
+
+                Lobby lobby = await foob.GetLobbyAsync(lobbyName);
+                if (lobby == null)
+                {
+                    throw new Exception($"Lobby '{lobbyName}' not found.");
+                }
+
+                string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SharedFiles", fileName);
+                Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+                File.WriteAllBytes(filePath, fileData); // Synchronously write the file to disk
+
+                lobby.AddFile(fileName); // Add the file to the lobby's list
+
+                Console.WriteLine($"File {fileName} successfully uploaded to {filePath}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error during file upload: {ex.Message}");
+                throw new FaultException($"Error during file upload: {ex.Message}");
+            }
         }
 
         public async Task<byte[]> DownloadFileAsync(string fileName)
