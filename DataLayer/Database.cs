@@ -39,20 +39,21 @@ namespace DataLayer
 
         public Database()
         {
+
             lobbies = new List<Lobby>();
-            User user1 = new User("me");
-            User user2 = new User("frank");
+            User user1 = new User("George");
+            User user2 = new User("Clooney");
             users = new List<User>();
             users.Add(user1);
             users.Add(user2);
 
-            tags = new List<string> { "newbie", "friendly", "casual" };
+            tags = new List<string> { "Beginner Friendly", "Ranked Match" };
 
 
-            addNewLobby("test1", "testing arena", "deathmatch", tags);
-            addNewLobby("test2", "testing arena", "King of the Hill", tags);
-            addNewLobby("test3", "testing arena", "deathmatch", tags);
-            addNewLobby("test4", "testing arena", "King of the Hill", new List<string> {"Solo"});
+            addNewLobby("Beginner Deathmatch", "A beginner friendly chat lobby for Deathmatch players.", "Deathmatch", new List<string> { "Beginner Friendly" });
+            addNewLobby("Beginner King of the Hill", "A beginner friendly chat lobby for King of the Hill players.", "King of the Hill", new List<string> { "Beginner Friendly" });
+            addNewLobby("Hardcore Deathmatch", "A chat lobby for hardcore Deathmatch players.", "Deathmatch", new List<string> { "Ranked Match" });
+            addNewLobby("Hardcore King of the Hill", "A chat lobby for hardcore King of the Hill players.", "King of the Hill", new List<string> { "Ranked Match" });
             lobbies[0].Users.Add(user1);
             lobbies[0].Users.Add(user2);
         }
