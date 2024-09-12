@@ -19,6 +19,11 @@ using Microsoft.Win32;
 using System.IO;
 using System.Diagnostics;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Xml.Serialization;
+using System.Threading;
+using System.Timers;
+using Timer = System.Threading.Timer;
 
 namespace GameClient
 {
@@ -31,6 +36,7 @@ namespace GameClient
         private IBusinessServerInterface foob;
         private List<string> currentMessage;
         private string thisLobby;
+        private Timer timer;
         public lobbyRoomWindow(string selectedLobby) 
         {
             
@@ -39,7 +45,6 @@ namespace GameClient
             this.foob = App.Instance.foob;
             this.thisLobby = selectedLobby;
             messageList.Document.Blocks.Clear();
-            
             
             List<string> lobbyMessages = foob.GetMessage(null, currUser, thisLobby);
             currentMessage = lobbyMessages;
@@ -56,7 +61,8 @@ namespace GameClient
             //get all users to populate user box
             //load current chat history
 
-
+            timer = new Timer(Refresh);
+            timer.Change(0, 250);
         }
 
         private void logOutBtn_Click(object sender, RoutedEventArgs e)
@@ -201,17 +207,61 @@ namespace GameClient
             }
         }
 
+        private void UpdateGUI(List<string> users, List<string> files)
+        {
+            //Clear old values
+            this.Dispatcher.Invoke(() => {
+                messageList.Document.Blocks.Clear();
+                filesList.Document.Blocks.Clear();
+
+                //Update messages
+                foreach (string msgItem in currentMessage)
+                {
+                    // Create a new paragraph for each message item
+                    var paragraph = new Paragraph(new Run(msgItem));
+                    messageList.Document.Blocks.Add(paragraph);
+                }
+
+                //update users
+                userlistBox.ItemsSource = users;
+                
+                foreach (string fileName in files)
+                {
+                    AddFileToRichTextBox(fileName);  // Reuse the existing helper method
+                }
+            });
+        }
+
         private void refreshBtn_click(object sender, RoutedEventArgs e)
+        {
+            //// Update messages from server
+            //currentMessage = foob.GetMessage(currUser, selectedUser, thisLobby);
+            //displayMsgs();
+
+            //// Update users in the server
+            //updateUsers();
+
+            //// Update the file list in the RichTextBox
+            //updateFiles();
+        }
+
+        private void Refresh(Object stateInfo)
         {
             // Update messages from server
             currentMessage = foob.GetMessage(currUser, selectedUser, thisLobby);
-            displayMsgs();
+            //displayMsgs();
 
             // Update users in the server
-            updateUsers();
+            List<string> lobbyList = foob.GetUsers(thisLobby);
+            lobbyList.Remove(currUser);
+            lobbyList.Add("Lobby");
 
-            // Update the file list in the RichTextBox
-            updateFiles();
+            // Update the files
+            List<string> uploadedFiles = foob.GetLobbyFiles(thisLobby);
+
+            //Update GUI with new figures
+            UpdateGUI(lobbyList, uploadedFiles);
+            
         }
 
         // Helper method to update the file list
@@ -243,6 +293,12 @@ namespace GameClient
             lobbyList.Remove(currUser);
             lobbyList.Add("Lobby");
             userlistBox.ItemsSource = lobbyList;
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+            timer.Dispose();
         }
 
     }

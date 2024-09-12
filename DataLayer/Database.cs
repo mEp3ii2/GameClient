@@ -40,6 +40,7 @@ namespace DataLayer
 
         public Database()
         {
+
             lobbies = new List<Lobby>();
             User user1 = new User("George");
             User user2 = new User("Clooney");
