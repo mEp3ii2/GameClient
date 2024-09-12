@@ -131,6 +131,7 @@ namespace GameClient
             }
         }
 
+<<<<<<< HEAD
         // Helper method to add the file as a hyperlink to the RichTextBox
         private void AddFileToRichTextBox(string fileName)
         {
@@ -146,6 +147,8 @@ namespace GameClient
             filesList.Document.Blocks.Add(paragraph);
         }
 
+=======
+>>>>>>> DevRyanA
         // Handle hyperlink click event to open the file
         private async void Hyperlink_Click(object sender, RoutedEventArgs e)
         {
@@ -159,19 +162,47 @@ namespace GameClient
             }
         }
 
+<<<<<<< HEAD
         // Open the file using the default application for its type
         private async Task OpenFileAsync(string fileName)
+=======
+        private void LoadSharedFiles()
+        {
+            List<string> uploadedFiles = foob.GetLobbyFiles(thisLobby);  // Fetch file names only
+            foreach (string fileName in uploadedFiles)
+            {
+                AddFileToRichTextBox(fileName);  // Display as clickable hyperlinks
+            }
+        }
+
+        private void AddFileToRichTextBox(string fileName)
+        {
+            Paragraph paragraph = new Paragraph();
+            Hyperlink link = new Hyperlink(new Run(fileName));
+            link.Click += (s, args) => OpenFile(fileName);  // Download and open the file on click
+            paragraph.Inlines.Add(link);
+            filesList.Document.Blocks.Add(paragraph);  // Add hyperlink to file list
+        }
+
+        private void OpenFile(string fileName)
+>>>>>>> DevRyanA
         {
             try
             {
-                // Download the file and save it locally before opening
                 string filePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Downloads", fileName);
+<<<<<<< HEAD
                 byte[] fileData = await foob.DownloadFileAsync(fileName);  // Download the file from the server
                 Directory.CreateDirectory(System.IO.Path.GetDirectoryName(filePath));  // Ensure directory exists
                 File.WriteAllBytes(filePath, fileData);  // Save the file locally
 
                 // Now open the file with the default application for its type
                 Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
+=======
+                byte[] fileData = foob.DownloadFile(fileName);  // Fetch file data from server when needed
+                Directory.CreateDirectory(System.IO.Path.GetDirectoryName(filePath));
+                File.WriteAllBytes(filePath, fileData);  // Write file locally
+                Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });  // Open file
+>>>>>>> DevRyanA
             }
             catch (Exception ex)
             {
@@ -179,6 +210,7 @@ namespace GameClient
             }
         }
 
+<<<<<<< HEAD
         // Method to load shared files when re-entering the lobby
         private async Task LoadSharedFilesAsync()
         {
@@ -198,6 +230,9 @@ namespace GameClient
         }
 
         private async Task DownloadFileAsync(string fileName)
+=======
+        private void DownloadFile(string fileName)
+>>>>>>> DevRyanA
         {
             try
             {

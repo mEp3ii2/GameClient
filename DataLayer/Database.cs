@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
@@ -239,11 +240,20 @@ namespace DataLayer
         {
             return users.Count;
         }
-        
 
+        public void SaveFilePath(string fileName, Lobby lobby)
+        {
+            string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SharedFiles", fileName);
+            Directory.CreateDirectory(Path.GetDirectoryName(filePath));  // Ensure the directory exists
 
-        //public void addFile(int lobbyID,!fileDetails here not sure yet)
+            Lobby currentLobby = getLobby(lobby);
+            currentLobby?.AddFile(filePath);  // Store the file path instead of file content
+        }
 
-        
+        public List<string> GetLobbyFilePaths(Lobby lobby)
+        {
+            Lobby searchLobby = getLobby(lobby);
+            return searchLobby?.UploadedFiles ?? new List<string>();
+        }
     }
 }

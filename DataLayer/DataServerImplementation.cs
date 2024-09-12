@@ -142,13 +142,29 @@ namespace DataLayer
             await Task.Run(() => currentLobby?.AddFile(fileName));  // Add the file to the lobby's list of uploaded files
         }
 
+<<<<<<< HEAD
         public async Task<byte[]> DownloadFileAsync(string fileName)
+=======
+        // Retrieve the list of previously uploaded files for a given lobby
+        public List<string> GetLobbyFiles(Lobby lobby)
+        {
+            Lobby searchLobby = database.getLobby(lobby);
+            return searchLobby?.UploadedFiles ?? new List<string>();  // Return file names only
+        }
+
+        // Add file download method
+        public byte[] downloadFile(string fileName)
+>>>>>>> DevRyanA
         {
             string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SharedFiles", fileName);
             if (File.Exists(filePath))
             {
                 Log($"File {fileName} downloaded from {filePath}");
+<<<<<<< HEAD
                 return await Task.FromResult(File.ReadAllBytes(filePath)); // Synchronous version used here
+=======
+                return File.ReadAllBytes(filePath);  // Send file data only when requested
+>>>>>>> DevRyanA
             }
             else
             {
