@@ -1,6 +1,7 @@
 ﻿using GameLobbyLib;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.ServiceModel;
@@ -80,5 +81,12 @@ namespace BusinessLayer
 
         [OperationContract]
         int GetUserCount();
+
+
+        [OperationContract]
+        Stream DownloadFile2(string fileName);
+
+        [OperationContract]
+        void UploadFile2(Stream fileStream, string fileName,string lobbyName);
     }
 }

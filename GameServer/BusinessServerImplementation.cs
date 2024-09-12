@@ -155,6 +155,19 @@ namespace BusinessLayer
             return foob.downloadFile(fileName);
         }
 
+        public Stream DownloadFile2(string fileName)
+        {
+            Log($"Received file download request: {fileName}");
+            return foob.DownloadFile2(fileName);
+        }
+
+        public void UploadFile2(Stream fileStream, string fileName, string lobbyName)
+        {
+            Lobby lobby = foob.GetLobby(lobbyName);
+            // Delegate to the data server with the lobby name
+            foob.saveFile2(fileName, fileStream, lobby);
+        }
+
         public void UpdateMessage(List<string> messageText, string lobbyName, string userName1, string userName2)
         {
             User user1 = foob.GetUser(userName1 );
@@ -172,6 +185,7 @@ namespace BusinessLayer
             foob.joinLobby(lobby,user);
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public List<string> GetMessage(string userName1, string userName2, string lobbyName)
         {
             User user1 = foob.GetUser(userName1);
@@ -192,5 +206,7 @@ namespace BusinessLayer
         {
             return foob.GetUserCount();
         }
+
+        
     }
 }

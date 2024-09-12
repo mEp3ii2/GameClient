@@ -1,6 +1,7 @@
 ﻿using GameLobbyLib;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.ServiceModel;
 using System.Text;
@@ -79,5 +80,10 @@ namespace DataLayer
 
         [OperationContract]
         int GetUserCount();
+
+        [OperationContract]
+        Stream DownloadFile2(string fileName);
+        [OperationContract]
+        void saveFile2(string fileName, Stream fileData, Lobby lobby);
     }
 }

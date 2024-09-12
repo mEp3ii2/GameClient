@@ -143,6 +143,22 @@ namespace DataLayer
             Lobby currentLobby = database.getLobby(lobby);
             currentLobby?.AddFile(fileName);  // Add the file to the lobby's list of uploaded files
         }
+        
+
+        public void saveFile2(string fileName, Stream fileData, Lobby lobby)
+        {
+            string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SharedFiles", fileName);
+            Directory.CreateDirectory(Path.GetDirectoryName(filePath));  // Ensure the directory exists
+            using (FileStream outputFileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+            {
+                fileData.CopyTo(outputFileStream);  // Copy the incoming stream to the file
+            }
+            Log($"File {fileName} saved to {filePath}");
+
+            // Retrieve the current lobby using the passed lobby name
+            Lobby currentLobby = database.getLobby(lobby);
+            currentLobby?.AddFile(fileName);  // Add the file to the lobby's list of uploaded files
+        }
 
         // Retrieve the list of previously uploaded files for a given lobby
         public List<string> GetLobbyFiles(Lobby lobby)
@@ -166,6 +182,22 @@ namespace DataLayer
             }
         }
 
+        public Stream DownloadFile2(string fileName)
+        {
+            string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SharedFiles", fileName);
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SharedFiles", fileName);
+            if (File.Exists(filePath))
+            {
+                Log($"File {fileName} downloaded from {filePath}");
+                FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+                return fileStream;
+            }
+            else
+            {
+                throw new FileNotFoundException($"File {fileName} not found.");
+            }
+        }
+
         [MethodImpl(MethodImplOptions.Synchronized)]
         private void Log(string logString)
         {
@@ -178,5 +210,7 @@ namespace DataLayer
         {
             return database.GetUserCount();
         }
+
+       
     }
 }

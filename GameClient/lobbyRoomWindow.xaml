@@ -21,18 +21,13 @@
             </FlowDocument>
         </RichTextBox>
         <Button x:Name="attachmentBtn" Content="Attachment" HorizontalAlignment="Left" Height="24" Margin="691,378,0,0" VerticalAlignment="Top" Width="99" Click="attachmentBtn_Click"/>
-        <ListBox x:Name="filesList" Height="302" Margin="691,34,10,0" VerticalAlignment="Top" Width="149" SelectionChanged="filesList_SelectionChanged">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock>
-                <Hyperlink>
-                    <!-- This makes the item look like a hyperlink -->
-                    <TextBlock Text="{Binding}" Foreground="Blue" TextDecorations="Underline" />
-                </Hyperlink>
-            </TextBlock>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+        <RichTextBox x:Name="filesList" Height="302" Margin="691,34,10,0" VerticalAlignment="Top" Width="149" IsDocumentEnabled="True" >
+            <FlowDocument>
+                <Paragraph>
+                    <Run Text=""/>
+                </Paragraph>
+            </FlowDocument>
+        </RichTextBox>
         <Label Content="Files" HorizontalAlignment="Left" Height="25" Margin="691,11,0,0" VerticalAlignment="Top" Width="149"/>
         <ListBox x:Name="userlistBox" Margin="10,34,671,148" SelectionChanged="userlistBox_SelectionChanged"/>
         <Button HorizontalAlignment="Left" Margin="642,8,0,0" VerticalAlignment="Top" Name="refreshBtn" Height="21" Width="44" Click="refreshBtn_click">

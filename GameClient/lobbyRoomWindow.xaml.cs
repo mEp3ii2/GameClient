@@ -1,4 +1,4 @@
-﻿using GameLobbyLib;
+﻿﻿using GameLobbyLib;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -24,6 +24,7 @@ using System.Xml.Serialization;
 using System.Threading;
 using System.Timers;
 using Timer = System.Threading.Timer;
+using System.Windows.Navigation;
 
 namespace GameClient
 {
@@ -31,21 +32,21 @@ namespace GameClient
     /// Interaction logic for lobbyRoomWindow.xaml
     /// </summary>
     public partial class lobbyRoomWindow : Window
-    {   
+    {
         private string currUser, selectedUser;
         private IBusinessServerInterface foob;
         private List<string> currentMessage;
         private string thisLobby;
         private Timer timer;
-        public lobbyRoomWindow(string selectedLobby) 
+        public lobbyRoomWindow(string selectedLobby)
         {
-            
+
             InitializeComponent();
             this.currUser = App.Instance.UserName;
             this.foob = App.Instance.foob;
             this.thisLobby = selectedLobby;
             messageList.Document.Blocks.Clear();
-            
+
             List<string> lobbyMessages = foob.GetMessage(null, currUser, thisLobby);
             currentMessage = lobbyMessages;
             displayMsgs();
@@ -83,38 +84,73 @@ namespace GameClient
         private void messageBtn_Click(object sender, RoutedEventArgs e)
         {
             refreshBtn_click(sender, e);
-            string msg =$"{currUser}: {userMessageBox.Text.ToString()}\n";
+            string msg = $"{currUser}: {userMessageBox.Text.ToString()}\n";
             currentMessage.Add(msg);
             foob.UpdateMessage(currentMessage, thisLobby, currUser, selectedUser);
             displayMsgs();
-            userMessageBox.Clear();
         }
 
         // Upload file button click handler
         private void attachmentBtn_Click(object sender, RoutedEventArgs e)
         {
+            const int maxFileSizeInMB = 5;
+            const int maxFileSizeInBytes = maxFileSizeInMB * 1024 * 1024;
             OpenFileDialog openFileDialog = new OpenFileDialog();
+            
             if (openFileDialog.ShowDialog() == true)
             {
-                string filePath = openFileDialog.FileName;
-                byte[] fileData = File.ReadAllBytes(filePath);
-                string fileName = System.IO.Path.GetFileName(filePath);
+                if(new FileInfo(openFileDialog.FileName).Length > maxFileSizeInBytes)
+                {
+                    MessageBox.Show("File size exceeds 5 MB limit");
+                    return;
+                }
+                try
+                {
+                    string filePath = openFileDialog.FileName;
+                    string fileName = System.IO.Path.GetFileName(filePath);
 
-                // Pass the lobby name when uploading the file
-                foob.UploadFile(fileData, fileName, thisLobby);
+                    // Open the file as a stream
+                    using (FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                    {
+                        // Upload the file using a stream
+                        foob.UploadFile2(fileStream, fileName, thisLobby);
+                    }
 
-                // Immediately display the uploaded file as a clickable hyperlink in the file list
-                AddFileToListBox(fileName);
+                    // Immediately display the uploaded file as a clickable hyperlink in the file list
+                    AddFileToRichTextBox(fileName);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error uploading file: {ex.Message}");
+                }
+
             }
         }
 
         // Helper method to add the file as a hyperlink to the RichTextBox
-        private void AddFileToListBox(string fileName)
+        private void AddFileToRichTextBox(string fileName)
         {
+            Paragraph paragraph = new Paragraph();
+            Hyperlink link = new Hyperlink(new Run(fileName))
+            {
+                NavigateUri = new Uri(fileName, UriKind.Relative)
+
+            };
+            //link.RequestNavigate += Hyperlink_RequestNavigate;
+            link.Click += (s, args) => OpenFile(fileName);  // Set up the click event handler
+            paragraph.Inlines.Add(link);
+
             // Add the hyperlink to the RichTextBox for file list
-            filesList.Items.Add(fileName);
+            filesList.Document.Blocks.Add(paragraph);
         }
 
+        private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+        {
+            MessageBox.Show("It worked");
+            /*string fileName = e.Uri.ToString();
+            OpenFile(fileName);
+            e.Handled = true;*/
+        }
         // Handle hyperlink click event to open the file
         private void Hyperlink_Click(object sender, RoutedEventArgs e)
         {
@@ -133,13 +169,21 @@ namespace GameClient
         {
             try
             {
-                // Download the file and save it locally before opening
+                // Define the local path to save the file
                 string filePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Downloads", fileName);
-                byte[] fileData = foob.DownloadFile(fileName);  // Download the file from the server
-                Directory.CreateDirectory(System.IO.Path.GetDirectoryName(filePath));  // Ensure directory exists
-                File.WriteAllBytes(filePath, fileData);  // Save the file locally
+                Directory.CreateDirectory(System.IO.Path.GetDirectoryName(filePath));  // Ensure the directory exists
 
-                // Now open the file with the default application for its type
+                // Open the stream from the server to download the file
+                using (Stream fileStream = foob.DownloadFile2(fileName))  // Download the file as a stream from the server
+                {
+                    // Save the incoming stream to a local file
+                    using (FileStream outputFileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+                    {
+                        fileStream.CopyTo(outputFileStream);  // Copy the data from the downloaded stream to the file
+                    }
+                }
+
+                // Open the downloaded file with the default application
                 Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
             }
             catch (Exception ex)
@@ -154,11 +198,14 @@ namespace GameClient
             // Fetch the list of previously shared files for the current lobby
             List<string> uploadedFiles = foob.GetLobbyFiles(thisLobby);  // Ensure thisLobby.Name is passed correctly
 
-            filesList.Items.Clear();
             // Display each file as a clickable hyperlink
             foreach (string fileName in uploadedFiles)
             {
-                filesList.Items.Add(fileName);  // Add the paragraph to the RichTextBox
+                Paragraph paragraph = new Paragraph();
+                Hyperlink link = new Hyperlink(new Run(fileName));
+                link.Click += (s, args) => OpenFile(fileName);  // Set up the click event handler
+                paragraph.Inlines.Add(link);
+                filesList.Document.Blocks.Add(paragraph);  // Add the paragraph to the RichTextBox
             }
         }
 
@@ -187,7 +234,7 @@ namespace GameClient
         {
             // user has selected user or lobby
             // change message box to relect chat with said entity
-            if (userlistBox.SelectedItem==null || userlistBox.SelectedItem.Equals("lobby"))
+            if (userlistBox.SelectedItem == null || userlistBox.SelectedItem.Equals("lobby"))
             {
                 selectedUser = null;
             }
@@ -232,7 +279,7 @@ namespace GameClient
 
                 //update users
                 userlistBox.ItemsSource = users;
-                
+
                 foreach (string fileName in files)
                 {
                     AddFileToRichTextBox(fileName);  // Reuse the existing helper method
@@ -255,28 +302,36 @@ namespace GameClient
 
         private void Refresh(Object stateInfo)
         {
-            // Update messages from server
-            currentMessage = foob.GetMessage(currUser, selectedUser, thisLobby);
-            //displayMsgs();
+            try
+            {
+                // Update messages from server
+                currentMessage = foob.GetMessage(currUser, selectedUser, thisLobby);
+                //displayMsgs();
 
-            // Update users in the server
-            List<string> lobbyList = foob.GetUsers(thisLobby);
-            lobbyList.Remove(currUser);
-            lobbyList.Add("Lobby");
+                // Update users in the server
+                List<string> lobbyList = foob.GetUsers(thisLobby);
+                lobbyList.Remove(currUser);
+                lobbyList.Add("Lobby");
 
-            // Update the files
-            List<string> uploadedFiles = foob.GetLobbyFiles(thisLobby);
+                // Update the files
+                List<string> uploadedFiles = foob.GetLobbyFiles(thisLobby);
 
-            //Update GUI with new figures
-            UpdateGUI(lobbyList, uploadedFiles);
+                //Update GUI with new figures
+                UpdateGUI(lobbyList, uploadedFiles);
+            }
+            catch (CommunicationObjectFaultedException)
+            {
+                //
+            }
             
+
         }
 
         // Helper method to update the file list
         private void updateFiles()
         {
             // Clear the existing file list from the RichTextBox
-            filesList.Items.Clear();
+            filesList.Document.Blocks.Clear();
 
             // Retrieve the list of uploaded files for the current lobby
             List<string> uploadedFiles = foob.GetLobbyFiles(thisLobby);
@@ -284,32 +339,15 @@ namespace GameClient
             // Display each file as a clickable hyperlink in the RichTextBox
             foreach (string fileName in uploadedFiles)
             {
-                filesList.Items.Add(fileName);  // Reuse the existing helper method
+                AddFileToRichTextBox(fileName);  // Reuse the existing helper method
             }
         }
 
-        //depreciated 
         private void app_Exit(object sender, CancelEventArgs e)
         {
             //foob.RemoveUserFromLobby(thisLobby,currUser);
             //foob.RemoveUser(currUser);
 
-        }
-
-        private void filesList_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (filesList.SelectedItem != null)
-            {
-                string fileName = filesList.SelectedItem.ToString();
-                if (!string.IsNullOrEmpty(fileName))
-                {
-                    MessageBoxResult result = MessageBox.Show($"Do you want to download {fileName}", "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question);
-                    if (result == MessageBoxResult.Yes)
-                    {
-                        DownloadFile(fileName);
-                    }
-                }
-            }
         }
 
         private void updateUsers()
@@ -320,11 +358,14 @@ namespace GameClient
             userlistBox.ItemsSource = lobbyList;
         }
 
+
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
             timer.Dispose();
         }
-
     }
 }
+
+
+
