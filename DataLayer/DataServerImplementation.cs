@@ -145,19 +145,27 @@ namespace DataLayer
         }
         
 
-        public void saveFile2(string fileName, Stream fileData, Lobby lobby)
+        public void saveFile2(Stream fileData)
         {
-            string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SharedFiles", fileName);
-            Directory.CreateDirectory(Path.GetDirectoryName(filePath));  // Ensure the directory exists
-            using (FileStream outputFileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+            if(fileData is FileStreamCustom customFileStream)
             {
-                fileData.CopyTo(outputFileStream);  // Copy the incoming stream to the file
-            }
-            Log($"File {fileName} saved to {filePath}");
+                string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SharedFiles", customFileStream.FileName);
+                string fileName = customFileStream.FileName;  // The file name from the stream
+                string lobby = customFileStream.lobbyName;
 
-            // Retrieve the current lobby using the passed lobby name
-            Lobby currentLobby = database.getLobby(lobby);
-            currentLobby?.AddFile(fileName);  // Add the file to the lobby's list of uploaded files
+                Directory.CreateDirectory(Path.GetDirectoryName(filePath));  // Ensure the directory exists
+
+                using (FileStream outputFileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+                {
+                    customFileStream.CopyTo(outputFileStream);  // Copy the incoming stream to the file
+                }
+                Log($"File {fileName} saved to {filePath}");
+
+                // Retrieve the current lobby using the passed lobby name
+                Lobby currentLobby = database.getLobby(lobby);
+                currentLobby?.AddFile(fileName);  // Add the file to the lobby's list of uploaded files
+            }
+            
         }
 
         // Retrieve the list of previously uploaded files for a given lobby
@@ -185,11 +193,11 @@ namespace DataLayer
         public Stream DownloadFile2(string fileName)
         {
             string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SharedFiles", fileName);
-            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SharedFiles", fileName);
+            
             if (File.Exists(filePath))
             {
                 Log($"File {fileName} downloaded from {filePath}");
-                FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+                FileStreamCustom fileStream = new FileStreamCustom(filePath, FileMode.Open, FileAccess.Read, null, null);
                 return fileStream;
             }
             else

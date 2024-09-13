@@ -161,11 +161,10 @@ namespace BusinessLayer
             return foob.DownloadFile2(fileName);
         }
 
-        public void UploadFile2(Stream fileStream, string fileName, string lobbyName)
+        public void UploadFile2(Stream fileStream)
         {
-            Lobby lobby = foob.GetLobby(lobbyName);
             // Delegate to the data server with the lobby name
-            foob.saveFile2(fileName, fileStream, lobby);
+            foob.saveFile2(fileStream);
         }
 
         public void UpdateMessage(List<string> messageText, string lobbyName, string userName1, string userName2)

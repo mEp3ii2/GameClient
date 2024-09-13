@@ -84,6 +84,6 @@ namespace DataLayer
         [OperationContract]
         Stream DownloadFile2(string fileName);
         [OperationContract]
-        void saveFile2(string fileName, Stream fileData, Lobby lobby);
+        void saveFile2(Stream fileData);
     }
 }

@@ -62,8 +62,8 @@ namespace GameClient
             //get all users to populate user box
             //load current chat history
 
-            timer = new Timer(Refresh);
-            timer.Change(0, 250);
+            //timer = new Timer(Refresh);
+            //timer.Change(0, 250);
         }
 
         private void logOutBtn_Click(object sender, RoutedEventArgs e)
@@ -110,10 +110,10 @@ namespace GameClient
                     string fileName = System.IO.Path.GetFileName(filePath);
 
                     // Open the file as a stream
-                    using (FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                    using (FileStreamCustom fileStream = new FileStreamCustom(filePath, FileMode.Open,thisLobby,fileName))
                     {
                         // Upload the file using a stream
-                        foob.UploadFile2(fileStream, fileName, thisLobby);
+                        foob.UploadFile2(fileStream);
                     }
 
                     // Immediately display the uploaded file as a clickable hyperlink in the file list

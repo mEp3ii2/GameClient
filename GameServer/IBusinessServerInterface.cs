@@ -87,6 +87,6 @@ namespace BusinessLayer
         Stream DownloadFile2(string fileName);
 
         [OperationContract]
-        void UploadFile2(Stream fileStream, string fileName,string lobbyName);
+        void UploadFile2(Stream fileStream);
     }
 }
