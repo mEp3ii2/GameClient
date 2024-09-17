@@ -21,7 +21,7 @@ namespace BusinessLayer
         public BusinessServerImplementation() {
 
             ChannelFactory<IDataServerInterface> foobFactory;
-            NetTcpBinding tcp = new NetTcpBinding();
+            NetTcpBinding tcp = BindingHelper.CreateLargeFileBinding();
             string URL = "net.tcp://localhost:8200/DataService";
             foobFactory = new ChannelFactory<IDataServerInterface>(tcp, URL);
             foob = foobFactory.CreateChannel();
