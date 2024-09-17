@@ -39,7 +39,8 @@ This project consists of two main components:
    git clone https://github.com/mEp3ii2/GameClient
    ```
 2. Open the solution in Visual Studio.
-3. Build the solution to restore any missing dependencies.
+3. Change from Single startUp project to multiple startup project with DataLayer at the top followed by Businesslayer and then GameClient. 
+4. Build the solution to restore any missing dependencies.
 
 ### Running the Application
 1. **Server**: Start the Gaming Lobby Server project to initiate the server.
