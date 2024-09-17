@@ -74,20 +74,9 @@ namespace GameClient
         */
         private void Refresh(Object stateInfo)
         {
-            currentList = foob.GetAllLobbies();
+            currentList = foob.GetfilterdLobbiesList(mode: currentModeFilter, tag: currentTagFilter);
 
-            List<string> modelist = new List<string> { "" };
-            List<string> modes = foob.GetUniqueModes(null);
-            modelist.AddRange(modes);
-
-            List<string> tagList = new List<string> { "" };
-            List<string> tags = foob.GetUniqueTags(null);
-            tagList.AddRange(tags);
-
-            currentModeFilter = null;
-            currentTagFilter = null;
-
-            UpdateGUI(modelist, tagList, currentList.Count);
+            UpdateGUI(currentList.Count);
         }
 
         /**
@@ -97,13 +86,11 @@ namespace GameClient
         Notes: Updates the user interface with the latest list of lobbies, modes, and tags.
         Algorithm: Uses the Dispatcher to invoke the update on the UI thread, updating the lobby list, mode filter, and tag filter.
         */
-        private void UpdateGUI(List<string> modelist, List<string> tagList, int lobbyCount)
+        private void UpdateGUI(int lobbyCount)
         {
             this.Dispatcher.Invoke(() =>
             {
                 lobbyList.ItemsSource = currentList;
-                modeFilterBox.ItemsSource = modelist;
-                tagFilterBox.ItemsSource = tagList;
                 lobbyCountLabel.Content = $"Active Lobbies: {lobbyCount}";
             });
         }
