@@ -1,4 +1,12 @@
-﻿using System;
+﻿/**
+Names: L Kipling (20899932), R Mackintosh (21171466), M Pontague (19126924)
+Date: 17 September 2024
+Class: createLobbyWindow
+Purpose: Handles the creation of new lobby rooms in the gaming lobby client application. Users can input details for the lobby, such as name, description, and tags.
+Notes: This class communicates with the business layer to create lobbies and join users to the created lobby.
+*/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
@@ -28,44 +36,45 @@ namespace GameClient
         private string roomName;
         private List<string> tags;
         private IBusinessServerInterface foob;
-        
+
+        /**
+        Method: createLobbyWindow (Constructor)
+        Imports: None
+        Exports: None
+        Notes: Initializes the createLobbyWindow class, setting up the communication with the business server and loading mode types and tag types for selection.
+        Algorithm: Sets up references to the communication interface and loads available game modes and tags.
+        */
         public createLobbyWindow()
         {
             InitializeComponent();
 
             this.foob = App.Instance.foob;
-            //passing foob instead
-            /*ChannelFactory<BusinessServerInterface> foobFactory;
-            NetTcpBinding tcp = new NetTcpBinding();
-            string URL = "net.tcp://localhost:8100/GameService";
-            foobFactory = new ChannelFactory<BusinessServerInterface>(tcp, URL);
-            foob = foobFactory.CreateChannel();
-            */
             this.currUser = App.Instance.UserName;
-            
-            modeSelBox.ItemsSource = foob.GetAllModeTypes();
-            //tagSelBox.ItemsSource = Database.getAllTagTypes();
-            
 
+            modeSelBox.ItemsSource = foob.GetAllModeTypes();
             optionsBox.ItemsSource = foob.GetAllTagTypes();
         }
 
+        /**
+        Method: submitBtn_Click
+        Imports: sender (object), e (RoutedEventArgs)
+        Exports: None
+        Notes: Handles the submission of the lobby creation form by gathering input values (room name, mode, tags) and sending a request to the server to create the lobby.
+        Algorithm: The method retrieves values from the form fields, adds the lobby through the business interface, joins the user to the newly created lobby, and opens the lobby room window.
+        */
         private void submitBtn_Click(object sender, RoutedEventArgs e)
         {
             mode = modeSelBox.SelectedItem as string;
-            List<string> temp = new List<string>();
-            
-            tags = new List<string>();
             tags = optionsBox.SelectedItems.Cast<string>().ToList();
-            
-            string tagString= "";
+
+            string tagString = "";
             foreach (string tag in tags)
             {
-                tagString = tagString+tag;
+                tagString += tag;
             }
             roomName = nameTxtBox.Text;
             desc = descTxtBox.Text;
-            MessageBox.Show(mode+" "+tagString + " " +roomName + " " + desc);
+            MessageBox.Show(mode + " " + tagString + " " + roomName + " " + desc);
             foob.AddLobby(roomName, desc, mode, tags);
             foob.joinLobby(roomName, currUser);
             lobbyRoomWindow curWindow = new lobbyRoomWindow(roomName);
@@ -73,6 +82,13 @@ namespace GameClient
             this.Close();
         }
 
+        /**
+        Method: clearBtn_Click
+        Imports: sender (object), e (RoutedEventArgs)
+        Exports: None
+        Notes: Clears the input fields in the lobby creation form.
+        Algorithm: The method clears the text boxes and deselects any selected options in the form.
+        */
         private void clearBtn_Click(object sender, RoutedEventArgs e)
         {
             nameTxtBox.Clear();
@@ -81,6 +97,13 @@ namespace GameClient
             optionsBox.SelectedItems.Clear();
         }
 
+        /**
+        Method: backBtn_Click
+        Imports: sender (object), e (RoutedEventArgs)
+        Exports: None
+        Notes: Navigates back to the lobby finder window when the user clicks the back button.
+        Algorithm: Closes the current window and opens the lobbyFinderWindow.
+        */
         private void backBtn_Click(object sender, RoutedEventArgs e)
         {
             lobbyFinderWindow curWindow = new lobbyFinderWindow();
